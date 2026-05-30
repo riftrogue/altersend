@@ -1,0 +1,115 @@
+import Protomux, { type ProtomuxMessage } from 'protomux'
+import type { PeerSocket } from 'hyperswarm'
+import c from 'compact-encoding'
+import { isValidControlMessage } from './control-validation'
+
+export const PROTOCOL_VERSION = 1
+
+export interface FileOffer {
+  id: string
+  transferId: string
+  name: string
+  path: string
+  size: number
+  driveKey: string
+  content?: string
+}
+
+export interface TransferReady {
+  type: 'transfer-ready'
+  transferId: string
+  files: FileOffer[]
+}
+
+export interface TransferStart {
+  type: 'transfer-start'
+  transferId: string
+  totalFiles: number
+  totalBytes: number
+}
+
+export interface DownloadRequest {
+  type: 'download-request'
+  transferId: string
+  fileId: string
+  fileName: string
+  path: string
+  totalBytes: number
+}
+
+export interface DownloadProgress {
+  type: 'download-progress'
+  transferId: string
+  fileId: string
+  fileName: string
+  bytesTransferred: number
+  totalBytes: number
+}
+
+export interface DownloadComplete {
+  type: 'download-complete'
+  transferId: string
+  fileId: string
+  fileName: string
+  savedTo: string
+}
+
+export interface DownloadFailed {
+  type: 'download-failed'
+  transferId: string
+  fileId: string
+  fileName: string
+  message: string
+}
+
+export type PeerControlMessage =
+  | TransferStart
+  | TransferReady
+  | DownloadRequest
+  | DownloadProgress
+  | DownloadComplete
+  | DownloadFailed
+
+type PeerControlHandler = (message: PeerControlMessage) => void
+
+export class PeerControlChannel {
+  private readonly message: ProtomuxMessage
+
+  constructor(message: ProtomuxMessage) {
+    this.message = message
+  }
+
+  static create(socket: PeerSocket, onmessage: PeerControlHandler): PeerControlChannel | null {
+    const mux = Protomux.from(socket)
+    const channel = mux.createChannel({
+      protocol: 'altersend/control'
+    })
+
+    if (!channel) return null
+
+    const message = channel.addMessage({
+      encoding: c.json,
+      onmessage: (raw: unknown) => {
+        if (!isValidControlMessage(raw)) {
+          const m = raw as { type?: unknown; protocolVersion?: unknown } | null
+          console.warn(
+            'PeerControlChannel: dropping invalid message',
+            'protocolVersion=',
+            m?.protocolVersion,
+            'type=',
+            m?.type
+          )
+          return
+        }
+        onmessage(raw)
+      }
+    })
+
+    channel.open()
+    return new PeerControlChannel(message)
+  }
+
+  send(message: PeerControlMessage): void {
+    this.message.send({ ...message, protocolVersion: PROTOCOL_VERSION })
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "appId": "com.altersend.desktop",
+  "electronVersion": "40.2.1",
+  "icon": "build/icon.png",
+  "asar": false,
+  "directories": {
+    "output": "out"
+  },
+  "files": [
+    "dist/**/*",
+    "package.json",
+    "!dist/**/*.map",
+    "!**/node_modules/react-native/**",
+    "!**/node_modules/react-native-*/**",
+    "!**/node_modules/@react-native/**",
+    "!**/node_modules/@expo/**",
+    "!**/node_modules/expo-*/**"
+  ],
+  "linux": {
+    "icon": "build/icon.png",
+    "target": ["AppImage"],
+    "artifactName": "${productName}-${arch}.${ext}"
+  },
+  "toolsets": {
+    "appimage": "1.0.2"
+  },
+  "afterPack": "scripts/afterPack.cjs"
+}

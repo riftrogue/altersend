@@ -1,0 +1,53 @@
+{
+  "name": "altersend",
+  "private": true,
+  "license": "Apache-2.0",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run desktop:dev",
+    "mobile": "npm run build -w packages/core && npm run build -w packages/domain && npm run build -w packages/components && npm run ios -w apps/mobile",
+    "mobile:setup": "npm run build -w packages/core && npm run setup:ios -w apps/mobile",
+    "mobile:start": "npm start -w apps/mobile",
+    "desktop:dev": "npm run build -w packages/core && npm run build -w packages/domain && npm run build -w packages/components && npm start -w apps/desktop",
+    "desktop:dev:peer2": "npm run build -w packages/core && npm run build -w packages/domain && npm run build -w packages/components && npm run start:peer2 -w apps/desktop",
+    "desktop:dev:peer3": "npm run build -w packages/core && npm run build -w packages/domain && npm run build -w packages/components && npm run start:peer3 -w apps/desktop",
+    "desktop:build": "npm run build -w packages/core && npm run build -w packages/domain && npm run build -w packages/components && npm run build -w apps/desktop",
+    "components:build": "npm run build -w packages/components",
+    "domain:build": "npm run build -w packages/domain",
+    "components:typecheck": "npm run typecheck -w packages/components",
+    "components:storybook": "npm run storybook -w packages/components",
+    "components:build-storybook": "npm run build-storybook -w packages/components",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm test --workspaces --if-present",
+    "lint": "eslint apps packages --max-warnings=0",
+    "format": "prettier --write \"apps/**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\" \"packages/**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"apps/**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\" \"packages/**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "check:tokens": "bash scripts/check-tokens.sh",
+    "knip": "knip",
+    "version:bump": "node scripts/bump-version.js",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "{apps,packages}/**/*.{ts,tsx,js,jsx}": "eslint --no-warn-ignored --max-warnings=0"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.4",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "husky": "^9.1.7",
+    "knip": "^6.14.1",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.0.0",
+    "typescript-eslint": "^8.59.2"
+  },
+  "version": "1.0.0",
+  "dependencies": {
+    "expo": "~55.0.15",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-native": "0.83.4"
+  }
+}

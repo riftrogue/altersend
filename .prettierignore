@@ -1,0 +1,26 @@
+node_modules
+dist
+build
+out
+coverage
+release
+.expo
+.next
+
+apps/desktop/dist
+apps/desktop/out
+apps/desktop/src/electron/sentry-dsn.gen.ts
+apps/mobile/ios
+apps/mobile/android
+apps/mobile/.expo
+
+# Generated from tokens.json by scripts/generate-tokens.mjs
+packages/components/src/theme/tokens.raw.ts
+packages/components/src/theme/tokens.css.ts
+packages/components/src/theme/themes/dark.ts
+packages/components/src/theme/themes/dark.css.ts
+packages/components/src/theme/themes/light.ts
+packages/components/src/theme/themes/light.css.ts
+
+package-lock.json
+*.log

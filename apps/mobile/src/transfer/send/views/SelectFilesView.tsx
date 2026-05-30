@@ -1,0 +1,153 @@
+import { useState } from 'react'
+import { View, StyleSheet, ActionSheetIOS, Alert, Platform } from 'react-native'
+import * as DocumentPicker from 'expo-document-picker'
+import * as ImagePicker from 'expo-image-picker'
+import {
+  addSelectedFiles,
+  removeSelectedFile,
+  useTransferStore,
+  type SelectedFile
+} from '@altersend/domain'
+import { DropZoneLink, ErrorBanner, FileDropZone, SendFileListRow } from '@altersend/components'
+
+function uriToFilePath(uri: string): string {
+  if (!uri.startsWith('file://')) return uri
+  const stripped = uri.slice('file://'.length)
+  try {
+    return decodeURIComponent(stripped)
+  } catch {
+    return stripped
+  }
+}
+
+export function SelectFilesView() {
+  const selectedFiles = useTransferStore((s) => s.selectedFiles)
+  const [selectionError, setSelectionError] = useState<string | null>(null)
+
+  const hasSelectedFiles = selectedFiles.length > 0
+
+  const pickFromFiles = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        multiple: true,
+        type: '*/*',
+        copyToCacheDirectory: false
+      })
+
+      if (result.canceled) return
+
+      const normalizedFiles: SelectedFile[] = result.assets.map((asset) => ({
+        name: asset.name,
+        path: uriToFilePath(asset.uri),
+        size: asset.size
+      }))
+
+      if (normalizedFiles.length > 0) {
+        setSelectionError(null)
+        addSelectedFiles(normalizedFiles)
+      }
+    } catch (error) {
+      setSelectionError('Failed to pick files')
+      console.error(error)
+    }
+  }
+
+  const pickFromPhotos = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images', 'videos'],
+        allowsMultipleSelection: true,
+        quality: 1,
+        exif: false
+      })
+
+      if (result.canceled) return
+
+      const normalizedFiles: SelectedFile[] = result.assets.map((asset) => ({
+        name: asset.fileName ?? asset.uri.split('/').pop() ?? 'photo',
+        path: uriToFilePath(asset.uri),
+        size: asset.fileSize
+      }))
+
+      if (normalizedFiles.length > 0) {
+        setSelectionError(null)
+        addSelectedFiles(normalizedFiles)
+      }
+    } catch (error) {
+      setSelectionError('Failed to pick photos')
+      console.error(error)
+    }
+  }
+
+  const browse = () => {
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['Cancel', 'Photos', 'Files'],
+          cancelButtonIndex: 0
+        },
+        (index) => {
+          if (index === 1) void pickFromPhotos()
+          else if (index === 2) void pickFromFiles()
+        }
+      )
+      return
+    }
+
+    Alert.alert('Add files', undefined, [
+      { text: 'Photos', onPress: () => void pickFromPhotos() },
+      { text: 'Files', onPress: () => void pickFromFiles() },
+      { text: 'Cancel', style: 'cancel' }
+    ])
+  }
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.dropZoneContainer}>
+        <FileDropZone
+          description={
+            hasSelectedFiles ? (
+              <>
+                Tap to <DropZoneLink>add more</DropZoneLink>
+              </>
+            ) : (
+              <>
+                Tap to <DropZoneLink>browse</DropZoneLink>
+              </>
+            )
+          }
+          hasFiles={hasSelectedFiles}
+          onClick={() => void browse()}
+          title={hasSelectedFiles ? 'Add more files' : 'Add files'}
+        />
+      </View>
+
+      {hasSelectedFiles && (
+        <View style={styles.fileList}>
+          {selectedFiles.map((file) => (
+            <SendFileListRow
+              key={file.path}
+              name={file.name}
+              onRemove={() => removeSelectedFile(file.path)}
+              size={file.size}
+            />
+          ))}
+        </View>
+      )}
+
+      <ErrorBanner message={selectionError} />
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  container: {
+    gap: 16
+  },
+  dropZoneContainer: {
+    padding: 1
+  },
+  fileList: {
+    gap: 8
+  }
+})

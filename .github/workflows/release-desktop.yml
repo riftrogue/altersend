@@ -1,0 +1,248 @@
+name: Release Desktop
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build packages
+        run: npm run build -w packages/core && npm run build -w packages/domain && npm run build -w packages/components
+
+      - name: Build desktop app
+        run: npm run build -w apps/desktop
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          VITE_DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Prune dev dependencies before packaging
+        run: |
+          npm prune --omit=dev
+          npm install electron@40.2.1 electron-builder@26.8.1 @electron/notarize@2.2.1 --no-save
+
+      - name: Install Apple signing certificate into a temp keychain
+        env:
+          MAC_CERTIFICATE_BASE64: ${{ secrets.MAC_CERTIFICATE_BASE64 }}
+          MAC_CERTIFICATE_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+        run: |
+          CERT_PATH="$RUNNER_TEMP/build_certificate.p12"
+          KEYCHAIN_PATH="$RUNNER_TEMP/app-signing.keychain-db"
+          KEYCHAIN_PASSWORD="$(openssl rand -base64 24)"
+
+          echo -n "$MAC_CERTIFICATE_BASE64" | base64 --decode -o "$CERT_PATH"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          security import "$CERT_PATH" -P "$MAC_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychain -d user -s "$KEYCHAIN_PATH"
+
+          echo "CSC_KEYCHAIN=$KEYCHAIN_PATH" >> "$GITHUB_ENV"
+
+      - name: Make macOS (arm64)
+        run: npm run dist:mac:arm64 -w apps/desktop
+        env:
+          CSC_NAME: "Devaprime LLC"
+          SKIP_NOTARIZE: "true"
+
+      - name: Make macOS (x64)
+        run: npm run dist:mac:x64 -w apps/desktop
+        env:
+          CSC_NAME: "Devaprime LLC"
+          SKIP_NOTARIZE: "true"
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: apps/desktop/out/**/*.dmg
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build packages
+        run: npm run build -w packages/core && npm run build -w packages/domain && npm run build -w packages/components
+
+      - name: Build desktop app
+        shell: bash
+        run: npm run build -w apps/desktop
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          VITE_DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Generate self-signed cert for MSIX
+        shell: pwsh
+        run: |
+          $cert = New-SelfSignedCertificate `
+            -Type CodeSigningCert `
+            -Subject "CN=FC1060C4-5ABD-47BF-A2C3-DBA96C1D853C" `
+            -KeyUsage DigitalSignature `
+            -CertStoreLocation "Cert:\CurrentUser\My" `
+            -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3", "2.5.29.19={text}")
+          $pfxPath = "$env:GITHUB_WORKSPACE\build-cert.pfx"
+          $password = ConvertTo-SecureString -String "buildcert" -Force -AsPlainText
+          Export-PfxCertificate -cert "Cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath $pfxPath -Password $password
+          "WINDOWS_CERTIFICATE_FILE=$pfxPath" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "WINDOWS_CERTIFICATE_PASSWORD=buildcert" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Make Windows
+        run: npm run dist:win:x64 -w apps/desktop
+        env:
+          DEBUG: electron-windows-msix*
+
+      - name: List Windows make output (debug)
+        if: always()
+        shell: bash
+        run: |
+          echo "=== files under apps/desktop/out/make ==="
+          find apps/desktop/out/make -type f 2>/dev/null || echo "(no out/make dir)"
+
+      - name: Upload Windows artifacts (unsigned)
+        id: upload-windows-unsigned
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-unsigned
+          path: |
+            apps/desktop/out/make/squirrel.windows/**/*
+            apps/desktop/out/AlterSend-win32-*/**/*.msix
+
+      # SignPath signing — only runs once `SIGNPATH_PROJECT_SLUG` repo variable is set.
+      # See docs/SIGNING.md for application and setup instructions.
+      - name: Sign with SignPath
+        if: vars.SIGNPATH_PROJECT_SLUG != ''
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG || 'release-signing' }}
+          artifact-configuration-slug: ${{ vars.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG || 'windows-installer' }}
+          github-artifact-id: ${{ steps.upload-windows-unsigned.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: signed-windows
+
+      - name: Upload signed Windows artifacts
+        if: vars.SIGNPATH_PROJECT_SLUG != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: signed-windows/**/*
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build packages
+        run: npm run build -w packages/core && npm run build -w packages/domain && npm run build -w packages/components
+
+      - name: Build desktop app
+        run: npm run build -w apps/desktop
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          VITE_DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Make Linux
+        run: npm run dist:linux:x64 -w apps/desktop
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: apps/desktop/out/**/*.AppImage
+
+  build-linux-arm64:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build packages
+        run: npm run build -w packages/core && npm run build -w packages/domain && npm run build -w packages/components
+
+      - name: Build desktop app
+        run: npm run build -w apps/desktop
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          VITE_DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Make Linux (arm64)
+        run: npm run dist:linux:arm64 -w apps/desktop
+
+      - name: Upload Linux arm64 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-arm64
+          path: apps/desktop/out/**/*.AppImage
+
+  release:
+    needs: [build-macos, build-windows, build-linux, build-linux-arm64]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read version
+        id: version
+        run: echo "value=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.value }}
+          name: v${{ steps.version.outputs.value }}
+          draft: true
+          files: |
+            artifacts/**/*.dmg
+            artifacts/**/*.exe
+            artifacts/**/*.AppImage
+            artifacts/**/*.apk

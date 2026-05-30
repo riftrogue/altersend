@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ESNext", "DOM"],
+    "types": ["vite/client"],
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "moduleSuffixes": [".web", ""],
+    "paths": {
+      "@altersend/domain": ["../../packages/domain/src"],
+      "@altersend/components": ["../../packages/components/src"],
+      "@altersend/components/icons": ["../../packages/components/src/icons"],
+      "@altersend/components/theme": ["../../packages/components/src/theme"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["dist", "node_modules"]
+}

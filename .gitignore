@@ -1,0 +1,71 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Testing
+coverage
+
+# Production
+dist
+build
+out
+.next
+.nuxt
+
+# Track desktop release resources (icons, AppRun, AppxManifest, entitlements)
+!apps/desktop/build
+!apps/desktop/build/**
+
+# Misc
+.DS_Store
+
+# Secrets — signing keys, certs, provisioning
+*.pem
+*.p8
+*.p12
+*.cer
+*.mobileprovision
+*.keystore
+*.jks
+AuthKey*.p8
+apple-asc-api-key.p8
+
+# Debug
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Env files
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# IDE
+.vscode
+.idea
+
+# Claude Code
+.claude/settings.local.json
+
+# Internal — not for the public repo
+app-marketing-context.md
+
+# Electron
+release
+apps/desktop/dist
+apps/desktop/out
+apps/desktop/src/electron/sentry-dsn.gen.ts
+
+apps/mobile/ios
+apps/mobile/android
+apps/mobile/.expo
+apps/mobile/bundles
+
+storage-2
+storage-3
+
+packages/components/storybook-static

@@ -1,0 +1,52 @@
+import { css } from 'react-strict-dom'
+import { tokens } from '../../theme/tokens.css'
+
+export const styles = css.create({
+  root: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: tokens.space15,
+    minHeight: tokens.space6,
+    paddingBlock: tokens.space05,
+    paddingInline: tokens.space25,
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderRadius: 7,
+    fontFamily: tokens.fontFamilySans,
+    fontSize: tokens.fontSizeSm,
+    fontWeight: tokens.fontWeightMedium,
+    lineHeight: tokens.lineHeightTight
+  },
+  neutral: {
+    backgroundColor: tokens.colorBackgroundSubtle,
+    borderColor: tokens.colorBorderPrimary,
+    color: tokens.colorTextSecondary
+  },
+  accent: {
+    backgroundColor: tokens.colorAccentSubtle,
+    borderColor: tokens.colorBorderStrong,
+    color: tokens.colorAccent
+  },
+  success: {
+    backgroundColor: tokens.colorSuccessSubtle,
+    borderColor: tokens.colorSuccess,
+    color: tokens.colorSuccess
+  },
+  danger: {
+    backgroundColor: tokens.colorDangerSubtle,
+    borderColor: tokens.colorDanger,
+    color: tokens.colorDanger
+  },
+  dot: {
+    width: tokens.space15,
+    height: tokens.space15,
+    borderRadius: tokens.radiusFull,
+    backgroundColor: 'currentColor',
+    flexShrink: 0
+  },
+  label: {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap'
+  }
+})

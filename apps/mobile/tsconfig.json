@@ -1,0 +1,21 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "moduleSuffixes": [".native", ".ios", ""],
+    "paths": {
+      "@/*": ["./*"],
+      "@altersend/core": ["../../packages/core/src"],
+      "@altersend/domain": ["../../packages/domain/src"],
+      "@altersend/components": ["../../packages/components/src"],
+      "@altersend/components/icons": ["../../packages/components/src/icons"],
+      "@altersend/components/theme": ["../../packages/components/src/theme"]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "../../packages/core/src/types.d.ts",
+    "../../packages/components/src/types/react-strict-dom-babel-preset.d.ts"
+  ]
+}

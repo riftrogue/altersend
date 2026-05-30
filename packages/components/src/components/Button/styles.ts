@@ -1,0 +1,149 @@
+import { css } from 'react-strict-dom'
+import { tokens } from '../../theme/tokens.css'
+
+export const styles = css.create({
+  base: {
+    display: 'flex',
+    flexDirection: 'row',
+    boxSizing: 'border-box',
+    gap: tokens.space15,
+    minWidth: 0,
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderRadius: tokens.radiusSm,
+    padding: tokens.space3,
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontFamily: tokens.fontFamilySans,
+    fontSize: tokens.fontSizeMd,
+    fontWeight: tokens.fontWeightSemibold,
+    lineHeight: 1,
+    letterSpacing: '-0.005em',
+    textAlign: 'center',
+    whiteSpace: 'nowrap',
+    cursor: 'pointer',
+    userSelect: 'none',
+    transitionDuration: '160ms',
+    transitionProperty: 'background-color, border-color, color, box-shadow, opacity, transform',
+    transitionTimingFunction: 'ease'
+  },
+  sm: {
+    paddingTop: tokens.space3,
+    paddingBottom: tokens.space3,
+    paddingLeft: tokens.space6,
+    paddingRight: tokens.space6,
+    fontSize: tokens.fontSizeMd,
+    borderRadius: tokens.radiusSm
+  },
+  md: {
+    paddingTop: tokens.space3,
+    paddingBottom: tokens.space3,
+    paddingLeft: 26,
+    paddingRight: 26,
+    fontSize: tokens.fontSizeBase,
+    borderRadius: tokens.radiusMd
+  },
+  lg: {
+    paddingTop: tokens.space35,
+    paddingBottom: tokens.space35,
+    paddingLeft: tokens.space7,
+    paddingRight: tokens.space7,
+    fontSize: tokens.fontSizeLg,
+    borderRadius: tokens.radiusMd
+  },
+  full: {
+    width: '100%'
+  },
+  primary: {
+    backgroundColor: tokens.colorTextPrimary,
+    borderColor: tokens.colorBorderPrimary,
+    color: tokens.colorBackground,
+    boxShadow: `0 1px 2px ${tokens.colorShadow}, inset 0 1px 0 ${tokens.colorHighlight}`,
+    ':hover': {
+      backgroundColor: tokens.colorAccentActive,
+      borderColor: tokens.colorBorderStrong
+    },
+    ':focus-visible': {
+      outline: 'none',
+      boxShadow: `0 0 0 2px ${tokens.colorFocusRing}`
+    }
+  },
+  primaryPressed: {
+    backgroundColor: tokens.colorAccentActive,
+    borderColor: tokens.colorBorderPrimary,
+    transform: 'translateY(1px)'
+  },
+  secondary: {
+    backgroundColor: tokens.colorBackgroundSubtle,
+    borderColor: tokens.colorBorderPrimary,
+    color: tokens.colorTextPrimary,
+    boxShadow: 'none',
+    ':hover': {
+      backgroundColor: tokens.colorSurfacePrimary,
+      borderColor: tokens.colorBorderStrong
+    },
+    ':focus-visible': {
+      outline: 'none',
+      boxShadow: `0 0 0 2px ${tokens.colorFocusRing}`
+    }
+  },
+  secondaryPressed: {
+    backgroundColor: tokens.colorSurfaceSecondary
+  },
+  ghost: {
+    backgroundColor: 'transparent',
+    borderColor: 'transparent',
+    color: tokens.colorTextSecondary,
+    ':hover': {
+      backgroundColor: tokens.colorBackgroundSubtle,
+      color: tokens.colorTextPrimary
+    },
+    ':focus-visible': {
+      outline: 'none',
+      boxShadow: `0 0 0 2px ${tokens.colorFocusRing}`
+    }
+  },
+  ghostPressed: {
+    backgroundColor: tokens.colorSurfaceSecondary
+  },
+  light: {
+    backgroundColor: tokens.colorAccent,
+    borderColor: tokens.colorAccent,
+    color: tokens.colorOnAccent,
+    boxShadow: 'none',
+    ':hover': {
+      backgroundColor: tokens.colorAccentHover,
+      borderColor: tokens.colorAccentHover
+    },
+    ':focus-visible': {
+      outline: 'none',
+      boxShadow: `0 0 0 2px ${tokens.colorHighlight}`
+    }
+  },
+  lightPressed: {
+    backgroundColor: tokens.colorAccentActive
+  },
+  disabled: {
+    backgroundColor: tokens.colorSurfaceTertiary,
+    borderColor: tokens.colorBorderPrimary,
+    color: tokens.colorTextMuted,
+    cursor: 'not-allowed',
+    boxShadow: 'none',
+    opacity: 1
+  },
+  textBase: {
+    fontFamily: tokens.fontFamilySans,
+    fontWeight: tokens.fontWeightSemibold,
+    letterSpacing: '-0.005em',
+    textAlign: 'center',
+    whiteSpace: 'nowrap'
+  },
+  textSm: { fontSize: tokens.fontSizeMd },
+  textMd: { fontSize: tokens.fontSizeBase },
+  textLg: { fontSize: tokens.fontSizeLg },
+  textPrimary: { color: tokens.colorBackground },
+  textSecondary: { color: tokens.colorTextPrimary },
+  textGhost: { color: tokens.colorTextSecondary },
+  textLight: { color: tokens.colorOnAccent },
+  textDisabled: { color: tokens.colorTextMuted }
+})

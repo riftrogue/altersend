@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../dist",
+    "rootDir": ".",
+    "paths": {
+      "@altersend/domain": ["../../../packages/domain/dist"],
+      "@altersend/components": ["../../../packages/components/dist"],
+      "@altersend/components/icons": ["../../../packages/components/dist/icons"],
+      "@altersend/components/theme": ["../../../packages/components/dist/theme"],
+      "@altersend/components/theme/raw": ["../../../packages/components/dist/theme/tokens.raw"]
+    }
+  },
+  "include": ["./electron/**/*", "./workers/**/*", "./types.d.ts"]
+}

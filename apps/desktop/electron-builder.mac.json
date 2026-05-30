@@ -1,0 +1,36 @@
+{
+  "appId": "com.altersend.desktop",
+  "electronVersion": "40.2.1",
+  "icon": "build/icon.icns",
+  "asar": false,
+  "directories": {
+    "output": "out"
+  },
+  "files": [
+    "dist/**/*",
+    "package.json",
+    "!dist/**/*.map",
+    "!**/node_modules/react-native/**",
+    "!**/node_modules/react-native-*/**",
+    "!**/node_modules/@react-native/**",
+    "!**/node_modules/@expo/**",
+    "!**/node_modules/expo-*/**",
+    "!**/node_modules/metro*/**",
+    "!**/node_modules/jest*/**",
+    "!**/node_modules/@jest/**",
+    "!**/node_modules/@babel/**",
+    "!**/node_modules/babel-*/**"
+  ],
+  "mac": {
+    "category": "public.app-category.utilities",
+    "icon": "build/icon.icns",
+    "target": "dmg",
+    "hardenedRuntime": true,
+    "gatekeeperAssess": false,
+    "entitlements": "build/entitlements.mac.plist",
+    "entitlementsInherit": "build/entitlements.mac.plist"
+  },
+  "afterSign": "scripts/notarize.cjs",
+  "afterPack": "scripts/afterPack.cjs",
+  "dmg": {}
+}

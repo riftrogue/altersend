@@ -1,0 +1,47 @@
+name: Checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format
+        run: npm run format:check
+
+      - name: Check design tokens
+        run: npm run check:tokens
+
+      - name: Knip (unused files / deps / exports)
+        run: npm run knip
+
+      - name: Build packages
+        run: npm run build --workspaces --if-present
+
+      - name: Type-check
+        run: |
+          npm run typecheck -w packages/core
+          npm run typecheck -w packages/domain
+          npm run typecheck -w packages/components
+          npm run typecheck -w apps/desktop
+          npm run typecheck -w apps/mobile
+
+      - name: Test
+        run: npm test --workspaces --if-present

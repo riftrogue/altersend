@@ -1,0 +1,70 @@
+name: Release Android
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-android-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+
+      - name: Build Android APK on EAS
+        working-directory: apps/mobile
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          eas build --platform android --profile preview --non-interactive --wait --json > build.json
+          BUILD_URL=$(jq -r '.[0].artifacts.buildUrl' build.json)
+          if [ -z "$BUILD_URL" ] || [ "$BUILD_URL" = "null" ]; then
+            echo "No build URL in EAS response"
+            cat build.json
+            exit 1
+          fi
+          VERSION=$(node -p "require('./app.json').expo.version")
+          curl -L "$BUILD_URL" -o "altersend-${VERSION}.apk"
+          ls -la altersend-*.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: apps/mobile/altersend-*.apk
+
+  release:
+    needs: build-android-apk
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read mobile version
+        id: version
+        run: echo "value=$(node -p "require('./apps/mobile/app.json').expo.version")" >> $GITHUB_OUTPUT
+
+      - name: Download APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: android-apk
+          path: artifacts
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-v${{ steps.version.outputs.value }}
+          name: Android v${{ steps.version.outputs.value }}
+          draft: true
+          files: artifacts/*.apk

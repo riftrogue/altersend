@@ -1,0 +1,82 @@
+{
+  "name": "@altersend/components",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared AlterSend UI theme and React Strict DOM setup",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./theme": {
+      "types": "./dist/theme/index.d.ts",
+      "import": "./dist/theme/index.js",
+      "require": "./dist/theme/index.js"
+    },
+    "./theme/raw": {
+      "types": "./dist/theme/tokens.raw.d.ts",
+      "import": "./dist/theme/tokens.raw.js",
+      "require": "./dist/theme/tokens.raw.js"
+    },
+    "./icons": {
+      "types": "./dist/icons/index.d.ts",
+      "import": "./dist/icons/index.js",
+      "require": "./dist/icons/index.js"
+    },
+    "./tailwind.css": "./src/theme/tailwind-theme.css",
+    "./package.json": "./package.json"
+  },
+  "license": "Apache-2.0",
+  "author": "AlterSend",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/denislupookov/altersend.git"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "generate-tokens": "node scripts/generate-tokens.mjs",
+    "build": "npm run generate-tokens && tsc --project tsconfig.build.json && node scripts/fix-esm-imports.mjs",
+    "typecheck": "npm run generate-tokens && tsc --noEmit",
+    "storybook": "storybook dev -p 6100",
+    "build-storybook": "storybook build"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "lucide-react": "*",
+    "lucide-react-native": "*"
+  },
+  "peerDependenciesMeta": {
+    "react-dom": {
+      "optional": true
+    },
+    "lucide-react": {
+      "optional": true
+    },
+    "lucide-react-native": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "react-strict-dom": "^0.0.55"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.10",
+    "@storybook/addon-a11y": "^10.2.13",
+    "@storybook/addon-docs": "^10.2.13",
+    "@storybook/react-vite": "^10.2.13",
+    "@stylexjs/babel-plugin": "^0.15.4",
+    "@types/react": "^19.2.14",
+    "@vitejs/plugin-react": "^5.2.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "storybook": "^10.2.13",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.5"
+  }
+}

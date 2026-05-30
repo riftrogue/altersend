@@ -1,0 +1,10 @@
+# Default owner — required reviewer on every PR
+* @denislupookov
+
+# Anything touching CI / release tooling / secrets-adjacent surfaces
+# is doubly sensitive — same owner, explicit pattern in case the
+# default rule is later loosened.
+/.github/ @denislupookov
+/apps/desktop/scripts/ @denislupookov
+/apps/desktop/electron-builder.*.json @denislupookov
+/apps/mobile/eas.json @denislupookov

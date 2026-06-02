@@ -147,9 +147,10 @@ jobs:
         shell: bash
         run: |
           MSIX=$(find apps/desktop/out/AlterSend-win32-x64 -name "*.msix" | head -1)
+          cp "$MSIX" apps/desktop/out/AlterSend-win32-x64/AlterSend.msix
           cd apps/desktop && npx pear-build \
             --package ./package.json \
-            --win32-x64-app "$MSIX" \
+            --win32-x64-app ./out/AlterSend-win32-x64/AlterSend.msix \
             --target "$RUNNER_TEMP/pear-release"
 
       - name: Upload Windows artifacts (unsigned)
@@ -217,9 +218,10 @@ jobs:
 
       - name: Package for Pear (linux x64)
         run: |
+          cp apps/desktop/out/AlterSend-x64.AppImage apps/desktop/out/AlterSend.AppImage
           cd apps/desktop && npx pear-build \
             --package ./package.json \
-            --linux-x64-app ./out/AlterSend-x64.AppImage \
+            --linux-x64-app ./out/AlterSend.AppImage \
             --target "$RUNNER_TEMP/pear-release"
 
       - name: Upload Linux artifacts
@@ -262,9 +264,10 @@ jobs:
 
       - name: Package for Pear (linux arm64)
         run: |
+          cp apps/desktop/out/AlterSend-arm64.AppImage apps/desktop/out/AlterSend.AppImage
           cd apps/desktop && npx pear-build \
             --package ./package.json \
-            --linux-arm64-app ./out/AlterSend-arm64.AppImage \
+            --linux-arm64-app ./out/AlterSend.AppImage \
             --target "$RUNNER_TEMP/pear-release"
 
       - name: Upload Linux arm64 artifacts

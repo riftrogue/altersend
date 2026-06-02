@@ -94,7 +94,7 @@
       "ignoreBinaries": ["eas"]
     }
   },
-  "ignoreBinaries": ["pod"],
+  "ignoreBinaries": ["pod", "pear-build"],
   "rules": {
     "duplicates": "off"
   }

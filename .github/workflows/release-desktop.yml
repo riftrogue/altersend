@@ -31,7 +31,7 @@ jobs:
       - name: Prune dev dependencies before packaging
         run: |
           npm prune --omit=dev
-          npm install electron@40.2.1 electron-builder@26.8.1 @electron/notarize@2.2.1 pear-build@1.1.0 --no-save
+          npm install electron@40.2.1 electron-builder@26.8.1 @electron/notarize@2.2.1 --no-save
 
       - name: Install Apple signing certificate into a temp keychain
         env:
@@ -66,31 +66,11 @@ jobs:
           CSC_NAME: "Devaprime LLC"
           SKIP_NOTARIZE: "true"
 
-      - name: Package for Pear (arm64)
-        run: |
-          cd apps/desktop && npx pear-build \
-            --package ./package.json \
-            --darwin-arm64-app ./out/mac-arm64/AlterSend.app \
-            --target "$RUNNER_TEMP/pear-release"
-
-      - name: Package for Pear (x64)
-        run: |
-          cd apps/desktop && npx pear-build \
-            --package ./package.json \
-            --darwin-x64-app ./out/mac/AlterSend.app \
-            --target "$RUNNER_TEMP/pear-release"
-
-      - name: Upload macOS DMG artifacts
+      - name: Upload macOS artifacts
         uses: actions/upload-artifact@v4
         with:
           name: macos
           path: apps/desktop/out/**/*.dmg
-
-      - name: Upload Pear macOS artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: pear-darwin
-          path: ${{ runner.temp }}/pear-release/by-arch/
 
   build-windows:
     runs-on: windows-latest
@@ -143,16 +123,6 @@ jobs:
           echo "=== files under apps/desktop/out/make ==="
           find apps/desktop/out/make -type f 2>/dev/null || echo "(no out/make dir)"
 
-      - name: Package for Pear (win32 x64)
-        shell: bash
-        run: |
-          MSIX=$(find apps/desktop/out/AlterSend-win32-x64 -name "*.msix" | head -1)
-          cp "$MSIX" apps/desktop/out/AlterSend-win32-x64/AlterSend.msix
-          cd apps/desktop && npx pear-build \
-            --package ./package.json \
-            --win32-x64-app ./out/AlterSend-win32-x64/AlterSend.msix \
-            --target "$RUNNER_TEMP/pear-release"
-
       - name: Upload Windows artifacts (unsigned)
         id: upload-windows-unsigned
         uses: actions/upload-artifact@v4
@@ -161,12 +131,6 @@ jobs:
           path: |
             apps/desktop/out/make/squirrel.windows/**/*
             apps/desktop/out/AlterSend-win32-*/**/*.msix
-
-      - name: Upload Pear Windows artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: pear-win32
-          path: ${{ runner.temp }}/pear-release/by-arch/
 
       # SignPath signing — only runs once `SIGNPATH_PROJECT_SLUG` repo variable is set.
       # See docs/SIGNING.md for application and setup instructions.
@@ -216,25 +180,11 @@ jobs:
       - name: Make Linux
         run: npm run dist:linux:x64 -w apps/desktop
 
-      - name: Package for Pear (linux x64)
-        run: |
-          cp apps/desktop/out/AlterSend-x64.AppImage apps/desktop/out/AlterSend.AppImage
-          cd apps/desktop && npx pear-build \
-            --package ./package.json \
-            --linux-x64-app ./out/AlterSend.AppImage \
-            --target "$RUNNER_TEMP/pear-release"
-
       - name: Upload Linux artifacts
         uses: actions/upload-artifact@v4
         with:
           name: linux
           path: apps/desktop/out/**/*.AppImage
-
-      - name: Upload Pear Linux artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: pear-linux-x64
-          path: ${{ runner.temp }}/pear-release/by-arch/
 
   build-linux-arm64:
     runs-on: ubuntu-24.04-arm
@@ -262,25 +212,11 @@ jobs:
       - name: Make Linux (arm64)
         run: npm run dist:linux:arm64 -w apps/desktop
 
-      - name: Package for Pear (linux arm64)
-        run: |
-          cp apps/desktop/out/AlterSend-arm64.AppImage apps/desktop/out/AlterSend.AppImage
-          cd apps/desktop && npx pear-build \
-            --package ./package.json \
-            --linux-arm64-app ./out/AlterSend.AppImage \
-            --target "$RUNNER_TEMP/pear-release"
-
       - name: Upload Linux arm64 artifacts
         uses: actions/upload-artifact@v4
         with:
           name: linux-arm64
           path: apps/desktop/out/**/*.AppImage
-
-      - name: Upload Pear Linux arm64 artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: pear-linux-arm64
-          path: ${{ runner.temp }}/pear-release/by-arch/
 
   release:
     needs: [build-macos, build-windows, build-linux, build-linux-arm64]
@@ -322,31 +258,67 @@ jobs:
         id: version
         run: echo "value=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
-      - name: Download Pear artifacts
+      - name: Install pear-build
+        run: npm install -g pear-build@1.1.0
+
+      - name: Download macOS artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: pear-*
-          path: pear-artifacts
-          merge-multiple: false
+          name: macos
+          path: /tmp/pear-installers/macos
 
-      - name: Merge by-arch into release folder
+      - name: Download Linux x64 artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: linux
+          path: /tmp/pear-installers/linux
+
+      - name: Download Linux arm64 artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-arm64
+          path: /tmp/pear-installers/linux-arm64
+
+      - name: Extract macOS apps from DMGs
+        run: |
+          mkdir -p /tmp/pear-apps
+          ARM64_DMG=$(find /tmp/pear-installers/macos -name "*arm64*.dmg" | head -1)
+          hdiutil attach "$ARM64_DMG" -mountpoint /tmp/dmg-arm64 -nobrowse -quiet
+          cp -r "/tmp/dmg-arm64/AlterSend.app" /tmp/pear-apps/AlterSend-arm64.app
+          hdiutil detach /tmp/dmg-arm64 -quiet
+
+          X64_DMG=$(find /tmp/pear-installers/macos -name "*.dmg" | grep -v arm64 | head -1)
+          hdiutil attach "$X64_DMG" -mountpoint /tmp/dmg-x64 -nobrowse -quiet
+          cp -r "/tmp/dmg-x64/AlterSend.app" /tmp/pear-apps/AlterSend-x64.app
+          hdiutil detach /tmp/dmg-x64 -quiet
+
+      - name: Build Pear packages
         run: |
           VERSION="${{ steps.version.outputs.value }}"
           TARGET="$HOME/altersend-desktop-$VERSION"
-          mkdir -p "$TARGET/by-arch"
-          cp apps/desktop/package.json "$TARGET/package.json"
-          for dir in pear-artifacts/*/; do
-            cp -r "$dir"* "$TARGET/by-arch/"
-          done
+          PKG="$GITHUB_WORKSPACE/apps/desktop/package.json"
+
+          pear-build --package "$PKG" --darwin-arm64-app /tmp/pear-apps/AlterSend-arm64.app --target "$TARGET"
+          pear-build --package "$PKG" --darwin-x64-app /tmp/pear-apps/AlterSend-x64.app --target "$TARGET"
+
+          APPIMAGE=$(find /tmp/pear-installers/linux -name "*.AppImage" | head -1)
+          cp "$APPIMAGE" /tmp/AlterSend-linux.AppImage
+          pear-build --package "$PKG" --linux-x64-app /tmp/AlterSend-linux.AppImage --target "$TARGET"
+
+          APPIMAGE_ARM=$(find /tmp/pear-installers/linux-arm64 -name "*.AppImage" | head -1)
+          cp "$APPIMAGE_ARM" /tmp/AlterSend-linux-arm64.AppImage
+          pear-build --package "$PKG" --linux-arm64-app /tmp/AlterSend-linux-arm64.AppImage --target "$TARGET"
+
 
       - name: Stage and release to Pear DHT
         run: |
           export PATH="$HOME/Library/Application Support/pear/bin:$PATH"
           VERSION="${{ steps.version.outputs.value }}"
-          TARGET="$HOME/altersend-desktop-$VERSION"
-          pear stage "${{ vars.PEAR_UPGRADE_LINK }}" "$TARGET"
+          pear stage "${{ vars.PEAR_UPGRADE_LINK }}" "$HOME/altersend-desktop-$VERSION"
           pear release "${{ vars.PEAR_UPGRADE_LINK }}"
 
       - name: Cleanup
         if: always()
-        run: rm -rf "$HOME/altersend-desktop-${{ steps.version.outputs.value }}"
+        run: |
+          rm -rf "$HOME/altersend-desktop-${{ steps.version.outputs.value }}"
+          rm -rf /tmp/pear-installers /tmp/pear-apps /tmp/AlterSend-linux.AppImage /tmp/AlterSend-linux-arm64.AppImage

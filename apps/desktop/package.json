@@ -2,7 +2,7 @@
   "name": "@altersend/desktop",
   "productName": "AlterSend",
   "version": "1.1.0",
-  "upgrade": "pear://qxenz5wmspmryjc13m9yzsqj1conqotn8fb4ocbufwtz9mtbqq5o",
+  "upgrade": "pear://w5u4xqsncqyfhb1owdqogr3mpg6b5tcdzn65pk88ispgew5jegso",
   "description": "Peer-to-peer file transfer. No servers, no accounts.",
   "license": "Apache-2.0",
   "author": "AlterSend",
@@ -25,7 +25,12 @@
     "dist:win:x64": "electron-forge make --platform=win32 --arch=x64",
     "dist:win:arm64": "electron-forge make --platform=win32 --arch=arm64",
     "dist:linux:x64": "npx electron-builder --linux --x64 -c electron-builder.linux.json --publish never",
-    "dist:linux:arm64": "npx electron-builder --linux --arm64 -c electron-builder.linux.json --publish never"
+    "dist:linux:arm64": "npx electron-builder --linux --arm64 -c electron-builder.linux.json --publish never",
+    "pear:build:darwin:arm64": "npx pear-build --package=./package.json --darwin-arm64-app ./out/mac-arm64/AlterSend.app --target ../../../altersend-desktop-$npm_package_version",
+    "pear:build:darwin:x64": "npx pear-build --package=./package.json --darwin-x64-app ./out/mac/AlterSend.app --target ../../../altersend-desktop-$npm_package_version",
+    "pear:build:linux:x64": "npx pear-build --package=./package.json --linux-x64-app ./out/AlterSend-x64.AppImage --target ../../../altersend-desktop-$npm_package_version",
+    "pear:build:linux:arm64": "npx pear-build --package=./package.json --linux-arm64-app ./out/AlterSend-arm64.AppImage --target ../../../altersend-desktop-$npm_package_version",
+    "pear:build:win:x64": "npx pear-build --package=./package.json --win32-x64-app ./out/AlterSend-win32-x64/AlterSend.msix --target ..\\..\\.\\altersend-desktop-%npm_package_version%"
   },
   "dependencies": {
     "@altersend/components": "1.1.0",
@@ -71,6 +76,7 @@
     "electron-builder": "^26.8.1",
     "electron-forge-plugin-prune-prebuilds": "^1.0.0",
     "electron-forge-plugin-universal-prebuilds": "^1.0.0",
+    "pear-build": "^1.1.0",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",

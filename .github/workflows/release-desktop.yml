@@ -298,8 +298,13 @@ jobs:
           TARGET="$HOME/altersend-desktop-$VERSION"
           PKG="$GITHUB_WORKSPACE/apps/desktop/package.json"
 
-          pear-build --package "$PKG" --darwin-arm64-app /tmp/pear-apps/AlterSend-arm64.app --target "$TARGET"
-          pear-build --package "$PKG" --darwin-x64-app /tmp/pear-apps/AlterSend-x64.app --target "$TARGET"
+          cp -r /tmp/pear-apps/AlterSend-arm64.app /tmp/pear-apps/AlterSend.app
+          pear-build --package "$PKG" --darwin-arm64-app /tmp/pear-apps/AlterSend.app --target "$TARGET"
+          rm -rf /tmp/pear-apps/AlterSend.app
+
+          cp -r /tmp/pear-apps/AlterSend-x64.app /tmp/pear-apps/AlterSend.app
+          pear-build --package "$PKG" --darwin-x64-app /tmp/pear-apps/AlterSend.app --target "$TARGET"
+          rm -rf /tmp/pear-apps/AlterSend.app
 
           APPIMAGE=$(find /tmp/pear-installers/linux -name "*.AppImage" | head -1)
           cp "$APPIMAGE" /tmp/AlterSend-linux.AppImage

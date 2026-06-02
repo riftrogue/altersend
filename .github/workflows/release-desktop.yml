@@ -307,23 +307,25 @@ jobs:
           rm -rf /tmp/pear-apps/AlterSend.app
 
           APPIMAGE=$(find /tmp/pear-installers/linux -name "*.AppImage" | head -1)
-          cp "$APPIMAGE" /tmp/AlterSend-linux.AppImage
-          pear-build --package "$PKG" --linux-x64-app /tmp/AlterSend-linux.AppImage --target "$TARGET"
+          cp "$APPIMAGE" /tmp/AlterSend.AppImage
+          pear-build --package "$PKG" --linux-x64-app /tmp/AlterSend.AppImage --target "$TARGET"
+          rm /tmp/AlterSend.AppImage
 
           APPIMAGE_ARM=$(find /tmp/pear-installers/linux-arm64 -name "*.AppImage" | head -1)
-          cp "$APPIMAGE_ARM" /tmp/AlterSend-linux-arm64.AppImage
-          pear-build --package "$PKG" --linux-arm64-app /tmp/AlterSend-linux-arm64.AppImage --target "$TARGET"
+          cp "$APPIMAGE_ARM" /tmp/AlterSend.AppImage
+          pear-build --package "$PKG" --linux-arm64-app /tmp/AlterSend.AppImage --target "$TARGET"
+          rm /tmp/AlterSend.AppImage
 
 
       - name: Stage and release to Pear DHT
         run: |
           export PATH="$HOME/Library/Application Support/pear/bin:$PATH"
           VERSION="${{ steps.version.outputs.value }}"
-          pear stage "${{ vars.PEAR_UPGRADE_LINK }}" "$HOME/altersend-desktop-$VERSION"
+          pear stage --no-ask "${{ vars.PEAR_UPGRADE_LINK }}" "$HOME/altersend-desktop-$VERSION"
           pear release "${{ vars.PEAR_UPGRADE_LINK }}"
 
       - name: Cleanup
         if: always()
         run: |
           rm -rf "$HOME/altersend-desktop-${{ steps.version.outputs.value }}"
-          rm -rf /tmp/pear-installers /tmp/pear-apps /tmp/AlterSend-linux.AppImage /tmp/AlterSend-linux-arm64.AppImage
+          rm -rf /tmp/pear-installers /tmp/pear-apps

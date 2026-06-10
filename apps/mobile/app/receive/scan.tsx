@@ -213,12 +213,7 @@ export default function ReceiveScanScreen() {
           >
             {permissionButtonLabel}
           </Button>
-          <Button
-            onClick={() => void importFromImage()}
-            size='lg'
-            variant='secondary'
-            width='full'
-          >
+          <Button onClick={() => void importFromImage()} size='lg' variant='secondary' width='full'>
             Import from image
           </Button>
           <Button onClick={goBack} size='lg' variant='secondary' width='full'>

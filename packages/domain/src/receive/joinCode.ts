@@ -7,7 +7,7 @@ export function buildJoinUrl(topic: string): string {
 }
 
 export function buildInviteText(topic: string): string {
-  return `Join my file transfer on AlterSend:\n${buildJoinUrl(topic)}`
+  return topic
 }
 
 export function isValidJoinCode(value: string): boolean {

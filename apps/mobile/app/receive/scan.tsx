@@ -8,7 +8,7 @@ import {
 } from 'expo-camera'
 import * as ImagePicker from 'expo-image-picker'
 import { Button, useTheme, withAlpha } from '@altersend/components'
-import { ArrowLeftIcon, ImageIcon, QrCodeIcon } from '@altersend/components/icons'
+import { ArrowLeftIcon, QrCodeIcon } from '@altersend/components/icons'
 import { useNavigation, useRouter } from 'expo-router'
 import { extractJoinCode, useTransferStore } from '@altersend/domain'
 import { joinSession } from '@altersend/domain'
@@ -214,7 +214,6 @@ export default function ReceiveScanScreen() {
             {permissionButtonLabel}
           </Button>
           <Button
-            icon={<ImageIcon size={18} />}
             onClick={() => void importFromImage()}
             size='lg'
             variant='secondary'
@@ -335,7 +334,6 @@ export default function ReceiveScanScreen() {
 
           <Button
             disabled={!canScan}
-            icon={<ImageIcon size={18} />}
             onClick={() => void importFromImage()}
             size='lg'
             variant='secondary'

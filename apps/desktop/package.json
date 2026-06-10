@@ -1,7 +1,7 @@
 {
   "name": "@altersend/desktop",
   "productName": "AlterSend",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "upgrade": "pear://w5u4xqsncqyfhb1owdqogr3mpg6b5tcdzn65pk88ispgew5jegso",
   "description": "Peer-to-peer file transfer. No servers, no accounts.",
   "license": "Apache-2.0",

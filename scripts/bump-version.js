@@ -17,12 +17,14 @@ const packages = [
   'apps/desktop/package.json',
   'apps/mobile/package.json',
   'packages/core/package.json',
+  'packages/locales/package.json',
   'packages/domain/package.json',
   'packages/components/package.json',
 ]
 
 const internalPackages = [
   '@altersend/core',
+  '@altersend/locales',
   '@altersend/domain',
   '@altersend/components',
 ]

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { execSync } from 'child_process'
 import { readFileSync, writeFileSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
@@ -51,5 +52,9 @@ const appJson = JSON.parse(readFileSync(appJsonPath, 'utf8'))
 appJson.expo.version = version
 writeFileSync(appJsonPath, JSON.stringify(appJson, null, 2) + '\n')
 console.log('bumped apps/mobile/app.json')
+
+// Sync package-lock.json so `npm ci` (CI) stays in lockstep with the new versions.
+console.log('updating package-lock.json…')
+execSync('npm install --package-lock-only', { cwd: root, stdio: 'inherit' })
 
 console.log(`\nversion → ${version}`)

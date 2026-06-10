@@ -17,13 +17,22 @@ import {
   termsOfServiceUrl,
   websiteUrl
 } from '@altersend/domain'
+import {
+  MULTI_LANG_ENABLED,
+  PICKABLE_LANGUAGES,
+  useTranslation,
+  changeLocale,
+  type LocalePreference
+} from '@altersend/locales'
 import logo from '../../../../../../assets/logo.png'
 import { bridgeApi } from '../../api/bridgeApi'
+import { Select } from '../../components/Select'
 import { closeSentry, initSentry } from '../../sentry'
 import {
   isCrashReportingEnabled,
   setCrashReportingEnabled
 } from '../../lifecycle/crashReportingStorage'
+import { setSavedLocale } from '../../lifecycle/localeStorage'
 
 const PLACEHOLDERS: Record<FeedbackType, string> = {
   'Bug report': 'Describe what went wrong…',
@@ -45,6 +54,8 @@ export function FooterBar({ version }: { version: string }) {
   const [reportMessage, setReportMessage] = useState('')
   const [reportState, setReportState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [crashReporting, setCrashReporting] = useState(isCrashReportingEnabled)
+  const { i18n } = useTranslation()
+  const locale = i18n.language
 
   const handleCrashReportingToggle = (next: boolean) => {
     setCrashReporting(next)
@@ -142,6 +153,29 @@ export function FooterBar({ version }: { version: string }) {
                         label='Crash reports'
                         description='Share anonymous crash data to help improve AlterSend'
                       />
+                      {MULTI_LANG_ENABLED && (
+                        <div className='mt-3'>
+                          <label className='mb-2 block text-[13px] font-medium text-text-secondary'>
+                            Language
+                          </label>
+                          <Select
+                            aria-label='Language'
+                            value={locale}
+                            onChange={async (value) => {
+                              try {
+                                await changeLocale(value as LocalePreference)
+                                setSavedLocale(value as LocalePreference)
+                              } catch (err) {
+                                console.warn('Failed to change language', err)
+                              }
+                            }}
+                            options={PICKABLE_LANGUAGES.map((l) => ({
+                              value: l.code,
+                              label: l.label
+                            }))}
+                          />
+                        </div>
+                      )}
                     </div>
                     <div className='border-t border-border-primary py-1'>
                       {MENU_ITEMS.map(({ icon: Icon, label, key, ...rest }) => (

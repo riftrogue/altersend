@@ -12,8 +12,13 @@ import {
   startPeerWatchdog,
   useSimulatedLoading
 } from '@altersend/domain'
+import { changeLocale, getInitialLocale } from '@altersend/locales'
 import { Stack } from 'expo-router'
 import { StyleSheet, View } from 'react-native'
+import { useEffect, useState } from 'react'
+import * as SplashScreen from 'expo-splash-screen'
+
+SplashScreen.preventAutoHideAsync().catch(() => {})
 import { LoadingScreen } from '../src/loading'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { mobileApi } from '../src/api/mobileApi'
@@ -21,6 +26,7 @@ import { ToastProvider } from '../src/components/Toast'
 import { UpdateBanner } from '../src/components/UpdateBanner'
 import { startAppStateBridge } from '../src/lifecycle/appStateBridge'
 import { startDeepLinkHandler } from '../src/lifecycle/deepLinkHandler'
+import { getSavedLocale } from '../src/lifecycle/localeStorage'
 import { ShareIntentHandler } from '../src/lifecycle/ShareIntentHandler'
 import { startPhotosCopyEffect } from '../src/transfer/receive'
 import { initSentry, captureException } from '../src/sentry'
@@ -60,6 +66,7 @@ function ThemedStack() {
       <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
       <Stack.Screen name='onboarding' options={{ headerShown: false, gestureEnabled: false }} />
       <Stack.Screen name='settings' options={flowScreenOptions} />
+      <Stack.Screen name='language' options={flowScreenOptions} />
       <Stack.Screen name='report' options={flowScreenOptions} />
       <Stack.Screen
         name='send/preparing'
@@ -83,6 +90,33 @@ function ThemedStack() {
 }
 
 export default function RootLayout() {
+  const [isReady, setIsReady] = useState(false)
+
+  useEffect(() => {
+    let isMounted = true
+    async function initLocale() {
+      try {
+        const savedLocale = await getSavedLocale()
+        if (!isMounted) return
+        const preference = savedLocale || 'system'
+        await changeLocale(getInitialLocale(preference))
+      } catch (err) {
+        console.warn(err)
+      } finally {
+        if (isMounted) {
+          setIsReady(true)
+          SplashScreen.hideAsync().catch(console.warn)
+        }
+      }
+    }
+    void initLocale()
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  if (!isReady) return null
+
   return (
     <SafeAreaProvider>
       <View style={styles.root}>

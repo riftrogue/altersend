@@ -9,6 +9,7 @@ import {
   termsOfServiceUrl,
   websiteUrl
 } from '@altersend/domain'
+import { MULTI_LANG_ENABLED, getLanguage, useTranslation } from '@altersend/locales'
 import { ToggleSwitch, useTheme } from '@altersend/components'
 import {
   AlertCircleIcon,
@@ -71,6 +72,8 @@ export default function SettingsScreen() {
   const router = useRouter()
   const version = Constants.expoConfig?.version ?? '0.0.0'
   const [crashReporting, setCrashReporting] = useState(isCrashReportingEnabled)
+  const { i18n } = useTranslation()
+  const locale = i18n.language
 
   const handleCrashReportingToggle = (value: boolean) => {
     setCrashReporting(value)
@@ -91,6 +94,20 @@ export default function SettingsScreen() {
   return (
     <Layout title='Settings' description='' hasNativeHeader>
       <View style={styles.content}>
+        {MULTI_LANG_ENABLED && (
+          <View style={styles.section}>
+            <View style={[styles.card, cardStyle]}>
+              <LinkRow
+                label='Language'
+                hint={getLanguage(locale)?.label ?? locale}
+                icon={<GlobeIcon size={16} color={theme.colors.colorTextSecondary} />}
+                onPress={() => router.push('/language')}
+                isLast
+              />
+            </View>
+          </View>
+        )}
+
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: theme.colors.colorTextMuted }]}>Privacy</Text>
           <View style={[styles.card, styles.toggleCardPad, cardStyle]}>

@@ -1,7 +1,6 @@
 import React, { PropsWithChildren } from 'react'
 import {
   View,
-  Text,
   ScrollView,
   StyleSheet,
   Pressable,
@@ -10,7 +9,9 @@ import {
 } from 'react-native'
 import { useTheme } from '@altersend/components'
 import { SettingsIcon } from '@altersend/components/icons'
+import { useTranslation } from '@altersend/locales'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Text } from '@/src/components/ThemedText'
 
 interface IllustrationLayoutProps {
   title: string
@@ -34,6 +35,7 @@ export function IllustrationLayout({
   onMenuPress,
   children
 }: PropsWithChildren<IllustrationLayoutProps>) {
+  const { t } = useTranslation(['common'])
   const { theme } = useTheme()
   const insets = useSafeAreaInsets()
 
@@ -54,7 +56,7 @@ export function IllustrationLayout({
           {onMenuPress ? (
             <Pressable
               accessibilityRole='button'
-              accessibilityLabel='Settings'
+              accessibilityLabel={t('common:labels.settings')}
               onPress={onMenuPress}
               hitSlop={12}
               style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}

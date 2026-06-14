@@ -1,0 +1,91 @@
+{
+  "page": {
+    "selecting": {
+      "title": "Enviar arquivos",
+      "description": "Escolha um ou mais arquivos e gere um código único para uma transferência criptografada direta."
+    },
+    "preparing": {
+      "title": "Preparando transferência",
+      "description": "Preparando os arquivos selecionados antes que o código de compartilhamento seja revelado."
+    },
+    "waitingForReceiver": {
+      "title": "Compartilhe o código",
+      "description": "Envie o código ou QR ao seu destinatário para iniciar a transferência."
+    },
+    "receiverConnected": {
+      "title": "Compartilhe o código",
+      "description": "Envie o código ou QR ao seu destinatário para iniciar a transferência."
+    }
+  },
+  "actions": {
+    "sendFiles_one": "Enviar {{count}} arquivo",
+    "sendFiles_other": "Enviar {{count}} arquivos",
+    "addFiles": "Adicionar arquivos",
+    "addMoreFiles": "Adicionar mais arquivos",
+    "dragAndDrop": "Arraste e solte",
+    "clear": "Limpar",
+    "endSession": "Encerrar sessão",
+    "pickFilesTitle": "Adicionar arquivos",
+    "pickPhotos": "Fotos",
+    "pickFiles": "Arquivos"
+  },
+  "status": {
+    "waitingForPeer": "Aguardando destinatário",
+    "peerConnected": "Destinatário conectado",
+    "uploadComplete": "Envio concluído",
+    "uploadingFiles": "Enviando arquivos",
+    "uploaded": "Enviado",
+    "uploading": "Enviando…",
+    "waiting": "Aguardando",
+    "failed": "Falha",
+    "downloaded": "Baixado",
+    "disconnected": "Desconectado",
+    "online": "On-line",
+    "downloading": "Baixando",
+    "downloadingPercent": "Baixando {{percent}}%"
+  },
+  "connection": {
+    "placeholder": "Gerando chave segura…",
+    "copyLabel": "Copiar código de conexão",
+    "showQrLabel": "Mostrar código QR",
+    "qrCodeLabel": "Código QR para chave de conexão",
+    "qrModalDescription": "Abra o AlterSend em outro dispositivo e escaneie este código",
+    "copiedToast": "Copiado para a área de transferência",
+    "scanToConnect": "Escaneie para conectar",
+    "orScan": "ou escaneie",
+    "generating": "Gerando…",
+    "waitingForConnection": "Aguardando conexão…"
+  },
+  "errors": {
+    "folderUnsupported": "As pastas ainda não são suportadas. Selecione apenas arquivos.",
+    "failedPickFiles": "Falha ao selecionar arquivos",
+    "failedPickPhotos": "Falha ao escolher fotos"
+  },
+  "hints": {
+    "keepOpen": "Fechar o aplicativo cancela a transferência."
+  },
+  "preparing": {
+    "uploadedCount_one": "{{completed}} de {{count}} arquivo enviado",
+    "uploadedCount_other": "{{completed}} de {{count}} arquivos enviados"
+  },
+  "peer": {
+    "completedDone_one": "{{count}} concluído",
+    "completedDone_other": "{{count}} concluídos",
+    "devices": "Dispositivos",
+    "connectedCount_one": "{{count}} conectado",
+    "connectedCount_other": "{{count}} conectados"
+  },
+  "dropzone": {
+    "addMoreDescription": "ou clique para <link>adicionar mais</link>",
+    "browseDescription": "ou clique para <link>procurar</link>",
+    "tapAddMoreDescription": "Toque para <link>adicionar mais</link>",
+    "tapBrowseDescription": "Toque para <link>procurar</link>",
+    "orClickTo": "ou clique para",
+    "tapTo": "Toque para",
+    "addMoreLink": "adicionar mais",
+    "browseLink": "procurar"
+  },
+  "files": {
+    "removeLabel": "Remover {{name}}"
+  }
+}

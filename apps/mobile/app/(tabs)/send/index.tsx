@@ -1,12 +1,12 @@
 import { useCallback, useEffect } from 'react'
 import { View } from 'react-native'
 import { Button } from '@altersend/components'
+import { useTranslation } from '@altersend/locales'
 import { Layout } from '@/src/components'
 import { SelectFilesView } from '@/src/transfer/send'
 import { usePathname, useRouter } from 'expo-router'
 import { getSendPageCopy, getSendStep, isShareStep, useTransferStore } from '@altersend/domain'
 import { continueShare } from '@altersend/domain'
-import { useTranslation } from '@altersend/locales'
 
 function NavigationController() {
   const router = useRouter()
@@ -39,14 +39,14 @@ function NavigationController() {
 }
 
 export default function SendSelectScreen() {
-  const { t } = useTranslation('send')
+  const { t } = useTranslation(['send'])
   const selectedFiles = useTransferStore((s) => s.selectedFiles)
   const draftPhase = useTransferStore((s) => s.draftPhase)
   const connectionState = useTransferStore((s) => s.connectionState)
   const router = useRouter()
 
   const step = getSendStep({ draftPhase, isPeerConnected: connectionState === 'peer-connected' })
-  const copy = getSendPageCopy(step, t)
+  const copy = getSendPageCopy(t, step)
   const hasSelectedFiles = selectedFiles.length > 0
 
   const openMenu = useCallback(() => router.push('/settings'), [router])
@@ -66,7 +66,7 @@ export default function SendSelectScreen() {
               variant='primary'
               width='full'
             >
-              {`Send ${selectedFiles.length} file${selectedFiles.length === 1 ? '' : 's'}`}
+              {t('send:actions.sendFiles', { count: selectedFiles.length })}
             </Button>
           ) : undefined
         }

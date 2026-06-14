@@ -1,14 +1,17 @@
 import { useTheme } from '@altersend/components'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { useTranslation } from '@altersend/locales'
+import { Image, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import LoadingSvg from '../../../../assets/loading.svg'
 import brandLogo from '@/assets/images/brand-logo.png'
+import { Text } from '@/src/components/ThemedText'
 
 interface LoadingScreenProps {
   progress?: number
 }
 
 export function LoadingScreen({ progress = 0 }: LoadingScreenProps) {
+  const { t } = useTranslation(['common'])
   const { theme } = useTheme()
   const insets = useSafeAreaInsets()
   const clamped = Math.max(0, Math.min(100, progress))
@@ -34,10 +37,10 @@ export function LoadingScreen({ progress = 0 }: LoadingScreenProps) {
       <View style={styles.content}>
         <LoadingSvg height={160} width={237} />
         <Text style={[styles.title, { color: theme.colors.colorTextPrimary }]}>
-          Welcome to AlterSend
+          {t('common:app.welcome')}
         </Text>
         <Text style={[styles.subtitle, { color: theme.colors.colorTextSecondary }]}>
-          {'Files travel directly between your devices.\nNo servers, no copies, no middlemen.'}
+          {t('common:app.loadingTagline')}
         </Text>
       </View>
 

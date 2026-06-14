@@ -1,0 +1,91 @@
+{
+  "page": {
+    "selecting": {
+      "title": "Envoyer des fichiers",
+      "description": "Choisissez un ou plusieurs fichiers et générez un code à usage unique pour un transfert crypté direct."
+    },
+    "preparing": {
+      "title": "Préparation du transfert",
+      "description": "Préparation des fichiers sélectionnés avant la révélation du code de partage."
+    },
+    "waitingForReceiver": {
+      "title": "Partagez le code",
+      "description": "Envoyez le code ou QR à votre destinataire pour démarrer le transfert."
+    },
+    "receiverConnected": {
+      "title": "Partagez le code",
+      "description": "Envoyez le code ou QR à votre destinataire pour démarrer le transfert."
+    }
+  },
+  "actions": {
+    "sendFiles_one": "Envoyer {{count}} fichier",
+    "sendFiles_other": "Envoyer {{count}} fichiers",
+    "addFiles": "Ajouter des fichiers",
+    "addMoreFiles": "Ajouter plus de fichiers",
+    "dragAndDrop": "Glisser et déposer",
+    "clear": "Effacer",
+    "endSession": "Fin de séance",
+    "pickFilesTitle": "Ajouter des fichiers",
+    "pickPhotos": "Photothèque",
+    "pickFiles": "Fichiers"
+  },
+  "status": {
+    "waitingForPeer": "En attente du destinataire",
+    "peerConnected": "Destinataire connecté",
+    "uploadComplete": "Téléchargement terminé",
+    "uploadingFiles": "Téléchargement de fichiers",
+    "uploaded": "Téléchargé",
+    "uploading": "Téléchargement…",
+    "waiting": "En attente",
+    "failed": "Échec",
+    "downloaded": "Téléchargé",
+    "disconnected": "Déconnecté",
+    "online": "En ligne",
+    "downloading": "Téléchargement",
+    "downloadingPercent": "Téléchargement de {{percent}} %"
+  },
+  "connection": {
+    "placeholder": "Génération de clé sécurisée…",
+    "copyLabel": "Copier le code de connexion",
+    "showQrLabel": "Afficher le code QR",
+    "qrCodeLabel": "Code QR pour la clé de connexion",
+    "qrModalDescription": "Ouvrez AlterSend sur un autre appareil et scannez ce code",
+    "copiedToast": "Copié dans le presse-papiers",
+    "scanToConnect": "Scannez pour vous connecter",
+    "orScan": "ou scannez",
+    "generating": "Génération…",
+    "waitingForConnection": "En attente de connexion…"
+  },
+  "errors": {
+    "folderUnsupported": "Les dossiers ne sont pas encore pris en charge. Veuillez sélectionner uniquement les fichiers.",
+    "failedPickFiles": "Échec de la sélection des fichiers",
+    "failedPickPhotos": "Échec de la sélection des photos"
+  },
+  "hints": {
+    "keepOpen": "La fermeture de l'application annule le transfert."
+  },
+  "preparing": {
+    "uploadedCount_one": "{{completed}} fichier sur {{count}} téléversé",
+    "uploadedCount_other": "{{completed}} fichiers sur {{count}} téléversés"
+  },
+  "peer": {
+    "completedDone_one": "{{count}} terminé",
+    "completedDone_other": "{{count}} terminés",
+    "devices": "Appareils",
+    "connectedCount_one": "{{count}} connecté",
+    "connectedCount_other": "{{count}} connectés"
+  },
+  "dropzone": {
+    "addMoreDescription": "ou cliquez pour <link>en ajouter</link>",
+    "browseDescription": "ou cliquez pour <link>parcourir</link>",
+    "tapAddMoreDescription": "Touchez pour <link>en ajouter</link>",
+    "tapBrowseDescription": "Touchez pour <link>parcourir</link>",
+    "orClickTo": "ou cliquez pour",
+    "tapTo": "Touchez pour",
+    "addMoreLink": "en ajouter",
+    "browseLink": "parcourir"
+  },
+  "files": {
+    "removeLabel": "Supprimer {{name}}"
+  }
+}

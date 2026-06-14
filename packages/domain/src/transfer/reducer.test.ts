@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { initialTransferSessionState, transferSessionReducer } from './reducer'
+import {
+  TRANSFER_ERROR_CODES,
+  initialTransferSessionState,
+  transferSessionReducer
+} from './reducer'
 import type { TransferAction, TransferSessionState } from './types'
 import type { IncomingFileOffer } from '@altersend/core'
 
@@ -27,12 +31,15 @@ describe('transferSessionReducer — lifecycle', () => {
   })
 
   it('clears errorMessage on booted when one is present', () => {
-    const state = make({ errorMessage: 'old' })
-    expect(apply(state, { type: 'booted' }).errorMessage).toBeNull()
+    const state = make({ errorCode: TRANSFER_ERROR_CODES.transferFailed, errorMessage: 'old' })
+    const next = apply(state, { type: 'booted' })
+    expect(next.errorCode).toBeNull()
+    expect(next.errorMessage).toBeNull()
   })
 
-  it('sets errorMessage on boot_failed', () => {
+  it('sets a typed error on boot_failed', () => {
     const next = apply(make(), { type: 'boot_failed', message: 'boom' })
+    expect(next.errorCode).toBe(TRANSFER_ERROR_CODES.transferFailed)
     expect(next.errorMessage).toBe('boom')
   })
 })
@@ -101,13 +108,14 @@ describe('transferSessionReducer — connection', () => {
     expect(apply(make(), { type: 'reconnecting' }).isReconnecting).toBe(true)
   })
 
-  it('join_failed clears the session and stores the error', () => {
+  it('join_failed clears the session and stores a typed error', () => {
     const next = apply(make({ role: 'receiver', connectionState: 'joining' }), {
       type: 'join_failed',
       message: 'no host'
     })
     expect(next.role).toBeNull()
     expect(next.connectionState).toBe('disconnected')
+    expect(next.errorCode).toBe(TRANSFER_ERROR_CODES.joinFailed)
     expect(next.errorMessage).toBe('no host')
   })
 })
@@ -133,7 +141,8 @@ describe('transferSessionReducer — peer_unreachable', () => {
     expect(next.role).toBeNull()
     expect(next.connectionState).toBe('disconnected')
     expect(next.topic).toBe('')
-    expect(next.errorMessage).toMatch(/Couldn't reach the sender/)
+    expect(next.errorCode).toBe(TRANSFER_ERROR_CODES.peerUnreachable)
+    expect(next.errorMessage).toBeNull()
   })
 })
 
@@ -208,6 +217,41 @@ describe('transferSessionReducer — receive flow', () => {
     expect(next).toBe(state)
   })
 
+  it('receive_download_event preserves an existing transfer error on non-failed updates', () => {
+    const state = apply(make({ role: 'receiver' }), {
+      type: 'transfer_ready',
+      files: [offer('a', 'a.txt')]
+    })
+    const failed = apply(state, {
+      type: 'receive_download_event',
+      event: {
+        type: 'status',
+        state: 'download-failed',
+        transferId: 'tx-1',
+        fileId: 'a',
+        file: 'a.txt',
+        path: '/files/a.txt',
+        message: 'disk full'
+      }
+    })
+    const next = apply(failed, {
+      type: 'receive_download_event',
+      event: {
+        type: 'status',
+        state: 'downloading',
+        transferId: 'tx-1',
+        fileId: 'a',
+        file: 'a.txt',
+        path: '/files/a.txt',
+        totalBytes: 1024,
+        bytesTransferred: 512
+      }
+    })
+
+    expect(next.errorCode).toBe(TRANSFER_ERROR_CODES.downloadFailed)
+    expect(next.errorMessage).toBe('disk full')
+  })
+
   it('download_routed is a no-op when role is not receiver', () => {
     const state = make({ role: 'sender' })
     const next = apply(state, {
@@ -258,9 +302,20 @@ describe('transferSessionReducer — sender guards', () => {
 })
 
 describe('transferSessionReducer — misc', () => {
-  it('set_error sets the error message', () => {
+  it('set_error sets a typed generic transfer error by default', () => {
     const next = apply(make(), { type: 'set_error', message: 'broken' })
+    expect(next.errorCode).toBe(TRANSFER_ERROR_CODES.transferFailed)
     expect(next.errorMessage).toBe('broken')
+  })
+
+  it('set_error can store a typed download error', () => {
+    const next = apply(make(), {
+      type: 'set_error',
+      code: TRANSFER_ERROR_CODES.downloadFailed,
+      message: 'disk full'
+    })
+    expect(next.errorCode).toBe(TRANSFER_ERROR_CODES.downloadFailed)
+    expect(next.errorMessage).toBe('disk full')
   })
 
   it('role_changed: null clears all session-specific fields', () => {

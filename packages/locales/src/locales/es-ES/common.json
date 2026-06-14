@@ -1,0 +1,67 @@
+{
+  "app": {
+    "name": "AlterSend",
+    "tagline": "Transferencia directa de archivos",
+    "welcome": "Te damos la bienvenida a AlterSend",
+    "loadingTagline": "Los archivos viajan directamente entre tus dispositivos.\nSin servidores, sin copias, sin intermediarios."
+  },
+  "actions": {
+    "back": "Atrás",
+    "continue": "Continuar",
+    "getStarted": "Empezar",
+    "cancel": "Cancelar",
+    "clear": "Borrar",
+    "close": "Cerrar",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "connect": "Conectar",
+    "connecting": "Conectando…",
+    "done": "Listo",
+    "endSession": "Finalizar sesión",
+    "restart": "Reiniciar",
+    "tryAgain": "Intentarlo de nuevo",
+    "dismiss": "Descartar",
+    "openSettings": "Abrir configuración",
+    "update": "Actualizar",
+    "downloadAll": "Descargar todo",
+    "skip": "Omitir"
+  },
+  "labels": {
+    "settings": "Ajustes",
+    "language": "Idioma",
+    "systemDefault": "Predeterminado del sistema",
+    "camera": "Cámara",
+    "statusBar": "barra de estado",
+    "transferMode": "Modo de transferencia",
+    "version": "Versión",
+    "platform": "Plataforma",
+    "desktop": "Desktop",
+    "mobile": "Móvil",
+    "send": "Enviar",
+    "receive": "Recibir",
+    "connectionCode": "Código de conexión"
+  },
+  "files": {
+    "count_one": "{{count}} archivo",
+    "count_other": "{{count}} archivos",
+    "photos": "Fotos",
+    "files": "Archivos",
+    "downloads": "Archivos › Descargas",
+    "photosAndAlterSend": "Fotos + carpeta AlterSend",
+    "alterSendFolder": "Carpeta AlterSend"
+  },
+  "update": {
+    "ready": "Actualización lista",
+    "available": "Actualización disponible",
+    "restart": "Reiniciar",
+    "update": "Actualizar",
+    "restartFailed": "Error al reiniciar: salga y vuelva a abrir"
+  },
+  "status": {
+    "connected": "Conectado"
+  },
+  "confirm": {
+    "leaveShareSession": "Al salir, finalizará su sesión activa para compartir. ¿Continuar?",
+    "leaveReceiveSession": "Al salir, finalizará su sesión de recepción activa. ¿Continuar?"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "title": "Commentaires",
+  "types": {
+    "bug": "Rapport de bug",
+    "feature": "Demande de fonctionnalité",
+    "general": "Général"
+  },
+  "placeholders": {
+    "bug": "Décrivez ce qui s’est passé et comment le reproduire…",
+    "desktopBug": "Décrivez ce qui n’a pas fonctionné…",
+    "feature": "Que souhaiteriez-vous voir dans AlterSend?",
+    "desktopFeature": "Qu’aimeriez-vous voir?",
+    "general": "Partagez vos réflexions…"
+  },
+  "actions": {
+    "send": "Envoyer des commentaires",
+    "sending": "Envoi…"
+  },
+  "states": {
+    "sent": "Merci pour vos commentaires!",
+    "failed": "Échec de l'envoi. Vérifiez votre connexion.",
+    "received": "Votre retour a bien été reçu."
+  }
+}

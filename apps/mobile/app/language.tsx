@@ -1,30 +1,59 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { useRouter } from 'expo-router'
 import {
-  PICKABLE_LANGUAGES,
-  changeLocale,
+  LOCALE_OPTIONS,
+  changeI18nLanguage,
+  getLocaleFontFamily,
+  isMultiLangEnabled,
+  normalizeLocalePreference,
+  resolveActiveLocalePreference,
   useTranslation,
-  type LocalePreference
+  type LocaleOption,
+  type LocalePreference,
+  type SupportedLocaleCode
 } from '@altersend/locales'
-import { useTheme } from '@altersend/components'
+import { getNativeFontFamilyName, useTheme } from '@altersend/components'
 import { CheckIcon } from '@altersend/components/icons'
 import { Layout } from '@/src/components'
-import { setSavedLocale } from '@/src/lifecycle/localeStorage'
+import {
+  getLocalePreferenceSnapshot,
+  getSavedLocalePreference,
+  setSavedLocalePreference
+} from '@/src/lifecycle/localePreferenceStorage'
+import { getMobileSystemLocales } from '@/src/lifecycle/systemLocale'
+import { useRouter } from 'expo-router'
+import { useEffect, useState } from 'react'
+import { Pressable, StyleSheet, View } from 'react-native'
+import { Text } from '@/src/components/ThemedText'
 
 export default function LanguageScreen() {
+  const { t } = useTranslation(['settings', 'common'])
   const { theme } = useTheme()
   const router = useRouter()
-  const { i18n } = useTranslation()
-  const locale = i18n.language
+  const [preference, setPreference] = useState<LocalePreference>(getLocalePreferenceSnapshot)
 
-  const handleSelect = async (code: string) => {
-    try {
-      await changeLocale(code as LocalePreference)
-      void setSavedLocale(code as LocalePreference)
+  useEffect(() => {
+    if (!isMultiLangEnabled) {
       router.back()
-    } catch (err) {
-      console.warn('Failed to change language', err)
+      return
     }
+
+    let mounted = true
+    void getSavedLocalePreference().then((saved) => {
+      if (mounted) setPreference(saved)
+    })
+    return () => {
+      mounted = false
+    }
+  }, [router])
+
+  if (!isMultiLangEnabled) return null
+
+  const handleSelect = async (value: string) => {
+    const next = normalizeLocalePreference(value)
+    const resolvedLocale = resolveActiveLocalePreference(next, getMobileSystemLocales())
+    setPreference(next)
+    await setSavedLocalePreference(next)
+    router.back()
+    scheduleLanguageChange(resolvedLocale)
   }
 
   const cardStyle = {
@@ -33,27 +62,53 @@ export default function LanguageScreen() {
   }
 
   return (
-    <Layout title='Language' description='' hasNativeHeader>
+    <Layout
+      title={t('settings:languageTitle')}
+      description={t('settings:languageHint')}
+      hasNativeHeader
+    >
       <View style={[styles.card, cardStyle]}>
-        {PICKABLE_LANGUAGES.map((language, index) => {
-          const selected = language.code === locale
+        {LOCALE_OPTIONS.map((option, index) => {
+          const selected = option.preference === preference
           return (
-            <View key={language.code}>
+            <View key={option.preference}>
               <Pressable
                 accessibilityRole='button'
                 accessibilityState={{ selected }}
-                onPress={() => handleSelect(language.code)}
+                onPress={() => void handleSelect(option.preference)}
                 style={({ pressed }) => [
                   styles.row,
                   pressed && { backgroundColor: theme.colors.colorSurfacePrimary }
                 ]}
               >
-                <Text style={[styles.label, { color: theme.colors.colorTextPrimary }]}>
-                  {language.label}
-                </Text>
+                <View style={styles.rowText}>
+                  <Text
+                    style={[
+                      styles.label,
+                      {
+                        color: theme.colors.colorTextPrimary,
+                        fontFamily: getOptionNativeNameFontFamily(option)
+                      }
+                    ]}
+                  >
+                    {option.nativeName ?? t('common:labels.systemDefault')}
+                  </Text>
+                  {option.nativeName ? (
+                    <Text
+                      style={[
+                        styles.hint,
+                        {
+                          color: theme.colors.colorTextMuted
+                        }
+                      ]}
+                    >
+                      {option.label}
+                    </Text>
+                  ) : null}
+                </View>
                 {selected && <CheckIcon size={18} color={theme.colors.colorTextPrimary} />}
               </Pressable>
-              {index < PICKABLE_LANGUAGES.length - 1 && (
+              {index < LOCALE_OPTIONS.length - 1 && (
                 <View
                   style={[styles.divider, { backgroundColor: theme.colors.colorBorderPrimary }]}
                 />
@@ -66,6 +121,24 @@ export default function LanguageScreen() {
   )
 }
 
+function scheduleLanguageChange(resolvedLocale: SupportedLocaleCode) {
+  const changeLanguage = () => {
+    void changeI18nLanguage(resolvedLocale)
+  }
+
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(changeLanguage)
+    return
+  }
+
+  requestAnimationFrame(changeLanguage)
+}
+
+function getOptionNativeNameFontFamily(option: LocaleOption) {
+  if (!option.resolvedCode) return undefined
+  return getNativeFontFamilyName(getLocaleFontFamily(option.resolvedCode))
+}
+
 const styles = StyleSheet.create({
   card: {
     borderRadius: 16,
@@ -76,12 +149,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: 12,
     paddingHorizontal: 16,
-    paddingVertical: 15
+    paddingVertical: 13
+  },
+  rowText: {
+    flex: 1,
+    gap: 2
   },
   label: {
     fontSize: 15,
-    fontWeight: '500'
+    includeFontPadding: false,
+    lineHeight: 20
+  },
+  hint: {
+    fontSize: 12,
+    includeFontPadding: false,
+    lineHeight: 16
   },
   divider: {
     height: StyleSheet.hairlineWidth,

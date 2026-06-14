@@ -1,0 +1,21 @@
+{
+  "crash": {
+    "title": "出了点问题",
+    "desktopDescription": "AlterSend 遇到意外错误，需要重新启动。传输服务可能不稳定，因此重新启动是最安全的选择。",
+    "mobileDescription": "AlterSend 遇到意外错误。请重试，或者如果问题仍然存在，请关闭并重新打开应用程序。",
+    "restartAlterSend": "重新启动 AlterSend",
+    "tryAgain": "再试一次"
+  },
+  "bridgeUnavailable": {
+    "title": "桌面连接不可用",
+    "description": "此窗口未连接到桌面应用。请从桌面应用重新启动 AlterSend。",
+    "status": "桌面连接不可用"
+  },
+  "transfer": {
+    "invalidTopic": "连接代码无效。",
+    "joinFailed": "无法加入会话。",
+    "peerUnreachable": "无法连接到发送方。请检查代码后重试。",
+    "transferFailed": "传输失败。请重试。",
+    "downloadFailed": "下载失败。请重试。"
+  }
+}

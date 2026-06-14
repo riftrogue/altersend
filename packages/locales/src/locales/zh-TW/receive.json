@@ -1,0 +1,136 @@
+{
+  "page": {
+    "tabTitle": "接收",
+    "join": {
+      "title": "接收文件",
+      "description": "輸入寄件者提供的 64 個字元的連接代碼以傳輸其檔案。",
+      "mobileDescription": "掃描或匯入傳送方的 QR，或貼上 64 字元代碼開始接收。"
+    },
+    "connecting": {
+      "title": "正在連接",
+      "description": "與寄件者建立安全會話。"
+    },
+    "incomingTransfer": {
+      "title": "可用文件",
+      "description": "{{count}} {{fileLabel}} · {{size}}",
+      "description_one": "{{count}} 個檔案 · {{size}}",
+      "description_other": "{{count}} 個檔案 · {{size}}"
+    },
+    "completed": {
+      "title_one": "文件已收到",
+      "title_other": "收到文件",
+      "downloadsComplete": "下載完成"
+    },
+    "reconnecting": {
+      "title": "重新連接",
+      "description": "重新連接到會話。連結恢復後，文件將再次可用。",
+      "panelDescription": "連線中斷。正在重新加入工作階段…"
+    },
+    "interrupted": {
+      "title": "傳輸不完整",
+      "description": "寄件者在所有文件到達之前離開。"
+    },
+    "handshake": {
+      "title": "連接正在進行中",
+      "description": "完成與發送方的安全握手。"
+    },
+    "sessionEnded": {
+      "title": "會議結束",
+      "description": "返回開始新的傳輸。"
+    }
+  },
+  "panel": {
+    "filesReadyTitle": "文件準備好",
+    "filesReadyDescription": "寄件者已共用文件。查看它們並在準備好後開始每次下載。",
+    "receivedFiles": "收到的文件"
+  },
+  "form": {
+    "codeLabel": "連線代碼",
+    "codePlaceholder": "貼上 64 字元代碼...",
+    "orPasteCode": "或貼上代碼"
+  },
+  "actions": {
+    "scanQr": "掃描QR代碼",
+    "allowCamera": "允許拍照",
+    "downloadAll": "下載全部",
+    "view": "查看",
+    "play": "播放",
+    "open": "打開",
+    "scanQrHint": "使用網路攝影機讀取傳送者的 QR",
+    "downloadingPercent": "下載中 {{percent}}%",
+    "downloadAllWithSize": "全部下載（{{size}}）",
+    "showInFinder": "在 Finder 中顯示",
+    "backToHome": "返回首頁",
+    "viewPhotos": "查看照片",
+    "scanOrImportQr": "掃描或匯入 QR",
+    "scanOrImportQrHintDesktop": "使用網路攝影機，或匯入已儲存的 QR 圖片",
+    "scanOrImportQrHintMobile": "使用相機，或匯入已儲存的圖片",
+    "importImage": "匯入圖片",
+    "importFromImage": "從圖片匯入"
+  },
+  "errors": {
+    "invalidCode": "輸入有效的 64 字元十六進位代碼。",
+    "invalidKey": "輸入有效的 64 字元十六進位金鑰。",
+    "joinFailed": "無法加入會話。",
+    "unreachable": "無法聯繫寄件者。檢查代碼並重試。",
+    "unsupportedQrTitle": "QR 程式碼不受支援",
+    "unsupportedQrHint": "掃描 AlterSend 連線代碼。",
+    "mobileJoinFailedTitle": "無法加入會話",
+    "mobileJoinFailedHint": "嘗試再次掃描或手動貼上代碼。",
+    "cameraUnavailable": "相機不可用。",
+    "cameraCouldNotStart": "相機無法啟動。請改為貼上連接代碼。",
+    "downloadFailed": "失敗",
+    "didntArrive": "沒有到達",
+    "transferIssue": "轉帳問題",
+    "imageNoQrTitle": "找不到 QR 碼",
+    "imageNoQrHint": "請選擇包含 AlterSend QR 碼的圖片。",
+    "imageUnsupportedQrHint": "這張圖片不是 AlterSend 連線代碼。",
+    "imageReadFailedTitle": "無法讀取該圖片"
+  },
+  "camera": {
+    "preparingTitle": "準備相機",
+    "preparingDescription": "檢查攝影機存取權限，以便您可以掃描寄件者的 QR 代碼。",
+    "accessNeededTitle": "需要相機存取權限",
+    "accessNeededDescription": "允許攝影機存取以掃描發送者的連接 QR 代碼。",
+    "scanTitle": "掃描QR代碼",
+    "scanDescription": "將傳送者的 QR 碼置於取景框中央。AlterSend 會自動連線。",
+    "desktopHint": "將傳送者的 QR 碼對準網路攝影機，AlterSend 會自動連線。",
+    "blockedTitle": "攝影機存取被阻止",
+    "blockedHint": "在系統設定中允許 AlterSend 存取攝像頭，然後重試。您也可以貼上代碼。",
+    "noneTitle": "沒有找到相機",
+    "noneHint": "連接網路攝影機進行掃描，或貼上連接代碼。",
+    "unavailableTitle": "相機不可用",
+    "starting": "啟動相機...",
+    "enableTitle": "啟用相機存取",
+    "enableDescription": "僅用於掃描傳送者的 QR 代碼。你也可以返回並手動貼上代碼。",
+    "usePastedCode": "改用貼上的代碼",
+    "joiningDescription": "正在加入傳送者的工作階段。",
+    "scanImportTitle": "掃描或匯入 QR",
+    "scanImportDescription": "將傳送方的 QR 對準框內，或匯入已儲存的圖片。AlterSend 會自動連線。",
+    "desktopImportHint": "將傳送方的 QR 對準框內，或匯入已儲存的圖片。AlterSend 會自動連線。",
+    "enableImportDescription": "相機僅用於掃描 QR。你也可以匯入已儲存的圖片或手動貼上代碼。"
+  },
+  "status": {
+    "ready": "準備好了",
+    "saved": "已儲存",
+    "failed": "失敗",
+    "downloadingPercent": "正在下載 {{percent}}%",
+    "percent": "{{percent}}%",
+    "waitingForFiles": "正在等待傳送者的檔案…"
+  },
+  "summary": {
+    "receivedCount_one": "已收到 {{completed}} 個檔案（共 {{count}} 個）",
+    "receivedCount_other": "已收到 {{completed}} 個檔案（共 {{count}} 個）",
+    "savedToPhotos_one": "儲存到照片",
+    "savedToPhotos_other": "{{count}} 已儲存到照片",
+    "savedInFiles_one": "已儲存到檔案",
+    "savedInFiles_other": "{{count}} 儲存在檔案中",
+    "tapToView": "點擊查看",
+    "saved": "已儲存",
+    "savedToLocation": "已儲存至 {{location}}",
+    "receivedProgress": "已接收 {{count}} 個中的 {{completed}} 個",
+    "senderLeftBeforeFinishing": "傳送者在完成前離開了。",
+    "filesSaved_one": "已儲存 {{count}} 個檔案",
+    "filesSaved_other": "已儲存 {{count}} 個檔案"
+  }
+}

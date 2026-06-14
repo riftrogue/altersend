@@ -1,0 +1,136 @@
+{
+  "page": {
+    "tabTitle": "接收",
+    "join": {
+      "title": "接收文件",
+      "description": "输入发件人提供的 64 个字符的连接代码以传输其文件。",
+      "mobileDescription": "扫描或导入发送方的二维码，或粘贴 64 字符代码以开始接收。"
+    },
+    "connecting": {
+      "title": "正在连接",
+      "description": "与发件人建立安全会话。"
+    },
+    "incomingTransfer": {
+      "title": "可用文件",
+      "description": "{{count}} {{fileLabel}} · {{size}}",
+      "description_one": "{{count}} 个文件 · {{size}}",
+      "description_other": "{{count}} 个文件 · {{size}}"
+    },
+    "completed": {
+      "title_one": "文件已收到",
+      "title_other": "收到文件",
+      "downloadsComplete": "下载完成"
+    },
+    "reconnecting": {
+      "title": "重新连接",
+      "description": "重新连接到会话。链接恢复后，文件将再次可用。",
+      "panelDescription": "连接已断开。正在重新加入会话…"
+    },
+    "interrupted": {
+      "title": "传输不完整",
+      "description": "发件人在所有文件到达之前离开。"
+    },
+    "handshake": {
+      "title": "连接正在进行中",
+      "description": "完成与发送方的安全握手。"
+    },
+    "sessionEnded": {
+      "title": "会议结束",
+      "description": "返回开始新的传输。"
+    }
+  },
+  "panel": {
+    "filesReadyTitle": "文件准备好",
+    "filesReadyDescription": "发件人已共享文件。查看它们并在准备好后开始每次下载。",
+    "receivedFiles": "收到的文件"
+  },
+  "form": {
+    "codeLabel": "连接代码",
+    "codePlaceholder": "粘贴 64 字符代码...",
+    "orPasteCode": "或粘贴代码"
+  },
+  "actions": {
+    "scanQr": "扫描QR代码",
+    "allowCamera": "允许拍照",
+    "downloadAll": "下载全部",
+    "view": "查看",
+    "play": "播放",
+    "open": "打开",
+    "scanQrHint": "使用摄像头读取发送者的二维码",
+    "downloadingPercent": "正在下载 {{percent}}%",
+    "downloadAllWithSize": "全部下载（{{size}}）",
+    "showInFinder": "在 Finder 中显示",
+    "backToHome": "返回首页",
+    "viewPhotos": "查看照片",
+    "scanOrImportQr": "扫描或导入二维码",
+    "scanOrImportQrHintDesktop": "使用摄像头，或导入已保存的二维码图片",
+    "scanOrImportQrHintMobile": "使用相机，或导入已保存的图片",
+    "importImage": "导入图片",
+    "importFromImage": "从图片导入"
+  },
+  "errors": {
+    "invalidCode": "输入有效的 64 字符十六进制代码。",
+    "invalidKey": "输入有效的 64 字符十六进制密钥。",
+    "joinFailed": "无法加入会话。",
+    "unreachable": "无法联系发件人。检查代码并重试。",
+    "unsupportedQrTitle": "QR 代码不受支持",
+    "unsupportedQrHint": "扫描 AlterSend 连接代码。",
+    "mobileJoinFailedTitle": "无法加入会话",
+    "mobileJoinFailedHint": "尝试再次扫描或手动粘贴代码。",
+    "cameraUnavailable": "相机不可用。",
+    "cameraCouldNotStart": "相机无法启动。请改为粘贴连接代码。",
+    "downloadFailed": "失败",
+    "didntArrive": "没有到达",
+    "transferIssue": "转账问题",
+    "imageNoQrTitle": "未找到二维码",
+    "imageNoQrHint": "请选择包含 AlterSend 二维码的图片。",
+    "imageUnsupportedQrHint": "这张图片不是 AlterSend 连接码。",
+    "imageReadFailedTitle": "无法读取该图片"
+  },
+  "camera": {
+    "preparingTitle": "准备相机",
+    "preparingDescription": "检查摄像头访问权限，以便您可以扫描发件人的 QR 代码。",
+    "accessNeededTitle": "需要相机访问权限",
+    "accessNeededDescription": "允许摄像头访问以扫描发送者的连接 QR 代码。",
+    "scanTitle": "扫描QR代码",
+    "scanDescription": "将发送方的 QR 码置于取景框中央。AlterSend 会自动连接。",
+    "desktopHint": "将发送方的 QR 码对准网络摄像头，AlterSend 会自动连接。",
+    "blockedTitle": "摄像头访问被阻止",
+    "blockedHint": "在系统设置中允许 AlterSend 访问摄像头，然后重试。您也可以粘贴代码。",
+    "noneTitle": "没有找到相机",
+    "noneHint": "连接网络摄像头进行扫描，或粘贴连接代码。",
+    "unavailableTitle": "相机不可用",
+    "starting": "启动相机...",
+    "enableTitle": "启用摄像头访问",
+    "enableDescription": "仅用于扫描发送者的二维码。你也可以返回并手动粘贴代码。",
+    "usePastedCode": "改用粘贴的代码",
+    "joiningDescription": "正在加入发送者的会话。",
+    "scanImportTitle": "扫描或导入二维码",
+    "scanImportDescription": "将发送方二维码置于框内，或导入已保存的图片。AlterSend 会自动连接。",
+    "desktopImportHint": "将发送方二维码置于框内，或导入已保存的图片。AlterSend 会自动连接。",
+    "enableImportDescription": "相机仅用于扫描二维码。你也可以导入已保存的图片或手动粘贴代码。"
+  },
+  "status": {
+    "ready": "准备好了",
+    "saved": "已保存",
+    "failed": "失败",
+    "downloadingPercent": "正在下载 {{percent}}%",
+    "percent": "{{percent}}%",
+    "waitingForFiles": "正在等待发送者的文件…"
+  },
+  "summary": {
+    "receivedCount_one": "已收到 {{completed}} 个文件（共 {{count}} 个）",
+    "receivedCount_other": "已收到 {{completed}} 个文件（共 {{count}} 个）",
+    "savedToPhotos_one": "保存到照片",
+    "savedToPhotos_other": "{{count}} 已保存到照片",
+    "savedInFiles_one": "已保存到文件",
+    "savedInFiles_other": "{{count}} 个已保存到文件",
+    "tapToView": "点击查看",
+    "saved": "已保存",
+    "savedToLocation": "已保存到 {{location}}",
+    "receivedProgress": "已接收 {{count}} 个中的 {{completed}} 个",
+    "senderLeftBeforeFinishing": "发送者在完成前离开了。",
+    "filesSaved_one": "已保存 {{count}} 个文件",
+    "filesSaved_other": "已保存 {{count}} 个文件"
+  }
+}

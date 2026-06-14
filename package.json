@@ -17,6 +17,8 @@
     "desktop:build": "npm run build -w packages/core && npm run build -w packages/locales && npm run build -w packages/domain && npm run build -w packages/components && npm run build -w apps/desktop",
     "components:build": "npm run build -w packages/components",
     "domain:build": "npm run build -w packages/domain",
+    "locales:build": "npm run build -w packages/locales",
+    "locales:typecheck": "npm run typecheck -w packages/locales",
     "components:typecheck": "npm run typecheck -w packages/components",
     "components:storybook": "npm run storybook -w packages/components",
     "components:build-storybook": "npm run build-storybook -w packages/components",

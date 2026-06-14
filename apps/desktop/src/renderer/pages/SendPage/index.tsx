@@ -1,4 +1,5 @@
 import { Button } from '@altersend/components'
+import { useTranslation } from '@altersend/locales'
 import {
   clearSenderFlow,
   continueShare,
@@ -7,20 +8,19 @@ import {
   isShareStep,
   useTransferStore
 } from '@altersend/domain'
-import { useTranslation } from '@altersend/locales'
 import { TransferActionGroup, TransferCardFrame } from '../../components/TransferPrimitives'
 import { PreparingView } from './PreparingView'
 import { SelectFilesView } from './SelectFilesView'
 import { ShareView } from './ShareView'
 
 export default function SendPage() {
-  const { t } = useTranslation('send')
+  const { t } = useTranslation(['send', 'common'])
   const selectedFiles = useTransferStore((s) => s.selectedFiles)
   const draftPhase = useTransferStore((s) => s.draftPhase)
   const connectionState = useTransferStore((s) => s.connectionState)
 
   const step = getSendStep({ draftPhase, isPeerConnected: connectionState === 'peer-connected' })
-  const copy = getSendPageCopy(step, t)
+  const copy = getSendPageCopy(t, step)
   const hasSelectedFiles = selectedFiles.length > 0
 
   function renderView() {
@@ -44,7 +44,7 @@ export default function SendPage() {
       return (
         <TransferActionGroup>
           <Button onClick={clearSenderFlow} size='sm' variant='secondary'>
-            End session
+            {t('common:actions.endSession')}
           </Button>
         </TransferActionGroup>
       )
@@ -57,10 +57,10 @@ export default function SendPage() {
     return (
       <TransferActionGroup>
         <Button onClick={clearSenderFlow} size='sm' variant='ghost'>
-          Clear
+          {t('common:actions.clear')}
         </Button>
         <Button onClick={() => void continueShare(selectedFiles)} size='sm' variant='primary'>
-          Send {selectedFiles.length} file{selectedFiles.length === 1 ? '' : 's'}
+          {t('send:actions.sendFiles', { count: selectedFiles.length })}
         </Button>
       </TransferActionGroup>
     )

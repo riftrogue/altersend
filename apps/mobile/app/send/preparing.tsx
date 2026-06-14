@@ -10,12 +10,12 @@ import { PreparingView } from '@/src/transfer/send'
 import { useNavigation, useRouter } from 'expo-router'
 
 export default function SendPreparingScreen() {
-  const { t } = useTranslation('send')
+  const { t } = useTranslation(['send', 'common'])
   const { theme } = useTheme()
   const draftPhase = useTransferStore((s) => s.draftPhase)
   const connectionState = useTransferStore((s) => s.connectionState)
   const step = getSendStep({ draftPhase, isPeerConnected: connectionState === 'peer-connected' })
-  const copy = getSendPageCopy(step, t)
+  const copy = getSendPageCopy(t, step)
   const navigation = useNavigation()
   const router = useRouter()
 
@@ -33,7 +33,7 @@ export default function SendPreparingScreen() {
       headerLeft: () => (
         <Pressable
           accessibilityRole='button'
-          accessibilityLabel='Back'
+          accessibilityLabel={t('common:actions.back')}
           onPress={handleBack}
           hitSlop={12}
           style={({ pressed }) => ({
@@ -46,7 +46,7 @@ export default function SendPreparingScreen() {
         </Pressable>
       )
     })
-  }, [navigation, handleBack, theme.colors.colorTextPrimary])
+  }, [navigation, handleBack, t, theme.colors.colorTextPrimary])
 
   return (
     <Layout title={copy.title} description={copy.description} hasNativeHeader>

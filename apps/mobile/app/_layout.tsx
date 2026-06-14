@@ -12,24 +12,32 @@ import {
   startPeerWatchdog,
   useSimulatedLoading
 } from '@altersend/domain'
-import { changeLocale, getInitialLocale } from '@altersend/locales'
+import {
+  getLocaleFontFamily,
+  initI18n,
+  isSupportedLocaleCode,
+  resolveActiveLocalePreference,
+  useTranslation
+} from '@altersend/locales'
 import { Stack } from 'expo-router'
-import { StyleSheet, View } from 'react-native'
+import { Platform, StyleSheet, View } from 'react-native'
 import { useEffect, useState } from 'react'
 import * as SplashScreen from 'expo-splash-screen'
-
-SplashScreen.preventAutoHideAsync().catch(() => {})
 import { LoadingScreen } from '../src/loading'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { mobileApi } from '../src/api/mobileApi'
 import { ToastProvider } from '../src/components/Toast'
 import { UpdateBanner } from '../src/components/UpdateBanner'
+import { useAlterSendFonts } from '../src/theme/useAlterSendFonts'
 import { startAppStateBridge } from '../src/lifecycle/appStateBridge'
 import { startDeepLinkHandler } from '../src/lifecycle/deepLinkHandler'
-import { getSavedLocale } from '../src/lifecycle/localeStorage'
+import { getSavedLocalePreference } from '../src/lifecycle/localePreferenceStorage'
+import { getMobileSystemLocales } from '../src/lifecycle/systemLocale'
 import { ShareIntentHandler } from '../src/lifecycle/ShareIntentHandler'
 import { startPhotosCopyEffect } from '../src/transfer/receive'
 import { initSentry, captureException } from '../src/sentry'
+
+SplashScreen.preventAutoHideAsync().catch(() => {})
 
 initSentry()
 bindTransferApi(mobileApi, {
@@ -41,20 +49,35 @@ startBackgroundReconnectEffect()
 startPhotosCopyEffect()
 startDeepLinkHandler()
 
-function getFlowScreenOptions(theme: Theme) {
+function MobileCrashScreen({ error, onRestart }: { error: Error; onRestart: () => void }) {
+  const { t } = useTranslation(['errors'])
+
+  return (
+    <CrashScreen
+      error={error}
+      onRestart={onRestart}
+      title={t('errors:crash.title')}
+      description={t('errors:crash.mobileDescription')}
+      restartLabel={t('errors:crash.tryAgain')}
+    />
+  )
+}
+
+function getFlowScreenOptions(theme: Theme, backTitle: string) {
   return {
     headerShown: true,
     headerStyle: { backgroundColor: theme.colors.colorBackground },
     headerTintColor: theme.colors.colorTextPrimary,
     headerShadowVisible: false,
     headerTitle: '',
-    headerBackTitle: 'Back'
+    ...(Platform.OS === 'ios' ? { headerBackTitle: backTitle } : {})
   } as const
 }
 
 function ThemedStack() {
+  const { t } = useTranslation(['common'])
   const { theme } = useTheme()
-  const flowScreenOptions = getFlowScreenOptions(theme)
+  const flowScreenOptions = getFlowScreenOptions(theme, t('common:actions.back'))
   const progress = useSimulatedLoading()
 
   if (progress < 100) {
@@ -89,49 +112,20 @@ function ThemedStack() {
   )
 }
 
-export default function RootLayout() {
-  const [isReady, setIsReady] = useState(false)
-
-  useEffect(() => {
-    let isMounted = true
-    async function initLocale() {
-      try {
-        const savedLocale = await getSavedLocale()
-        if (!isMounted) return
-        const preference = savedLocale || 'system'
-        await changeLocale(getInitialLocale(preference))
-      } catch (err) {
-        console.warn(err)
-      } finally {
-        if (isMounted) {
-          setIsReady(true)
-          SplashScreen.hideAsync().catch(console.warn)
-        }
-      }
-    }
-    void initLocale()
-    return () => {
-      isMounted = false
-    }
-  }, [])
-
-  if (!isReady) return null
+function AppShell() {
+  const { i18n } = useTranslation()
+  const language = i18n.resolvedLanguage ?? i18n.language
+  const locale = isSupportedLocaleCode(language) ? language : 'en-US'
+  const fontFamily = getLocaleFontFamily(locale)
 
   return (
     <SafeAreaProvider>
       <View style={styles.root}>
-        <ThemeProvider theme={ThemeType.Dark}>
+        <ThemeProvider theme={ThemeType.Dark} fontFamily={fontFamily}>
           <ErrorBoundary
             fallback={(error, reset) => {
               captureException(error)
-              return (
-                <CrashScreen
-                  error={error}
-                  onRestart={reset}
-                  description='AlterSend hit an unexpected error. Try again, or close and reopen the app if the problem persists.'
-                  restartLabel='Try again'
-                />
-              )
+              return <MobileCrashScreen error={error} onRestart={reset} />
             }}
           >
             <ToastProvider>
@@ -144,6 +138,42 @@ export default function RootLayout() {
       </View>
     </SafeAreaProvider>
   )
+}
+
+export default function RootLayout() {
+  const [i18nReady, setI18nReady] = useState(false)
+  const [fontsLoaded, fontError] = useAlterSendFonts()
+
+  useEffect(() => {
+    let mounted = true
+    async function initializeLocale() {
+      try {
+        const preference = await getSavedLocalePreference()
+        await initI18n(resolveActiveLocalePreference(preference, getMobileSystemLocales()))
+      } catch (error) {
+        captureException(error)
+        console.warn('Failed to initialize locale:', error)
+      } finally {
+        if (mounted) setI18nReady(true)
+      }
+    }
+
+    void initializeLocale()
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (i18nReady && fontsLoaded) {
+      SplashScreen.hideAsync().catch(console.warn)
+    }
+  }, [fontsLoaded, i18nReady])
+
+  if (fontError) throw fontError
+  if (!i18nReady || !fontsLoaded) return null
+
+  return <AppShell />
 }
 
 const styles = StyleSheet.create({

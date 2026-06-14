@@ -1,0 +1,67 @@
+{
+  "app": {
+    "name": "AlterSend",
+    "tagline": "Transfert direct de fichiers",
+    "welcome": "Bienvenue dans AlterSend",
+    "loadingTagline": "Les fichiers passent directement entre vos appareils.\nAucun serveur, aucune copie, aucun intermédiaire."
+  },
+  "actions": {
+    "back": "Retour",
+    "continue": "Continuer",
+    "getStarted": "Commencer",
+    "cancel": "Annuler",
+    "clear": "Effacer",
+    "close": "Fermer",
+    "copy": "Copier",
+    "copied": "Copié",
+    "connect": "Connecter",
+    "connecting": "Connexion…",
+    "done": "Terminé",
+    "endSession": "Terminer la session",
+    "restart": "Redémarrer",
+    "tryAgain": "Réessayer",
+    "dismiss": "Fermer",
+    "openSettings": "Ouvrir les paramètres",
+    "update": "Mettre à jour",
+    "downloadAll": "Téléchargez tout",
+    "skip": "Ignorer"
+  },
+  "labels": {
+    "settings": "Paramètres",
+    "language": "Langue",
+    "systemDefault": "Valeur système",
+    "camera": "Caméra",
+    "statusBar": "Barre d'état",
+    "transferMode": "Mode de transfert",
+    "version": "Version de l’app",
+    "platform": "Plateforme",
+    "desktop": "Ordinateur",
+    "mobile": "Appareil mobile",
+    "send": "Envoyer",
+    "receive": "Recevoir",
+    "connectionCode": "Code de connexion"
+  },
+  "files": {
+    "count_one": "{{count}} fichier",
+    "count_other": "{{count}} fichiers",
+    "photos": "Photothèque",
+    "files": "Fichiers",
+    "downloads": "Fichiers › Téléchargements",
+    "photosAndAlterSend": "Photos + dossier AlterSend",
+    "alterSendFolder": "Dossier AlterSend"
+  },
+  "update": {
+    "ready": "Mise à jour prête",
+    "available": "Mise à jour disponible",
+    "restart": "Redémarrer",
+    "update": "Mettre à jour",
+    "restartFailed": "Échec du redémarrage: veuillez quitter et rouvrir"
+  },
+  "status": {
+    "connected": "Connecté"
+  },
+  "confirm": {
+    "leaveShareSession": "Quitter mettra fin à votre session de partage active. Continuer?",
+    "leaveReceiveSession": "Quitter mettra fin à votre session de réception active. Continuer?"
+  }
+}

@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo } from 'react'
-import { View, Text, StyleSheet, Pressable } from 'react-native'
+import { View, StyleSheet, Pressable } from 'react-native'
 import { Paths } from 'expo-file-system'
 import { Button, useTheme, withAlpha } from '@altersend/components'
 import { ArrowLeftIcon, DownloadIcon } from '@altersend/components/icons'
+import { useTranslation } from '@altersend/locales'
 import { useNavigation, useRouter } from 'expo-router'
 import { uriToPath } from '@/src/api/mobileApi'
 import { Layout, IllustrationLayout } from '@/src/components'
@@ -11,14 +12,17 @@ import ConnectionLostSvg from '../../../../assets/connection-lost.svg'
 import {
   createDirectoryDownloadRequests,
   formatFileSize,
+  getDisplayError,
   getDownloadTotals,
   getReceivePageCopy,
   getReceiveStep,
   useTransferStore
 } from '@altersend/domain'
 import { clearSession, downloadFiles } from '@altersend/domain'
+import { Text } from '@/src/components/ThemedText'
 
 export default function ReceiveIncomingScreen() {
+  const { t } = useTranslation(['receive', 'common', 'errors'])
   const { theme } = useTheme()
   const navigation = useNavigation()
   const router = useRouter()
@@ -27,7 +31,8 @@ export default function ReceiveIncomingScreen() {
   const role = useTransferStore((s) => s.role)
   const peerCount = useTransferStore((s) => s.peerCount)
   const isReconnecting = useTransferStore((s) => s.isReconnecting)
-  const errorMessage = useTransferStore((s) => s.errorMessage)
+  const errorCode = useTransferStore((s) => s.errorCode)
+  const displayError = getDisplayError(t, errorCode)
 
   const totals = useMemo(
     () => getDownloadTotals(incomingFileOffers, receiveDownloadStates),
@@ -63,7 +68,7 @@ export default function ReceiveIncomingScreen() {
       headerLeft: () => (
         <Pressable
           accessibilityRole='button'
-          accessibilityLabel='Back'
+          accessibilityLabel={t('common:actions.back')}
           onPress={handleEndSession}
           hitSlop={12}
           style={({ pressed }) => ({
@@ -76,10 +81,10 @@ export default function ReceiveIncomingScreen() {
         </Pressable>
       )
     })
-  }, [navigation, handleEndSession, theme.colors.colorTextPrimary])
+  }, [navigation, handleEndSession, t, theme.colors.colorTextPrimary])
 
   const totalBytes = incomingFileOffers.reduce((sum, f) => sum + f.size, 0)
-  const { title, description } = getReceivePageCopy(step, incomingFileOffers.length, totalBytes)
+  const { title, description } = getReceivePageCopy(t, step, incomingFileOffers.length, totalBytes)
 
   const handleDownloadAll = async () => {
     if (incomingFileOffers.length === 0 || isDownloading) return
@@ -96,7 +101,7 @@ export default function ReceiveIncomingScreen() {
 
   const endSessionButton = (
     <Button onClick={handleEndSession} size='lg' variant='secondary' width='full'>
-      End session
+      {t('common:actions.endSession')}
     </Button>
   )
 
@@ -118,14 +123,14 @@ export default function ReceiveIncomingScreen() {
   if (step !== 'incoming_transfer') {
     return (
       <IllustrationLayout
-        title='Session ended'
-        description='Return to start a new transfer.'
+        title={t('receive:page.sessionEnded.title')}
+        description={t('receive:page.sessionEnded.description')}
         hasNativeHeader
         illustration={<ConnectionLostSvg width='100%' height='100%' />}
         aspectRatio={800 / 430}
         footer={
           <Button onClick={handleEndSession} size='lg' variant='primary' width='full'>
-            Back to home
+            {t('receive:actions.backToHome')}
           </Button>
         }
       />
@@ -143,7 +148,9 @@ export default function ReceiveIncomingScreen() {
       ]}
     >
       <View style={[styles.badgeDot, { backgroundColor: theme.colors.colorSuccess }]} />
-      <Text style={[styles.badgeText, { color: theme.colors.colorSuccess }]}>Connected</Text>
+      <Text style={[styles.badgeText, { color: theme.colors.colorSuccess }]}>
+        {t('common:status.connected')}
+      </Text>
     </View>
   )
 
@@ -163,13 +170,19 @@ export default function ReceiveIncomingScreen() {
             variant='light'
             width='full'
           >
-            {isDownloading ? `Downloading ${totals.percent}%` : `Download all${sizeLabel}`}
+            {isDownloading
+              ? t('receive:actions.downloadingPercent', { percent: totals.percent })
+              : sizeLabel
+                ? t('receive:actions.downloadAllWithSize', { size: formatFileSize(totalBytes) })
+                : t('receive:actions.downloadAll')}
           </Button>
           {endSessionButton}
         </View>
       }
     >
-      {errorMessage ? <ErrorPanel message={errorMessage} /> : null}
+      {displayError ? (
+        <ErrorPanel title={t('receive:errors.transferIssue')} message={displayError} />
+      ) : null}
       <ReceiveIncomingView />
     </Layout>
   )

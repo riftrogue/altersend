@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react'
-import { Animated, Pressable, StyleSheet, Text, View } from 'react-native'
+import { Animated, Pressable, StyleSheet, View } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
 import { buildJoinUrl } from '@altersend/domain'
 import { Input, useTheme } from '@altersend/components'
 import { CheckIcon, CopyIcon } from '@altersend/components/icons'
+import { useTranslation } from '@altersend/locales'
+import { Text } from '@/src/components/ThemedText'
 
 interface QRSectionProps {
   topic: string
@@ -13,6 +15,7 @@ interface QRSectionProps {
 }
 
 export function QRSection({ topic, isKeyCopied, onCopy, showWaitingState }: QRSectionProps) {
+  const { t } = useTranslation(['send'])
   const { theme } = useTheme()
 
   const pulseAnim = useRef(new Animated.Value(0.3)).current
@@ -51,7 +54,9 @@ export function QRSection({ topic, isKeyCopied, onCopy, showWaitingState }: QRSe
             { backgroundColor: theme.colors.colorTextPrimary }
           ]}
         >
-          <Text style={{ color: theme.colors.colorTextSecondary }}>Generating code...</Text>
+          <Text style={{ color: theme.colors.colorTextSecondary }}>
+            {t('send:connection.generating')}
+          </Text>
         </View>
       )}
 
@@ -60,13 +65,13 @@ export function QRSection({ topic, isKeyCopied, onCopy, showWaitingState }: QRSe
           mono
           readOnly
           secure
-          placeholder='Generating secure key...'
+          placeholder={t('send:connection.placeholder')}
           value={topic}
           trailing={
             <Pressable
               onPress={onCopy}
               accessibilityRole='button'
-              accessibilityLabel='Copy connection code'
+              accessibilityLabel={t('send:connection.copyLabel')}
               style={({ pressed }) => [styles.copyButton, pressed && styles.copyButtonPressed]}
             >
               {isKeyCopied ? <CheckIcon size={16} /> : <CopyIcon size={16} />}
@@ -84,7 +89,7 @@ export function QRSection({ topic, isKeyCopied, onCopy, showWaitingState }: QRSe
             ]}
           />
           <Text style={[styles.waitingText, { color: theme.colors.colorTextMuted }]}>
-            Waiting for connection…
+            {t('send:connection.waitingForConnection')}
           </Text>
         </View>
       )}

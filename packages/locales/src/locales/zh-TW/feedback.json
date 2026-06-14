@@ -1,0 +1,24 @@
+{
+  "title": "意見回饋",
+  "types": {
+    "bug": "錯誤報告",
+    "feature": "功能請求",
+    "general": "一般"
+  },
+  "placeholders": {
+    "bug": "描述發生了什麼以及如何重現它...",
+    "desktopBug": "描述一下出了什麼問題...",
+    "feature": "您希望在 AlterSend 中看到什麼？",
+    "desktopFeature": "你想看什麼？",
+    "general": "分享您的想法..."
+  },
+  "actions": {
+    "send": "傳送回饋",
+    "sending": "正在發送..."
+  },
+  "states": {
+    "sent": "感謝您的回饋！",
+    "failed": "發送失敗。檢查您的連線。",
+    "received": "已收到你的回饋。"
+  }
+}

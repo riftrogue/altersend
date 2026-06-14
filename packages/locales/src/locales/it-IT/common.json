@@ -1,0 +1,67 @@
+{
+  "app": {
+    "name": "AlterSend",
+    "tagline": "Trasferimento diretto di file",
+    "welcome": "Benvenuto in AlterSend",
+    "loadingTagline": "I file viaggiano direttamente tra i tuoi dispositivi.\nNessun server, nessuna copia, nessun intermediario."
+  },
+  "actions": {
+    "back": "Indietro",
+    "continue": "Continua",
+    "getStarted": "Inizia",
+    "cancel": "Annulla",
+    "clear": "Cancella",
+    "close": "Chiudi",
+    "copy": "Copia",
+    "copied": "Copiato",
+    "connect": "Connetti",
+    "connecting": "Connessione…",
+    "done": "Fine",
+    "endSession": "Termina sessione",
+    "restart": "Riavvia",
+    "tryAgain": "Riprova",
+    "dismiss": "Ignora",
+    "openSettings": "Apri le impostazioni",
+    "update": "Aggiorna",
+    "downloadAll": "Scarica tutto",
+    "skip": "Salta"
+  },
+  "labels": {
+    "settings": "Impostazioni",
+    "language": "Lingua",
+    "systemDefault": "Predefinito di sistema",
+    "camera": "Fotocamera",
+    "statusBar": "Barra di stato",
+    "transferMode": "Modalità di trasferimento",
+    "version": "Versione",
+    "platform": "Piattaforma",
+    "desktop": "App desktop",
+    "mobile": "Dispositivo mobile",
+    "send": "Invia",
+    "receive": "Ricevi",
+    "connectionCode": "Codice di connessione"
+  },
+  "files": {
+    "count_one": "{{count}} file",
+    "count_other": "{{count}} file",
+    "photos": "Foto",
+    "files": "File",
+    "downloads": "File › Download",
+    "photosAndAlterSend": "Foto + cartella AlterSend",
+    "alterSendFolder": "Cartella AlterSend"
+  },
+  "update": {
+    "ready": "Aggiornamento pronto",
+    "available": "Aggiornamento disponibile",
+    "restart": "Riavvia",
+    "update": "Aggiorna",
+    "restartFailed": "Riavvio non riuscito: esci e riapri"
+  },
+  "status": {
+    "connected": "Connesso"
+  },
+  "confirm": {
+    "leaveShareSession": "L'abbandono terminerà la sessione di condivisione attiva. Continuare?",
+    "leaveReceiveSession": "L'abbandono terminerà la sessione di ricezione attiva. Continuare?"
+  }
+}

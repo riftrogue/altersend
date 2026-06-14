@@ -1,0 +1,67 @@
+{
+  "app": {
+    "name": "AlterSend",
+    "tagline": "直接文件传输",
+    "welcome": "欢迎使用 AlterSend",
+    "loadingTagline": "文件会在你的设备之间直接传输。\n没有服务器、没有副本、没有中间人。"
+  },
+  "actions": {
+    "back": "返回",
+    "continue": "继续",
+    "getStarted": "开始使用",
+    "cancel": "取消",
+    "clear": "清除",
+    "close": "关闭",
+    "copy": "复制",
+    "copied": "已复制",
+    "connect": "连接",
+    "connecting": "正在连接…",
+    "done": "完成",
+    "endSession": "结束会话",
+    "restart": "重启",
+    "tryAgain": "重试",
+    "dismiss": "关闭",
+    "openSettings": "打开设置",
+    "update": "更新",
+    "downloadAll": "下载全部",
+    "skip": "跳过"
+  },
+  "labels": {
+    "settings": "设置",
+    "language": "语言",
+    "systemDefault": "系统默认",
+    "camera": "摄像头",
+    "statusBar": "状态栏",
+    "transferMode": "传输方式",
+    "version": "版本",
+    "platform": "平台",
+    "desktop": "桌面端",
+    "mobile": "移动端",
+    "send": "发送",
+    "receive": "接收",
+    "connectionCode": "连接代码"
+  },
+  "files": {
+    "count_one": "{{count}} 个文件",
+    "count_other": "{{count}} 个文件",
+    "photos": "照片",
+    "files": "文件",
+    "downloads": "文件 › 下载",
+    "photosAndAlterSend": "照片 + AlterSend 文件夹",
+    "alterSendFolder": "AlterSend 文件夹"
+  },
+  "update": {
+    "ready": "更新准备就绪",
+    "available": "可用更新",
+    "restart": "重启",
+    "update": "更新",
+    "restartFailed": "重新启动失败 - 请退出并重新启动"
+  },
+  "status": {
+    "connected": "已连接"
+  },
+  "confirm": {
+    "leaveShareSession": "离开将结束您的活跃共享会话。继续？",
+    "leaveReceiveSession": "离开将结束您的活动接收会话。继续？"
+  }
+}

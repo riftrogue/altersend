@@ -1,9 +1,12 @@
 import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import { SendFileListRow, useTheme } from '@altersend/components'
 import { getDownloadRowDisplay, getOfferKey, useTransferStore } from '@altersend/domain'
+import { useTranslation } from '@altersend/locales'
+import { Text } from '@/src/components/ThemedText'
 
 export function ReceiveIncomingView() {
+  const { t } = useTranslation(['receive'])
   const incomingFileOffers = useTransferStore((s) => s.incomingFileOffers)
   const downloadStates = useTransferStore((s) => s.receiveDownloadStates)
   const { theme } = useTheme()
@@ -37,7 +40,7 @@ export function ReceiveIncomingView() {
         </View>
       ) : (
         <Text style={[styles.waitingText, { color: theme.colors.colorTextMuted }]}>
-          Waiting for files from sender…
+          {t('receive:status.waitingForFiles')}
         </Text>
       )}
     </View>

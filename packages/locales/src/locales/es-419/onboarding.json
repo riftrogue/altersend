@@ -1,0 +1,17 @@
+{
+  "slides": {
+    "direct": {
+      "title": "Archivos, directamente entre dispositivos.",
+      "description": "Un dispositivo envía, el otro recibe. Un código corto los conecta para que los archivos puedan transmitirse directamente."
+    },
+    "keepOpen": {
+      "title": "Mantenga ambas aplicaciones abiertas.",
+      "description": "Los archivos se transmiten directamente entre dispositivos: no hay nube. Cerrar o poner en segundo plano la aplicación cancelará la transferencia."
+    },
+    "encrypted": {
+      "title": "Cifrado de extremo a extremo.",
+      "description": "Sin servidores, sin copias, sin intermediarios. Tus archivos viajan directamente entre tú y el destinatario.",
+      "link": "Lea nuestra política de privacidad"
+    }
+  }
+}

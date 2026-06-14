@@ -77,7 +77,7 @@ export const tokens = css.defineVars({
   lineHeightRelaxed: "1.5",
   fontFamilySans: "\"SF Pro Text\", \"SF Pro Display\", \"Helvetica Neue\", sans-serif",
   fontFamilyDisplay: "\"SF Pro Display\", \"SF Pro Text\", \"Helvetica Neue\", sans-serif",
-  fontFamilyMono: "\"IBM Plex Mono\", \"SFMono-Regular\", \"JetBrains Mono\", Menlo, monospace",
+  fontFamilyMono: "ui-monospace, \"SFMono-Regular\", \"Menlo\", \"Monaco\", \"Consolas\", \"Liberation Mono\", \"Courier New\", monospace",
 });
 
 export type Tokens = typeof tokens;

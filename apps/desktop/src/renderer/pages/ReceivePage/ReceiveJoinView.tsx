@@ -1,16 +1,29 @@
 import { useState, type ChangeEvent } from 'react'
 import { Button, Input } from '@altersend/components'
 import { ChevronRightIcon, QrCodeIcon } from '@altersend/components/icons'
-import { isValidJoinCode, joinSession, useTransferStore } from '@altersend/domain'
+import {
+  getDisplayError,
+  getTransferErrorCode,
+  isValidJoinCode,
+  joinSession,
+  TRANSFER_ERROR_CODES,
+  type TransferErrorCode,
+  useTransferStore
+} from '@altersend/domain'
+import { useTranslation } from '@altersend/locales'
 import { WebcamScanView } from './WebcamScanView'
 
 export function ReceiveJoinView() {
+  const { t } = useTranslation(['receive', 'common', 'errors'])
   const [joinKey, setJoinKey] = useState('')
   const [showValidation, setShowValidation] = useState(false)
   const [isJoining, setIsJoining] = useState(false)
-  const [localError, setLocalError] = useState<string | null>(null)
+  const [localErrorCode, setLocalErrorCode] = useState<TransferErrorCode | null>(null)
   const [mode, setMode] = useState<'paste' | 'scan'>('paste')
-  const storeError = useTransferStore((s) => s.errorMessage)
+  const storeErrorCode = useTransferStore((s) => s.errorCode)
+  const displayStoreError = getDisplayError(t, storeErrorCode, {
+    invalidTopicKey: 'receive:errors.invalidKey'
+  })
 
   if (mode === 'scan') {
     return <WebcamScanView onCancel={() => setMode('paste')} />
@@ -20,19 +33,21 @@ export function ReceiveJoinView() {
   const isValidJoinKey = isValidJoinCode(trimmedJoinKey)
   const joinKeyError =
     showValidation && trimmedJoinKey.length > 0 && !isValidJoinKey
-      ? 'Enter a valid 64-character hex key.'
-      : (localError ?? storeError ?? undefined)
+      ? t('receive:errors.invalidKey')
+      : (getDisplayError(t, localErrorCode, { invalidTopicKey: 'receive:errors.invalidKey' }) ??
+        displayStoreError ??
+        undefined)
 
   const join = async () => {
     setShowValidation(true)
     if (!isValidJoinKey) return
     try {
       setIsJoining(true)
-      setLocalError(null)
+      setLocalErrorCode(null)
       await joinSession(trimmedJoinKey)
     } catch (error) {
       setIsJoining(false)
-      setLocalError(error instanceof Error ? error.message : 'Could not join the session.')
+      setLocalErrorCode(getTransferErrorCode(error, TRANSFER_ERROR_CODES.joinFailed))
     }
   }
 
@@ -49,10 +64,10 @@ export function ReceiveJoinView() {
         </span>
         <span className='min-w-0 flex-1'>
           <span className='block text-[13.5px] font-semibold text-text-primary'>
-            Scan or import QR
+            {t('receive:actions.scanOrImportQr')}
           </span>
           <span className='block text-[12px] leading-snug text-text-muted'>
-            Use the webcam, or import a saved QR image
+            {t('receive:actions.scanOrImportQrHintDesktop')}
           </span>
         </span>
         <span className='shrink-0 text-text-muted transition-transform group-hover:translate-x-0.5'>
@@ -60,7 +75,9 @@ export function ReceiveJoinView() {
         </span>
       </button>
 
-      <div className='py-0.5 text-center text-[12px] text-text-muted'>or paste code</div>
+      <div className='py-0.5 text-center text-[12px] text-text-muted'>
+        {t('receive:form.orPasteCode')}
+      </div>
 
       <div className='flex flex-col gap-3.5'>
         <Input
@@ -69,14 +86,14 @@ export function ReceiveJoinView() {
           disabled={isJoining}
           error={joinKeyError}
           secure
-          label='Connection code'
+          label={t('receive:form.codeLabel')}
           mono
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
             setJoinKey(e.currentTarget.value)
             if (showValidation) setShowValidation(false)
-            if (localError) setLocalError(null)
+            if (localErrorCode) setLocalErrorCode(null)
           }}
-          placeholder='Paste 64-char code…'
+          placeholder={t('receive:form.codePlaceholder')}
           spellCheck={false}
           type='text'
           value={joinKey}
@@ -84,7 +101,7 @@ export function ReceiveJoinView() {
 
         <div>
           <Button disabled={isJoining} onClick={() => void join()} size='sm' variant='primary'>
-            {isJoining ? 'Connecting…' : 'Connect'}
+            {isJoining ? t('common:actions.connecting') : t('common:actions.connect')}
           </Button>
         </div>
       </div>

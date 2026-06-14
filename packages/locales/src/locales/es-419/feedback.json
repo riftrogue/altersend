@@ -1,0 +1,24 @@
+{
+  "title": "Comentarios",
+  "types": {
+    "bug": "Informe de error",
+    "feature": "Solicitud de función",
+    "general": "generales"
+  },
+  "placeholders": {
+    "bug": "Describe lo que pasó y cómo reproducirlo...",
+    "desktopBug": "Describe lo que salió mal...",
+    "feature": "¿Qué te gustaría ver en AlterSend?",
+    "desktopFeature": "¿Qué te gustaría ver?",
+    "general": "Comparte tus pensamientos..."
+  },
+  "actions": {
+    "send": "Enviar comentarios",
+    "sending": "Enviando…"
+  },
+  "states": {
+    "sent": "¡Gracias por tus comentarios!",
+    "failed": "No se pudo enviar. Comprueba tu conexión.",
+    "received": "Recibimos tus comentarios."
+  }
+}

@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import QrScanner from 'qr-scanner'
 import { Button } from '@altersend/components'
-import { extractJoinCode, joinSession } from '@altersend/domain'
+import {
+  extractJoinCode,
+  getDisplayError,
+  getTransferErrorCode,
+  joinSession,
+  TRANSFER_ERROR_CODES
+} from '@altersend/domain'
+import { useTranslation } from '@altersend/locales'
 import { bridgeApi } from '../../api/bridgeApi'
 import { Select } from '../../components/Select'
 
@@ -19,6 +26,7 @@ const CAMERA_ERROR_STATES: Record<string, ScanState> = {
 }
 
 export function WebcamScanView({ onCancel }: WebcamScanViewProps) {
+  const { t } = useTranslation(['receive', 'common', 'errors'])
   const videoRef = useRef<HTMLVideoElement>(null)
   const scannerRef = useRef<QrScanner | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -50,7 +58,11 @@ export function WebcamScanView({ onCancel }: WebcamScanViewProps) {
       } catch (error) {
         if (signal.aborted) return
         handledRef.current = false
-        setErrorMessage(error instanceof Error ? error.message : 'Could not join the session.')
+        setErrorMessage(
+          getDisplayError(t, getTransferErrorCode(error, TRANSFER_ERROR_CODES.joinFailed), {
+            invalidTopicKey: 'receive:errors.invalidKey'
+          })
+        )
         setState('scanning')
         void scannerRef.current?.start()
       }
@@ -99,7 +111,7 @@ export function WebcamScanView({ onCancel }: WebcamScanViewProps) {
         if (mapped) {
           setState(mapped)
         } else {
-          setErrorMessage(error instanceof Error ? error.message : 'Camera unavailable.')
+          setErrorMessage(t('receive:errors.cameraCouldNotStart'))
           setState('failed')
         }
       }
@@ -112,7 +124,7 @@ export function WebcamScanView({ onCancel }: WebcamScanViewProps) {
       scanner.destroy()
       scannerRef.current = null
     }
-  }, [retryNonce])
+  }, [retryNonce, t])
 
   const retry = () => {
     setErrorMessage(null)
@@ -139,13 +151,13 @@ export function WebcamScanView({ onCancel }: WebcamScanViewProps) {
       const result = await QrScanner.scanImage(file, { returnDetailedScanResult: true })
       data = result.data
     } catch {
-      setErrorMessage('No QR code found in that image.')
+      setErrorMessage(t('receive:errors.imageNoQrHint'))
       return
     }
 
     const joinCode = extractJoinCode(data)
     if (!joinCode) {
-      setErrorMessage('That image isn’t an AlterSend connection code.')
+      setErrorMessage(t('receive:errors.imageUnsupportedQrHint'))
       return
     }
 
@@ -161,7 +173,11 @@ export function WebcamScanView({ onCancel }: WebcamScanViewProps) {
       await joinSession(joinCode)
     } catch (error) {
       handledRef.current = false
-      setErrorMessage(error instanceof Error ? error.message : 'Could not join the session.')
+      setErrorMessage(
+        getDisplayError(t, getTransferErrorCode(error, TRANSFER_ERROR_CODES.joinFailed), {
+          invalidTopicKey: 'receive:errors.invalidKey'
+        })
+      )
       setState(resumeState)
       if (resumeState === 'scanning') void scannerRef.current?.start()
     }
@@ -169,16 +185,16 @@ export function WebcamScanView({ onCancel }: WebcamScanViewProps) {
 
   const blockedMessages: Partial<Record<ScanState, { title: string; hint: string }>> = {
     denied: {
-      title: 'Camera access blocked',
-      hint: 'Allow camera access for AlterSend in your system settings, then try again. You can also paste the code instead.'
+      title: t('receive:camera.blockedTitle'),
+      hint: t('receive:camera.blockedHint')
     },
     'no-camera': {
-      title: 'No camera found',
-      hint: 'Connect a webcam to scan, or paste the connection code instead.'
+      title: t('receive:camera.noneTitle'),
+      hint: t('receive:camera.noneHint')
     },
     failed: {
-      title: 'Camera unavailable',
-      hint: errorMessage ?? 'The camera could not be started. Paste the connection code instead.'
+      title: t('receive:camera.unavailableTitle'),
+      hint: errorMessage ?? t('receive:errors.cameraCouldNotStart')
     }
   }
   const blocked = blockedMessages[state] ?? null
@@ -202,13 +218,13 @@ export function WebcamScanView({ onCancel }: WebcamScanViewProps) {
           <p className='m-0 mt-1.5 text-[13px] leading-relaxed text-text-muted'>{blocked.hint}</p>
           <div className='mt-4 flex flex-wrap items-center gap-2.5'>
             <Button onClick={retry} size='sm' variant='primary'>
-              Try again
+              {t('common:actions.tryAgain')}
             </Button>
             <Button onClick={() => fileInputRef.current?.click()} size='sm' variant='secondary'>
-              Import image
+              {t('receive:actions.importImage')}
             </Button>
             <Button onClick={onCancel} size='sm' variant='secondary'>
-              Paste code instead
+              {t('receive:camera.usePastedCode')}
             </Button>
           </div>
         </div>
@@ -237,11 +253,13 @@ export function WebcamScanView({ onCancel }: WebcamScanViewProps) {
             {state === 'starting' || state === 'connecting' ? (
               <div className='absolute inset-0 flex flex-col items-center justify-center gap-2 bg-scrim/55 text-center'>
                 <span className='text-[14px] font-medium text-on-accent'>
-                  {state === 'connecting' ? 'Connecting…' : 'Starting camera…'}
+                  {state === 'connecting'
+                    ? t('common:actions.connecting')
+                    : t('receive:camera.starting')}
                 </span>
                 {state === 'connecting' ? (
                   <span className='text-[12px] text-on-accent/75'>
-                    Joining the sender’s session.
+                    {t('receive:camera.joiningDescription')}
                   </span>
                 ) : null}
               </div>
@@ -250,8 +268,7 @@ export function WebcamScanView({ onCancel }: WebcamScanViewProps) {
 
           <div className='flex min-w-0 flex-1 flex-col gap-4'>
             <p className='m-0 text-[13px] leading-relaxed text-text-muted'>
-              Center the sender’s QR in the frame, or import a saved image. AlterSend connects
-              automatically.
+              {t('receive:camera.desktopImportHint')}
             </p>
 
             {errorMessage ? (
@@ -260,22 +277,27 @@ export function WebcamScanView({ onCancel }: WebcamScanViewProps) {
 
             {cameras.length > 1 ? (
               <div className='flex flex-col gap-1.5'>
-                <span className='text-[12px] font-medium text-text-secondary'>Camera</span>
+                <span className='text-[12px] font-medium text-text-secondary'>
+                  {t('common:labels.camera')}
+                </span>
                 <Select
-                  aria-label='Camera'
+                  aria-label={t('common:labels.camera')}
                   value={activeCamera ?? ''}
                   onChange={(value) => void switchCamera(value)}
-                  options={cameras.map((cam) => ({ value: cam.id, label: cam.label || 'Camera' }))}
+                  options={cameras.map((cam) => ({
+                    value: cam.id,
+                    label: cam.label || t('common:labels.camera')
+                  }))}
                 />
               </div>
             ) : null}
 
             <div className='flex flex-wrap gap-2.5'>
               <Button onClick={() => fileInputRef.current?.click()} size='sm' variant='secondary'>
-                Import image
+                {t('receive:actions.importImage')}
               </Button>
               <Button onClick={onCancel} size='sm' variant='secondary'>
-                Paste code instead
+                {t('receive:camera.usePastedCode')}
               </Button>
             </div>
           </div>

@@ -1,0 +1,24 @@
+{
+  "title": "Rückmeldung",
+  "types": {
+    "bug": "Fehlerbericht",
+    "feature": "Funktionsanfrage",
+    "general": "Allgemein"
+  },
+  "placeholders": {
+    "bug": "Beschreiben Sie, was passiert ist und wie Sie es reproduzieren können...",
+    "desktopBug": "Beschreiben Sie, was schief gelaufen ist...",
+    "feature": "Was würden Sie gerne in AlterSend sehen?",
+    "desktopFeature": "Was möchten Sie sehen?",
+    "general": "Teilen Sie Ihre Gedanken mit..."
+  },
+  "actions": {
+    "send": "Feedback senden",
+    "sending": "Senden…"
+  },
+  "states": {
+    "sent": "Vielen Dank für Ihr Feedback!",
+    "failed": "Senden fehlgeschlagen. Überprüfen Sie Ihre Verbindung.",
+    "received": "Dein Feedback wurde empfangen."
+  }
+}

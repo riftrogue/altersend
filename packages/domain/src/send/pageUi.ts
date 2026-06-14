@@ -2,56 +2,34 @@ export type SendStep = 'selecting' | 'preparing' | 'waiting_for_receiver' | 'rec
 
 export type SendDraftPhase = 'empty' | 'selected' | 'preparing' | 'ready'
 
+type Translate = (key: string, options?: Record<string, unknown>) => string
+
 export interface SendPageCopy {
   title: string
   description: string
 }
 
-export interface SendShareStatus {
-  label: string
-  tone: 'muted' | 'success'
-}
-import type { TFunction } from 'i18next'
-
-export function getSendPageCopy(step: SendStep, t: TFunction<'send'>): SendPageCopy {
+export function getSendPageCopy(t: Translate, step: SendStep): SendPageCopy {
   switch (step) {
     case 'selecting':
       return {
-        title: t('steps.selecting.title'),
-        description: t('steps.selecting.description')
+        title: t('send:page.selecting.title'),
+        description: t('send:page.selecting.description')
       }
     case 'preparing':
       return {
-        title: t('steps.preparing.title'),
-        description: t('steps.preparing.description')
+        title: t('send:page.preparing.title'),
+        description: t('send:page.preparing.description')
       }
     case 'waiting_for_receiver':
-    case 'receiver_connected':
       return {
-        title: t('steps.waiting_for_receiver.title'),
-        description: t('steps.waiting_for_receiver.description')
-      }
-    default: {
-      const exhaustiveCheck: never = step
-      return exhaustiveCheck
-    }
-  }
-}
-
-export function getSendShareStatus(step: SendStep, t: TFunction<'send'>): SendShareStatus | null {
-  switch (step) {
-    case 'selecting':
-    case 'preparing':
-      return null
-    case 'waiting_for_receiver':
-      return {
-        label: t('status.waiting_for_peer'),
-        tone: 'muted'
+        title: t('send:page.waitingForReceiver.title'),
+        description: t('send:page.waitingForReceiver.description')
       }
     case 'receiver_connected':
       return {
-        label: t('status.peer_connected'),
-        tone: 'success'
+        title: t('send:page.receiverConnected.title'),
+        description: t('send:page.receiverConnected.description')
       }
     default: {
       const exhaustiveCheck: never = step

@@ -1,0 +1,21 @@
+{
+  "crash": {
+    "title": "Algo deu errado",
+    "desktopDescription": "O AlterSend encontrou um erro inesperado e precisa ser reiniciado. O serviço de transferência pode estar instável — reiniciar é a opção mais segura.",
+    "mobileDescription": "O AlterSend encontrou um erro inesperado. Tente novamente ou feche e reabra o aplicativo se o problema persistir.",
+    "restartAlterSend": "Reiniciar o AlterSend",
+    "tryAgain": "Tente novamente"
+  },
+  "bridgeUnavailable": {
+    "title": "Conexão com o desktop indisponível",
+    "description": "Esta janela não está conectada ao aplicativo desktop. Reinicie o AlterSend pelo aplicativo desktop.",
+    "status": "Conexão com o desktop indisponível"
+  },
+  "transfer": {
+    "invalidTopic": "O código de conexão é inválido.",
+    "joinFailed": "Não foi possível entrar na sessão.",
+    "peerUnreachable": "Não foi possível alcançar o remetente. Verifique o código e tente novamente.",
+    "transferFailed": "A transferência falhou. Tente novamente.",
+    "downloadFailed": "O download falhou. Tente novamente."
+  }
+}

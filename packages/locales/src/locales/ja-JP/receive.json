@@ -1,0 +1,136 @@
+{
+  "page": {
+    "tabTitle": "受信",
+    "join": {
+      "title": "ファイルを受信",
+      "description": "送信側の64文字の接続コードを入力してファイルを受信します。",
+      "mobileDescription": "送信側のQRをスキャンまたは画像から読み込むか、64文字のコードを貼り付けて受信を開始します。"
+    },
+    "connecting": {
+      "title": "接続中",
+      "description": "送信側との安全なセッションを確立しています。"
+    },
+    "incomingTransfer": {
+      "title": "ファイルがあります",
+      "description": "{{count}} {{fileLabel}} · {{size}}",
+      "description_one": "{{count}} 個のファイル · {{size}}",
+      "description_other": "{{count}} 個のファイル · {{size}}"
+    },
+    "completed": {
+      "title_one": "ファイルを受信しました",
+      "title_other": "ファイルを受信しました",
+      "downloadsComplete": "ダウンロード完了"
+    },
+    "reconnecting": {
+      "title": "再接続中",
+      "description": "セッションに再接続しています。リンクが復旧するとファイルを再び利用できます。",
+      "panelDescription": "接続が切れました。セッションに再参加しています…"
+    },
+    "interrupted": {
+      "title": "転送未完了",
+      "description": "すべてのファイルが届く前に送信側が退出しました。"
+    },
+    "handshake": {
+      "title": "接続処理中",
+      "description": "送信側との安全なハンドシェイクを完了しています。"
+    },
+    "sessionEnded": {
+      "title": "セッション終了",
+      "description": "戻って新しい転送を開始してください。"
+    }
+  },
+  "panel": {
+    "filesReadyTitle": "ファイル準備完了",
+    "filesReadyDescription": "送信側がファイルを共有しました。確認して必要なものをダウンロードしてください。",
+    "receivedFiles": "受信したファイル"
+  },
+  "form": {
+    "codeLabel": "接続コード",
+    "codePlaceholder": "64文字のコードを貼り付け…",
+    "orPasteCode": "またはコードを貼り付け"
+  },
+  "actions": {
+    "scanQr": "QRコードをスキャン",
+    "allowCamera": "カメラを許可",
+    "downloadAll": "すべてダウンロード",
+    "view": "表示",
+    "play": "再生",
+    "open": "開く",
+    "scanQrHint": "Web カメラで送信者の QR を読み取ります",
+    "downloadingPercent": "ダウンロード中 {{percent}}%",
+    "downloadAllWithSize": "すべてダウンロード（{{size}}）",
+    "showInFinder": "Finder で表示",
+    "backToHome": "ホームに戻る",
+    "viewPhotos": "写真を表示",
+    "scanOrImportQr": "QRをスキャンまたは読み込み",
+    "scanOrImportQrHintDesktop": "Webカメラを使うか、保存済みのQR画像を読み込みます",
+    "scanOrImportQrHintMobile": "カメラを使うか、保存済み画像を読み込みます",
+    "importImage": "画像を読み込む",
+    "importFromImage": "画像から読み込む"
+  },
+  "errors": {
+    "invalidCode": "有効な64文字の16進コードを入力してください。",
+    "invalidKey": "有効な64文字の16進キーを入力してください。",
+    "joinFailed": "セッションに参加できませんでした。",
+    "unreachable": "送信側に接続できませんでした。コードを確認して再試行してください。",
+    "unsupportedQrTitle": "対応していないQRコード",
+    "unsupportedQrHint": "AlterSend の接続コードをスキャンしてください。",
+    "mobileJoinFailedTitle": "セッションに参加できませんでした",
+    "mobileJoinFailedHint": "もう一度スキャンするかコードを貼り付けてください。",
+    "cameraUnavailable": "カメラを利用できません。",
+    "cameraCouldNotStart": "カメラを開始できませんでした。コードを貼り付けてください。",
+    "downloadFailed": "失敗",
+    "didntArrive": "未着",
+    "transferIssue": "転送の問題",
+    "imageNoQrTitle": "QRコードが見つかりません",
+    "imageNoQrHint": "AlterSend のQRコードが写っている画像を選択してください。",
+    "imageUnsupportedQrHint": "この画像は AlterSend の接続コードではありません。",
+    "imageReadFailedTitle": "画像を読み取れませんでした"
+  },
+  "camera": {
+    "preparingTitle": "カメラを準備中",
+    "preparingDescription": "送信側のQRコードをスキャンできるようカメラ権限を確認しています。",
+    "accessNeededTitle": "カメラアクセスが必要です",
+    "accessNeededDescription": "送信側の接続QRコードをスキャンするにはカメラを許可してください。",
+    "scanTitle": "QRコードをスキャン",
+    "scanDescription": "送信側のQRコードを枠内に合わせてください。AlterSend が自動で接続します。",
+    "desktopHint": "送信側のQRコードをWebカメラに向けてください — AlterSend が自動で接続します。",
+    "blockedTitle": "カメラアクセスがブロックされています",
+    "blockedHint": "システム設定で AlterSend のカメラアクセスを許可してから再試行してください。コード貼り付けも使えます。",
+    "noneTitle": "カメラが見つかりません",
+    "noneHint": "Webカメラを接続するか、接続コードを貼り付けてください。",
+    "unavailableTitle": "カメラを利用できません",
+    "starting": "カメラを起動中…",
+    "enableTitle": "カメラアクセスを有効にする",
+    "enableDescription": "送信者の QR コードを読み取るためだけに使用します。戻ってコードを手動で貼り付けることもできます。",
+    "usePastedCode": "代わりに貼り付けたコードを使う",
+    "joiningDescription": "送信者のセッションに参加しています。",
+    "scanImportTitle": "QRをスキャンまたは読み込み",
+    "scanImportDescription": "送信側のQRを枠内に合わせるか、保存済み画像を読み込んでください。AlterSend が自動で接続します。",
+    "desktopImportHint": "送信側のQRを枠内に合わせるか、保存済み画像を読み込んでください。AlterSend が自動で接続します。",
+    "enableImportDescription": "カメラはQRをスキャンするためだけに使用します。保存済み画像の読み込みやコードの貼り付けもできます。"
+  },
+  "status": {
+    "ready": "準備完了",
+    "saved": "保存済み",
+    "failed": "失敗",
+    "downloadingPercent": "{{percent}}% ダウンロード中",
+    "percent": "{{percent}}%",
+    "waitingForFiles": "送信者からのファイルを待機中…"
+  },
+  "summary": {
+    "receivedCount_one": "{{count}} 個中 {{completed}} 個を受信",
+    "receivedCount_other": "{{count}} 個中 {{completed}} 個を受信",
+    "savedToPhotos_one": "写真に保存しました",
+    "savedToPhotos_other": "{{count}} 個を写真に保存しました",
+    "savedInFiles_one": "ファイルに保存しました",
+    "savedInFiles_other": "{{count}} 個をファイルに保存しました",
+    "tapToView": "タップして表示",
+    "saved": "保存済み",
+    "savedToLocation": "{{location}} に保存済み",
+    "receivedProgress": "{{count}} 個中 {{completed}} 個受信済み",
+    "senderLeftBeforeFinishing": "完了前に送信者が退出しました。",
+    "filesSaved_one": "{{count}} 個のファイルを保存済み",
+    "filesSaved_other": "{{count}} 個のファイルを保存済み"
+  }
+}

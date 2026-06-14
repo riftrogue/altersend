@@ -1,0 +1,24 @@
+{
+  "title": "Feedback",
+  "types": {
+    "bug": "Relatório de bug",
+    "feature": "Sugestão de funcionalidade",
+    "general": "Geral"
+  },
+  "placeholders": {
+    "bug": "Descreva o que aconteceu e como reproduzi-lo…",
+    "desktopBug": "Descreva o que deu errado…",
+    "feature": "O que você gostaria de ver no AlterSend?",
+    "desktopFeature": "O que você gostaria de ver?",
+    "general": "Conte o que você acha…"
+  },
+  "actions": {
+    "send": "Enviar feedback",
+    "sending": "Enviando…"
+  },
+  "states": {
+    "sent": "Obrigado pelo seu feedback!",
+    "failed": "Falha ao enviar. Verifique sua conexão.",
+    "received": "Seu feedback foi recebido."
+  }
+}

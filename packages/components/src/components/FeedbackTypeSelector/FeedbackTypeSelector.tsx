@@ -1,13 +1,14 @@
 import { css, html } from 'react-strict-dom'
 import { tokens } from '../../theme/tokens.css'
 
-const TYPES = ['Bug report', 'Feature request', 'General'] as const
+const TYPES = ['bug', 'feature', 'general'] as const
 export type FeedbackType = (typeof TYPES)[number]
 export { TYPES as FEEDBACK_TYPES }
 
 interface FeedbackTypeSelectorProps {
   value: FeedbackType
   onChange: (type: FeedbackType) => void
+  labels: Record<FeedbackType, string>
   disabled?: boolean
 }
 
@@ -23,10 +24,12 @@ const styles = css.create({
   chip: {
     display: 'flex',
     flex: 1,
+    minWidth: 0,
+    minHeight: 40,
     borderRadius: tokens.radiusSm,
     borderWidth: 0,
-    paddingTop: 10,
-    paddingBottom: 10,
+    paddingTop: 8,
+    paddingBottom: 8,
     paddingLeft: 8,
     paddingRight: 8,
     alignItems: 'center',
@@ -34,8 +37,7 @@ const styles = css.create({
     cursor: 'pointer',
     transitionProperty: 'background-color',
     transitionDuration: '150ms',
-    transitionTimingFunction: 'ease',
-    whiteSpace: 'nowrap'
+    transitionTimingFunction: 'ease'
   },
   chipDefault: {
     backgroundColor: 'transparent'
@@ -52,8 +54,11 @@ const styles = css.create({
     fontFamily: tokens.fontFamilySans,
     fontSize: tokens.fontSizeMd,
     fontWeight: tokens.fontWeightMedium,
+    overflow: 'hidden',
     textAlign: 'center',
-    whiteSpace: 'nowrap'
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    width: '100%'
   },
   labelDefault: {
     color: tokens.colorTextMuted
@@ -63,7 +68,12 @@ const styles = css.create({
   }
 })
 
-export function FeedbackTypeSelector({ value, onChange, disabled }: FeedbackTypeSelectorProps) {
+export function FeedbackTypeSelector({
+  value,
+  onChange,
+  labels,
+  disabled
+}: FeedbackTypeSelectorProps) {
   return (
     <html.div style={styles.track}>
       {TYPES.map((t) => {
@@ -82,7 +92,7 @@ export function FeedbackTypeSelector({ value, onChange, disabled }: FeedbackType
             <html.span
               style={[styles.label, selected ? styles.labelSelected : styles.labelDefault]}
             >
-              {t}
+              {labels[t]}
             </html.span>
           </html.button>
         )

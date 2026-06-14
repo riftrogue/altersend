@@ -1,0 +1,91 @@
+{
+  "page": {
+    "selecting": {
+      "title": "发送文件",
+      "description": "选择一个或多个文件并生成一次性代码以进行直接加密传输。"
+    },
+    "preparing": {
+      "title": "准备转移",
+      "description": "在共享代码公开之前准备好选定的文件。"
+    },
+    "waitingForReceiver": {
+      "title": "分享代码",
+      "description": "将代码或 QR 发送给您的收件人以开始转移。"
+    },
+    "receiverConnected": {
+      "title": "分享代码",
+      "description": "将代码或 QR 发送给您的收件人以开始转移。"
+    }
+  },
+  "actions": {
+    "sendFiles_one": "发送 {{count}} 个文件",
+    "sendFiles_other": "发送 {{count}} 个文件",
+    "addFiles": "添加文件",
+    "addMoreFiles": "添加更多文件",
+    "dragAndDrop": "拖放",
+    "clear": "清除",
+    "endSession": "结束会话",
+    "pickFilesTitle": "添加文件",
+    "pickPhotos": "照片",
+    "pickFiles": "文件"
+  },
+  "status": {
+    "waitingForPeer": "等待接收方",
+    "peerConnected": "接收方已连接",
+    "uploadComplete": "上传完成",
+    "uploadingFiles": "上传文件",
+    "uploaded": "已上传",
+    "uploading": "正在上传...",
+    "waiting": "等待",
+    "failed": "失败",
+    "downloaded": "已下载",
+    "disconnected": "已断开连接",
+    "online": "在线",
+    "downloading": "正在下载",
+    "downloadingPercent": "正在下载 {{percent}}%"
+  },
+  "connection": {
+    "placeholder": "正在生成安全密钥...",
+    "copyLabel": "复制连接代码",
+    "showQrLabel": "显示QR代码",
+    "qrCodeLabel": "连接密钥的 QR 代码",
+    "qrModalDescription": "在另一台设备上打开 AlterSend 并扫描此代码",
+    "copiedToast": "已复制到剪贴板",
+    "scanToConnect": "扫描以连接",
+    "orScan": "或扫描",
+    "generating": "正在生成…",
+    "waitingForConnection": "正在等待连接…"
+  },
+  "errors": {
+    "folderUnsupported": "尚不支持文件夹。请仅选择文件。",
+    "failedPickFiles": "选取文件失败",
+    "failedPickPhotos": "无法选择照片"
+  },
+  "hints": {
+    "keepOpen": "关闭应用程序会取消传输。"
+  },
+  "preparing": {
+    "uploadedCount_one": "已上传 {{count}} 个文件中的 {{completed}} 个",
+    "uploadedCount_other": "已上传 {{count}} 个文件中的 {{completed}} 个"
+  },
+  "peer": {
+    "completedDone_one": "{{count}} 个已完成",
+    "completedDone_other": "{{count}} 个已完成",
+    "devices": "设备",
+    "connectedCount_one": "{{count}} 台设备已连接",
+    "connectedCount_other": "{{count}} 台设备已连接"
+  },
+  "dropzone": {
+    "addMoreDescription": "或点击<link>继续添加</link>",
+    "browseDescription": "或点击<link>浏览</link>",
+    "tapAddMoreDescription": "点按<link>继续添加</link>",
+    "tapBrowseDescription": "点按<link>浏览</link>",
+    "orClickTo": "或点击",
+    "tapTo": "点按",
+    "addMoreLink": "继续添加",
+    "browseLink": "浏览"
+  },
+  "files": {
+    "removeLabel": "删除{{name}}"
+  }
+}

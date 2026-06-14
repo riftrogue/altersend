@@ -1,6 +1,6 @@
 # Architecture
 
-AlterSend is a monorepo with two apps (desktop, mobile) sharing three packages (core, domain, components). All P2P networking runs in a Bare worklet process, isolated from both the UI and the host runtime.
+AlterSend is a monorepo with two apps (desktop, mobile) sharing four packages (core, domain, components, i18n). All P2P networking runs in a Bare worklet process, isolated from both the UI and the host runtime.
 
 ## Repository layout
 
@@ -12,6 +12,7 @@ packages/
   core/             P2P protocol — Hyperswarm, Hyperdrive, RPC, transfer orchestration
   domain/           State management — Zustand store, reducers, business logic
   components/       Shared UI — React Strict DOM components, Tailwind tokens
+  i18n/             Shared locale metadata, i18next setup, and catalogs
 ```
 
 ## Data flow
@@ -49,7 +50,6 @@ packages/
 The protocol layer. Runs entirely inside a **Bare worklet** — a lightweight JS runtime (Bare) spawned by the host app. This isolates P2P networking from Electron / React Native.
 
 Key modules:
-
 - `worklet/index.ts` — entrypoint; wires Bare IPC → RPC server → orchestrator
 - `worklet/transfer/orchestrator.ts` — top-level coordinator; owns session lifecycle + state and composes the three subsystems below
 - `worklet/transfer/swarm.ts` — `TransferSwarm`: Hyperswarm peer connectivity, Corestore replication, and per-peer control channels
@@ -64,7 +64,6 @@ Key modules:
 State and business logic, shared across desktop and mobile.
 
 Key modules:
-
 - `transfer/store.ts` — Zustand store
 - `transfer/reducer.ts` — pure reducer (all state transitions)
 - `transfer/binding.ts` — `bindTransferApi()` wires the store to the core worklet
@@ -76,7 +75,7 @@ Shared React components using **React Strict DOM** (works on both web and native
 
 ### `packages/locales`
 
-Shared multi-language (i18n) setup, consumed by both apps. Translations are JSON split by context (`common`, `send`, …) under `src/locales/<code>/`, with vanilla **i18next** initialized via **react-i18next** bindings; formatting leans on the platform `Intl` APIs. Each language declares a `productionReady` flag in its `meta.json`, and only ready languages are offered (`PICKABLE_LANGUAGES`); `resolveSupportedLocale()` normalizes any system/persisted BCP-47 tag down to a ready code. Locale preference lives in a small settings store in `packages/domain`; persistence is app-side (`localStorage` on desktop, a file on mobile). The picker UI is gated behind the `MULTI_LANG_ENABLED` release flag (currently `false`) so the app ships single-language until translations land. See `packages/locales/README.md` for the add-a-language guide.
+Shared internationalization package used by desktop and mobile. It owns supported locale metadata, locale preference resolution, i18next initialization, and bundled translation catalogs. The app-facing language UI is currently release-gated by `isMultiLangEnabled = false`; while disabled, desktop and mobile hide language pickers and force the active locale to `en-US`. See [i18n.md](i18n.md) for catalog structure and translation workflow.
 
 ## Transfer flow
 

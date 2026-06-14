@@ -1,0 +1,21 @@
+{
+  "crash": {
+    "title": "Etwas ist schief gelaufen",
+    "desktopDescription": "AlterSend ist auf einen unerwarteten Fehler gestoßen und muss neu gestartet werden. Der Übertragungsdienst ist möglicherweise instabil, daher ist ein Neustart die sicherste Option.",
+    "mobileDescription": "AlterSend hat einen unerwarteten Fehler festgestellt. Versuchen Sie es erneut oder schließen Sie die App und öffnen Sie sie erneut, wenn das Problem weiterhin besteht.",
+    "restartAlterSend": "Starten Sie AlterSend neu",
+    "tryAgain": "Versuchen Sie es erneut"
+  },
+  "bridgeUnavailable": {
+    "title": "Desktop-Verbindung nicht verfügbar",
+    "description": "Dieses Fenster ist nicht mit der Desktop-App verbunden. Starten Sie AlterSend über die Desktop-App neu.",
+    "status": "Desktop-Verbindung nicht verfügbar"
+  },
+  "transfer": {
+    "invalidTopic": "Der Verbindungscode ist ungültig.",
+    "joinFailed": "Der Sitzung konnte nicht beigetreten werden.",
+    "peerUnreachable": "Der Sender ist nicht erreichbar. Prüfen Sie den Code und versuchen Sie es erneut.",
+    "transferFailed": "Die Übertragung ist fehlgeschlagen. Versuchen Sie es erneut.",
+    "downloadFailed": "Der Download ist fehlgeschlagen. Versuchen Sie es erneut."
+  }
+}

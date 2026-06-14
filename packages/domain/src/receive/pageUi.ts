@@ -1,4 +1,4 @@
-import type { TransferRole } from '@altersend/domain'
+import type { TransferRole } from '@altersend/core'
 import { formatFileSize } from '../format'
 
 export type ReceiveStep =
@@ -9,12 +9,9 @@ export type ReceiveStep =
   | 'interrupted'
   | 'completed'
 
-export interface ReceivePageCopy {
-  title: string
-  description: string
-}
+type Translate = (key: string, options?: Record<string, unknown>) => string
 
-export interface ReceiveConnectedPanelCopy {
+export interface ReceivePageCopy {
   title: string
   description: string
 }
@@ -58,64 +55,45 @@ export function getReceiveStep({
 }
 
 export function getReceivePageCopy(
+  t: Translate,
   step: ReceiveStep,
   incomingCount: number,
-  totalBytes = 0
+  totalBytes: number
 ): ReceivePageCopy {
   switch (step) {
     case 'join':
       return {
-        title: 'Receive files',
-        description: 'Enter a 64-character connection code from the sender to stream their files.'
+        title: t('receive:page.join.title'),
+        description: t('receive:page.join.description')
       }
     case 'connecting':
       return {
-        title: 'Connecting',
-        description: 'Establishing a secure session with the sender.'
+        title: t('receive:page.connecting.title'),
+        description: t('receive:page.connecting.description')
       }
     case 'incoming_transfer':
       return {
-        title: 'Files available',
-        description: `${incomingCount} ${incomingCount === 1 ? 'file' : 'files'} · ${formatFileSize(totalBytes)}`
+        title: t('receive:page.incomingTransfer.title'),
+        description: t('receive:page.incomingTransfer.description', {
+          count: incomingCount,
+          size: formatFileSize(totalBytes)
+        })
       }
     case 'completed':
       return {
-        title: incomingCount === 1 ? 'File received' : 'Files received',
+        title: t('receive:page.completed.title', { count: incomingCount }),
         description: ''
       }
     case 'reconnecting':
       return {
-        title: 'Reconnecting',
-        description:
-          'Reconnecting to the session. Files will be available again as soon as the link is restored.'
+        title: t('receive:page.reconnecting.title'),
+        description: t('receive:page.reconnecting.description')
       }
     case 'interrupted':
       return {
-        title: 'Transfer incomplete',
-        description: 'The sender left before all files arrived.'
+        title: t('receive:page.interrupted.title'),
+        description: t('receive:page.interrupted.description')
       }
-    default: {
-      const exhaustiveCheck: never = step
-      return exhaustiveCheck
-    }
-  }
-}
-
-export function getConnectedPanelCopy(step: ReceiveStep): ReceiveConnectedPanelCopy | null {
-  switch (step) {
-    case 'incoming_transfer':
-      return {
-        title: 'Files ready',
-        description: 'The sender has shared files. Review them and start each download when ready.'
-      }
-    case 'completed':
-      return null
-    case 'reconnecting':
-    case 'interrupted':
-      return null
-    case 'join':
-    case 'connecting':
-      return null
     default: {
       const exhaustiveCheck: never = step
       return exhaustiveCheck

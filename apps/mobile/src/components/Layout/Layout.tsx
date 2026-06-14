@@ -1,9 +1,11 @@
 import { useTheme } from '@altersend/components'
 import { SettingsIcon } from '@altersend/components/icons'
+import { useTranslation } from '@altersend/locales'
 import { BlurView } from 'expo-blur'
 import { PropsWithChildren } from 'react'
-import { View, Text, StyleSheet, ScrollView, Pressable, Platform } from 'react-native'
+import { View, StyleSheet, ScrollView, Pressable, Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Text } from '@/src/components/ThemedText'
 
 interface LayoutProps {
   title: string
@@ -25,6 +27,7 @@ export const Layout = ({
   compactHeader,
   onMenuPress
 }: PropsWithChildren<LayoutProps>) => {
+  const { t } = useTranslation(['common'])
   const { theme } = useTheme()
   const insets = useSafeAreaInsets()
 
@@ -49,7 +52,7 @@ export const Layout = ({
           {onMenuPress ? (
             <Pressable
               accessibilityRole='button'
-              accessibilityLabel='Settings'
+              accessibilityLabel={t('common:labels.settings')}
               onPress={onMenuPress}
               hitSlop={12}
               style={({ pressed }) => [styles.menuButton, { opacity: pressed ? 0.6 : 1 }]}

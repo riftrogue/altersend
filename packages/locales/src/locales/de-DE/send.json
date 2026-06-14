@@ -1,0 +1,91 @@
+{
+  "page": {
+    "selecting": {
+      "title": "Dateien senden",
+      "description": "Wählen Sie eine oder mehrere Dateien aus und generieren Sie einen Einmalcode für eine direkte verschlüsselte Übertragung."
+    },
+    "preparing": {
+      "title": "Transfer vorbereiten",
+      "description": "Vorbereiten der ausgewählten Dateien, bevor der Freigabecode angezeigt wird."
+    },
+    "waitingForReceiver": {
+      "title": "Teilen Sie den Code",
+      "description": "Senden Sie den Code oder QR an Ihren Empfänger, um die Übertragung zu starten."
+    },
+    "receiverConnected": {
+      "title": "Teilen Sie den Code",
+      "description": "Senden Sie den Code oder QR an Ihren Empfänger, um die Übertragung zu starten."
+    }
+  },
+  "actions": {
+    "sendFiles_one": "{{count}} Datei senden",
+    "sendFiles_other": "{{count}} Dateien senden",
+    "addFiles": "Dateien hinzufügen",
+    "addMoreFiles": "Fügen Sie weitere Dateien hinzu",
+    "dragAndDrop": "Ziehen und ablegen",
+    "clear": "Klar",
+    "endSession": "Sitzung beenden",
+    "pickFilesTitle": "Dateien hinzufügen",
+    "pickPhotos": "Fotos",
+    "pickFiles": "Dateien"
+  },
+  "status": {
+    "waitingForPeer": "Warten auf Empfänger",
+    "peerConnected": "Empfänger verbunden",
+    "uploadComplete": "Hochladen abgeschlossen",
+    "uploadingFiles": "Hochladen von Dateien",
+    "uploaded": "Hochgeladen",
+    "uploading": "Hochladen…",
+    "waiting": "Warten",
+    "failed": "Fehlgeschlagen",
+    "downloaded": "Heruntergeladen",
+    "disconnected": "Nicht verbunden",
+    "online": "Verbunden",
+    "downloading": "Herunterladen",
+    "downloadingPercent": "{{percent}} % wird heruntergeladen"
+  },
+  "connection": {
+    "placeholder": "Sicherer Schlüssel wird generiert…",
+    "copyLabel": "Verbindungscode kopieren",
+    "showQrLabel": "QR-Code anzeigen",
+    "qrCodeLabel": "QR-Code für Verbindungsschlüssel",
+    "qrModalDescription": "Öffnen Sie AlterSend auf einem anderen Gerät und scannen Sie diesen Code",
+    "copiedToast": "In die Zwischenablage kopiert",
+    "scanToConnect": "Zum Verbinden scannen",
+    "orScan": "oder scannen",
+    "generating": "Wird erstellt…",
+    "waitingForConnection": "Warte auf Verbindung…"
+  },
+  "errors": {
+    "folderUnsupported": "Ordner werden noch nicht unterstützt. Bitte wählen Sie nur Dateien aus.",
+    "failedPickFiles": "Dateien konnten nicht ausgewählt werden",
+    "failedPickPhotos": "Fotos konnten nicht ausgewählt werden"
+  },
+  "hints": {
+    "keepOpen": "Durch das Schließen der App wird die Übertragung abgebrochen."
+  },
+  "preparing": {
+    "uploadedCount_one": "{{completed}} von {{count}} Datei hochgeladen",
+    "uploadedCount_other": "{{completed}} von {{count}} Dateien hochgeladen"
+  },
+  "peer": {
+    "completedDone_one": "{{count}} abgeschlossen",
+    "completedDone_other": "{{count}} abgeschlossen",
+    "devices": "Geräte",
+    "connectedCount_one": "{{count}} verbunden",
+    "connectedCount_other": "{{count}} verbunden"
+  },
+  "dropzone": {
+    "addMoreDescription": "oder klicken, um <link>weitere hinzuzufügen</link>",
+    "browseDescription": "oder klicken zum <link>Durchsuchen</link>",
+    "tapAddMoreDescription": "Tippen, um <link>weitere hinzuzufügen</link>",
+    "tapBrowseDescription": "Tippen zum <link>Durchsuchen</link>",
+    "orClickTo": "oder klicken zum",
+    "tapTo": "Tippen zum",
+    "addMoreLink": "weitere hinzufügen",
+    "browseLink": "Durchsuchen"
+  },
+  "files": {
+    "removeLabel": "Entfernen Sie {{name}}"
+  }
+}

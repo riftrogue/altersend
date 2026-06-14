@@ -10,12 +10,12 @@ import { ShareView } from '@/src/transfer/send'
 import { useNavigation } from 'expo-router'
 
 export default function SendShareScreen() {
-  const { t } = useTranslation('send')
+  const { t } = useTranslation(['send', 'common'])
   const { theme } = useTheme()
   const draftPhase = useTransferStore((s) => s.draftPhase)
   const connectionState = useTransferStore((s) => s.connectionState)
   const step = getSendStep({ draftPhase, isPeerConnected: connectionState === 'peer-connected' })
-  const copy = getSendPageCopy(step, t)
+  const copy = getSendPageCopy(t, step)
   const navigation = useNavigation()
 
   const handleBack = useCallback(() => {
@@ -28,7 +28,7 @@ export default function SendShareScreen() {
       headerLeft: () => (
         <Pressable
           accessibilityRole='button'
-          accessibilityLabel='Back'
+          accessibilityLabel={t('common:actions.back')}
           onPress={handleBack}
           hitSlop={12}
           style={({ pressed }) => ({
@@ -41,7 +41,7 @@ export default function SendShareScreen() {
         </Pressable>
       )
     })
-  }, [navigation, handleBack, theme.colors.colorTextPrimary])
+  }, [navigation, handleBack, t, theme.colors.colorTextPrimary])
 
   return (
     <Layout
@@ -51,7 +51,7 @@ export default function SendShareScreen() {
       footer={
         <View style={{ marginBottom: Platform.OS === 'android' ? 20 : 0 }}>
           <Button onClick={clearSenderFlow} size='lg' variant='secondary' width='full'>
-            End session
+            {t('common:actions.endSession')}
           </Button>
         </View>
       }

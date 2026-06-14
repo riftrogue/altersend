@@ -76,7 +76,7 @@
   --as-line-height-relaxed: 1.5;
   --as-font-family-sans: "SF Pro Text", "SF Pro Display", "Helvetica Neue", sans-serif;
   --as-font-family-display: "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
-  --as-font-family-mono: "IBM Plex Mono", "SFMono-Regular", "JetBrains Mono", Menlo, monospace;
+  --as-font-family-mono: ui-monospace, "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", monospace;
 }
 
 [data-theme='light'] {

@@ -1,6 +1,24 @@
 import { useState } from 'react'
-import { Button, ExternalLink, FeedbackTypeSelector, ToggleSwitch } from '@altersend/components'
+import {
+  Button,
+  ExternalLink,
+  FeedbackTypeSelector,
+  ToggleSwitch,
+  getFontFamilyCssVariables
+} from '@altersend/components'
 import type { FeedbackType } from '@altersend/components'
+import {
+  LOCALE_OPTIONS,
+  changeI18nLanguage,
+  getLocaleFontFamily,
+  isMultiLangEnabled,
+  normalizeLocalePreference,
+  resolveActiveLocalePreference,
+  Trans,
+  useTranslation,
+  type LocaleOption,
+  type LocalePreference
+} from '@altersend/locales'
 import {
   AlertCircleIcon,
   ArrowLeftIcon,
@@ -17,13 +35,6 @@ import {
   termsOfServiceUrl,
   websiteUrl
 } from '@altersend/domain'
-import {
-  MULTI_LANG_ENABLED,
-  PICKABLE_LANGUAGES,
-  useTranslation,
-  changeLocale,
-  type LocalePreference
-} from '@altersend/locales'
 import logo from '../../../../../../assets/logo.png'
 import { bridgeApi } from '../../api/bridgeApi'
 import { Select } from '../../components/Select'
@@ -32,30 +43,35 @@ import {
   isCrashReportingEnabled,
   setCrashReportingEnabled
 } from '../../lifecycle/crashReportingStorage'
-import { setSavedLocale } from '../../lifecycle/localeStorage'
-
-const PLACEHOLDERS: Record<FeedbackType, string> = {
-  'Bug report': 'Describe what went wrong…',
-  'Feature request': 'What would you like to see?',
-  General: 'Share your thoughts…'
-}
+import {
+  getSavedLocalePreference,
+  setSavedLocalePreference
+} from '../../lifecycle/localePreferenceStorage'
+import { getDesktopSystemLocales } from '../../lifecycle/systemLocale'
 
 const MENU_ITEMS = [
-  { icon: AlertCircleIcon, label: 'Feedback', key: 'feedback', chevron: true },
-  { icon: DiscordIcon, label: 'Discord', key: 'discord' },
-  { icon: GithubIcon, label: 'GitHub', key: 'github' },
-  { icon: GlobeIcon, label: 'Website', key: 'website' }
+  { icon: AlertCircleIcon, key: 'feedback', chevron: true },
+  { icon: DiscordIcon, key: 'discord' },
+  { icon: GithubIcon, key: 'github' },
+  { icon: GlobeIcon, key: 'website' }
 ] as const
+const DISCORD_EMBED_COLOR = 0x5865f2
+
+function getLocaleOptionFontFamily(option: LocaleOption): string | undefined {
+  if (!option.resolvedCode) return undefined
+  return getFontFamilyCssVariables(getLocaleFontFamily(option.resolvedCode)).fontFamily
+}
 
 export function FooterBar({ version }: { version: string }) {
+  const { t } = useTranslation(['settings', 'common', 'feedback'])
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [panel, setPanel] = useState<'settings' | 'report'>('settings')
-  const [reportType, setReportType] = useState<FeedbackType>('Bug report')
+  const [reportType, setReportType] = useState<FeedbackType>('bug')
   const [reportMessage, setReportMessage] = useState('')
   const [reportState, setReportState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [crashReporting, setCrashReporting] = useState(isCrashReportingEnabled)
-  const { i18n } = useTranslation()
-  const locale = i18n.language
+  const [localePreference, setLocalePreference] =
+    useState<LocalePreference>(getSavedLocalePreference)
 
   const handleCrashReportingToggle = (next: boolean) => {
     setCrashReporting(next)
@@ -65,10 +81,17 @@ export function FooterBar({ version }: { version: string }) {
     void bridgeApi.setSentryEnabled(next)
   }
 
+  const handleLocaleChange = (value: string) => {
+    const preference = normalizeLocalePreference(value)
+    setLocalePreference(preference)
+    setSavedLocalePreference(preference)
+    void changeI18nLanguage(resolveActiveLocalePreference(preference, getDesktopSystemLocales()))
+  }
+
   const closePanel = () => {
     setSettingsOpen(false)
     setPanel('settings')
-    setReportType('Bug report')
+    setReportType('bug')
     setReportMessage('')
     setReportState('idle')
   }
@@ -94,12 +117,16 @@ export function FooterBar({ version }: { version: string }) {
         body: JSON.stringify({
           embeds: [
             {
-              title: reportType,
+              title: t(`feedback:types.${reportType}`),
               description: reportMessage.trim(),
-              color: 0x5865f2,
+              color: DISCORD_EMBED_COLOR,
               fields: [
-                { name: 'Version', value: `v${version}`, inline: true },
-                { name: 'Platform', value: 'Desktop', inline: true }
+                { name: t('common:labels.version'), value: `v${version}`, inline: true },
+                {
+                  name: t('common:labels.platform'),
+                  value: t('common:labels.desktop'),
+                  inline: true
+                }
               ],
               timestamp: new Date().toISOString()
             }
@@ -128,8 +155,8 @@ export function FooterBar({ version }: { version: string }) {
 
         <div className='relative'>
           <button
-            aria-label='Settings'
-            title='Settings'
+            aria-label={t('common:labels.settings')}
+            title={t('common:labels.settings')}
             type='button'
             className='flex p-1.5 appearance-none items-center justify-center rounded-full border border-border-strong bg-surface-primary text-text-muted transition-colors hover:border-text-muted hover:text-text-primary'
             onClick={() => setSettingsOpen((v) => !v)}
@@ -145,40 +172,36 @@ export function FooterBar({ version }: { version: string }) {
                   <>
                     <div className='px-5 pb-4 pt-5'>
                       <p className='mb-4 mt-0 text-[11px] font-semibold uppercase tracking-widest text-text-muted'>
-                        Settings
+                        {t('settings:title')}
                       </p>
                       <ToggleSwitch
                         checked={crashReporting}
                         onChange={handleCrashReportingToggle}
-                        label='Crash reports'
-                        description='Share anonymous crash data to help improve AlterSend'
+                        label={t('settings:crashReports.label')}
+                        description={t('settings:crashReports.description')}
                       />
-                      {MULTI_LANG_ENABLED && (
+                      {isMultiLangEnabled && (
                         <div className='mt-3'>
                           <label className='mb-2 block text-[13px] font-medium text-text-secondary'>
-                            Language
+                            {t('common:labels.language')}
                           </label>
                           <Select
-                            aria-label='Language'
-                            value={locale}
-                            onChange={async (value) => {
-                              try {
-                                await changeLocale(value as LocalePreference)
-                                setSavedLocale(value as LocalePreference)
-                              } catch (err) {
-                                console.warn('Failed to change language', err)
-                              }
-                            }}
-                            options={PICKABLE_LANGUAGES.map((l) => ({
-                              value: l.code,
-                              label: l.label
+                            aria-label={t('common:labels.language')}
+                            value={localePreference}
+                            onChange={handleLocaleChange}
+                            options={LOCALE_OPTIONS.map((option) => ({
+                              value: option.preference,
+                              label: option.nativeName
+                                ? `${option.nativeName} · ${option.label}`
+                                : t('common:labels.systemDefault'),
+                              fontFamily: getLocaleOptionFontFamily(option)
                             }))}
                           />
                         </div>
                       )}
                     </div>
                     <div className='border-t border-border-primary py-1'>
-                      {MENU_ITEMS.map(({ icon: Icon, label, key, ...rest }) => (
+                      {MENU_ITEMS.map(({ icon: Icon, key, ...rest }) => (
                         <button
                           key={key}
                           type='button'
@@ -186,25 +209,41 @@ export function FooterBar({ version }: { version: string }) {
                           className='flex w-full appearance-none items-center gap-3 border-0 bg-transparent px-5 py-2.5 text-[14px] text-text-secondary transition-colors hover:bg-surface-secondary hover:text-text-primary'
                         >
                           <Icon size={15} />
-                          <span className='flex-1 text-left'>{label}</span>
+                          <span className='flex-1 text-left'>
+                            {key === 'feedback'
+                              ? t('settings:rows.feedback')
+                              : key === 'discord'
+                                ? t('settings:rows.discord')
+                                : key === 'github'
+                                  ? 'GitHub'
+                                  : t('settings:rows.website')}
+                          </span>
                           {'chevron' in rest && rest.chevron && <ChevronRightIcon size={13} />}
                         </button>
                       ))}
                     </div>
                     <div className='border-t border-border-primary px-5 py-4'>
                       <p className='m-0 font-medium text-[12px] text-text-muted'>
-                        <ExternalLink
-                          onPress={() => void bridgeApi.openExternalUrl(termsOfServiceUrl)}
-                        >
-                          Terms of Use
-                        </ExternalLink>
-                        {' and '}
-                        <ExternalLink
-                          onPress={() => void bridgeApi.openExternalUrl(privacyPolicyUrl)}
-                        >
-                          Privacy Statement
-                        </ExternalLink>
-                        {'.'}
+                        <Trans
+                          ns='settings'
+                          i18nKey='legal.sentence'
+                          components={{
+                            terms: (
+                              <ExternalLink
+                                onPress={() => void bridgeApi.openExternalUrl(termsOfServiceUrl)}
+                              >
+                                {null}
+                              </ExternalLink>
+                            ),
+                            privacy: (
+                              <ExternalLink
+                                onPress={() => void bridgeApi.openExternalUrl(privacyPolicyUrl)}
+                              >
+                                {null}
+                              </ExternalLink>
+                            )
+                          }}
+                        />
                       </p>
                     </div>
                   </>
@@ -219,16 +258,16 @@ export function FooterBar({ version }: { version: string }) {
                           setPanel('settings')
                           setReportState('idle')
                           setReportMessage('')
-                          setReportType('Bug report')
+                          setReportType('bug')
                         }}
                       >
-                        Feedback
+                        {t('feedback:title')}
                       </Button>
                     </div>
 
                     {reportState === 'sent' ? (
                       <p className='py-8 text-center text-[14px] text-text-secondary'>
-                        Thanks for your feedback!
+                        {t('feedback:states.sent')}
                       </p>
                     ) : (
                       <>
@@ -236,13 +275,24 @@ export function FooterBar({ version }: { version: string }) {
                           <FeedbackTypeSelector
                             value={reportType}
                             onChange={setReportType}
+                            labels={{
+                              bug: t('feedback:types.bug'),
+                              feature: t('feedback:types.feature'),
+                              general: t('feedback:types.general')
+                            }}
                             disabled={reportState === 'sending'}
                           />
                         </div>
                         <textarea
                           className='w-full resize-none rounded-lg border border-border-primary bg-surface-secondary px-3 py-3 font-sans text-[13px] text-text-primary placeholder:text-text-muted focus:border-border-strong focus:outline-none disabled:opacity-50'
                           rows={4}
-                          placeholder={PLACEHOLDERS[reportType]}
+                          placeholder={
+                            reportType === 'bug'
+                              ? t('feedback:placeholders.desktopBug')
+                              : reportType === 'feature'
+                                ? t('feedback:placeholders.desktopFeature')
+                                : t('feedback:placeholders.general')
+                          }
                           value={reportMessage}
                           disabled={reportState === 'sending'}
                           onChange={(e) => {
@@ -252,7 +302,7 @@ export function FooterBar({ version }: { version: string }) {
                         />
                         {reportState === 'error' && (
                           <p className='mt-1.5 text-[11px] text-danger'>
-                            Failed to send. Check your connection.
+                            {t('feedback:states.failed')}
                           </p>
                         )}
                         <div className='mt-3'>
@@ -263,7 +313,9 @@ export function FooterBar({ version }: { version: string }) {
                             disabled={!reportMessage.trim() || reportState === 'sending'}
                             onClick={() => void sendReport()}
                           >
-                            {reportState === 'sending' ? 'Sending…' : 'Send feedback'}
+                            {reportState === 'sending'
+                              ? t('feedback:actions.sending')
+                              : t('feedback:actions.send')}
                           </Button>
                         </div>
                       </>

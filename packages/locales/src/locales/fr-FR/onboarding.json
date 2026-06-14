@@ -1,0 +1,17 @@
+{
+  "slides": {
+    "direct": {
+      "title": "Fichiers, directement entre appareils.",
+      "description": "Un appareil envoie, l'autre reçoit. Un code court les connecte afin que les fichiers puissent être diffusés directement."
+    },
+    "keepOpen": {
+      "title": "Gardez les deux applications ouvertes.",
+      "description": "Les fichiers sont diffusés directement entre les appareils – il n’y a pas de cloud. La fermeture ou la mise en arrière-plan de l'application annulera le transfert."
+    },
+    "encrypted": {
+      "title": "Chiffré de bout en bout.",
+      "description": "Pas de serveurs, pas de copies, pas d'intermédiaires. Vos fichiers sont transférés directement entre vous et le destinataire.",
+      "link": "Lire notre politique de confidentialité"
+    }
+  }
+}

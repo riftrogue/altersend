@@ -1,0 +1,91 @@
+{
+  "page": {
+    "selecting": {
+      "title": "发送文件",
+      "description": "選擇一個或多個檔案並產生一次性代碼以進行直接加密傳輸。"
+    },
+    "preparing": {
+      "title": "準備轉移",
+      "description": "在共享代碼公開之前準備好選定的文件。"
+    },
+    "waitingForReceiver": {
+      "title": "分享程式碼",
+      "description": "將代碼或 QR 傳送給您的收件者以開始轉移。"
+    },
+    "receiverConnected": {
+      "title": "分享程式碼",
+      "description": "將代碼或 QR 傳送給您的收件者以開始轉移。"
+    }
+  },
+  "actions": {
+    "sendFiles_one": "傳送 {{count}} 個檔案",
+    "sendFiles_other": "傳送 {{count}} 個檔案",
+    "addFiles": "新增文件",
+    "addMoreFiles": "新增更多文件",
+    "dragAndDrop": "拖放",
+    "clear": "清除",
+    "endSession": "結束會話",
+    "pickFilesTitle": "新增文件",
+    "pickPhotos": "照片",
+    "pickFiles": "文件"
+  },
+  "status": {
+    "waitingForPeer": "等待接收方",
+    "peerConnected": "接收方已連線",
+    "uploadComplete": "上傳完成",
+    "uploadingFiles": "上傳文件",
+    "uploaded": "已上傳",
+    "uploading": "正在上傳...",
+    "waiting": "等待",
+    "failed": "失敗",
+    "downloaded": "已下載",
+    "disconnected": "已斷開連接",
+    "online": "網路",
+    "downloading": "正在下載",
+    "downloadingPercent": "正在下載 {{percent}}%"
+  },
+  "connection": {
+    "placeholder": "正在生成安全密钥...",
+    "copyLabel": "复制连接代码",
+    "showQrLabel": "显示QR代码",
+    "qrCodeLabel": "連接金鑰的 QR 代碼",
+    "qrModalDescription": "在另一個裝置上開啟 AlterSend 並掃描此程式碼",
+    "copiedToast": "已複製到剪貼簿",
+    "scanToConnect": "掃描以連線",
+    "orScan": "或掃描",
+    "generating": "產生中…",
+    "waitingForConnection": "正在等待連線…"
+  },
+  "errors": {
+    "folderUnsupported": "尚不支持文件夹。请仅选择文件。",
+    "failedPickFiles": "选取文件失败",
+    "failedPickPhotos": "无法选择照片"
+  },
+  "hints": {
+    "keepOpen": "關閉應用程式會取消傳輸。"
+  },
+  "preparing": {
+    "uploadedCount_one": "已上傳 {{count}} 個檔案中的 {{completed}} 個",
+    "uploadedCount_other": "已上傳 {{count}} 個檔案中的 {{completed}} 個"
+  },
+  "peer": {
+    "completedDone_one": "{{count}} 個已完成",
+    "completedDone_other": "{{count}} 個已完成",
+    "devices": "裝置",
+    "connectedCount_one": "{{count}} 台裝置已連線",
+    "connectedCount_other": "{{count}} 台裝置已連線"
+  },
+  "dropzone": {
+    "addMoreDescription": "或點擊<link>繼續新增</link>",
+    "browseDescription": "或點擊<link>瀏覽</link>",
+    "tapAddMoreDescription": "點一下<link>繼續新增</link>",
+    "tapBrowseDescription": "點一下<link>瀏覽</link>",
+    "orClickTo": "或點擊",
+    "tapTo": "點一下",
+    "addMoreLink": "繼續新增",
+    "browseLink": "瀏覽"
+  },
+  "files": {
+    "removeLabel": "删除{{name}}"
+  }
+}

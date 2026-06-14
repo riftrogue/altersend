@@ -2,19 +2,61 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { CrashScreen, ErrorBoundary, ThemeProvider, ThemeType } from '@altersend/components'
 import {
+  getLocaleFontFamily,
+  initI18n,
+  isSupportedLocaleCode,
+  resolveActiveLocalePreference,
+  useTranslation
+} from '@altersend/locales'
+import {
   bindTransferApi,
   startBackgroundReconnectEffect,
   startPeerWatchdog
 } from '@altersend/domain'
-import { changeLocale, getInitialLocale } from '@altersend/locales'
 import App from './App.js'
 import { bridgeApi, hasBridge } from './api/bridgeApi'
 import { startDeepLinkHandler } from './lifecycle/deepLinkHandler'
 import { initSentry, captureException } from './sentry'
 import { isCrashReportingEnabled } from './lifecycle/crashReportingStorage'
-import { getSavedLocale } from './lifecycle/localeStorage'
+import { getSavedLocalePreference } from './lifecycle/localePreferenceStorage'
+import { getDesktopSystemLocales } from './lifecycle/systemLocale'
 import './strict.css'
+import './fonts.css'
 import './index.css'
+
+function DesktopCrashScreen({ error }: { error: Error }) {
+  const { t } = useTranslation(['errors'])
+
+  return (
+    <CrashScreen
+      error={error}
+      onRestart={() => bridgeApi.appRestart?.()}
+      title={t('errors:crash.title')}
+      description={t('errors:crash.desktopDescription')}
+      restartLabel={t('errors:crash.restartAlterSend')}
+    />
+  )
+}
+
+function DesktopRoot() {
+  const { i18n } = useTranslation()
+  const language = i18n.resolvedLanguage ?? i18n.language
+  const locale = isSupportedLocaleCode(language) ? language : 'en-US'
+  const fontFamily = getLocaleFontFamily(locale)
+
+  return (
+    <ThemeProvider theme={ThemeType.Dark} fontFamily={fontFamily}>
+      <ErrorBoundary
+        fallback={(error) => {
+          captureException(error)
+          return <DesktopCrashScreen error={error} />
+        }}
+      >
+        <App />
+      </ErrorBoundary>
+    </ThemeProvider>
+  )
+}
 
 initSentry()
 void bridgeApi.setSentryEnabled(isCrashReportingEnabled())
@@ -29,32 +71,18 @@ if (hasBridge()) {
 }
 
 async function bootstrap() {
-  const savedLocale = getSavedLocale() || 'system'
   try {
-    await changeLocale(getInitialLocale(savedLocale))
-  } catch (err) {
-    console.warn('Failed to bootstrap locale', err)
+    await initI18n(
+      resolveActiveLocalePreference(getSavedLocalePreference(), getDesktopSystemLocales())
+    )
+  } catch (error) {
+    captureException(error)
+    console.warn('Failed to bootstrap locale', error)
   }
 
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
-      <ThemeProvider theme={ThemeType.Dark}>
-        <ErrorBoundary
-          fallback={(error) => {
-            captureException(error)
-            return (
-              <CrashScreen
-                error={error}
-                onRestart={() => bridgeApi.appRestart?.()}
-                description='AlterSend hit an unexpected error and needs to restart. The transfer worker may be in an inconsistent state, so a restart is the safest option.'
-                restartLabel='Restart AlterSend'
-              />
-            )
-          }}
-        >
-          <App />
-        </ErrorBoundary>
-      </ThemeProvider>
+      <DesktopRoot />
     </React.StrictMode>
   )
 }

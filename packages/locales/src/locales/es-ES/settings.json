@@ -1,0 +1,31 @@
+{
+  "title": "Ajustes",
+  "languageTitle": "Idioma",
+  "languageHint": "Elige el idioma utilizado por AlterSend.",
+  "sections": {
+    "privacy": "Privacidad",
+    "support": "Soporte",
+    "about": "Acerca de"
+  },
+  "crashReports": {
+    "label": "Informes de fallos",
+    "description": "Comparte datos anónimos sobre fallos para ayudar a mejorar AlterSend"
+  },
+  "rows": {
+    "feedback": "Comentarios",
+    "feedbackHint": "Informar un problema o sugerir una característica",
+    "discord": "Discord",
+    "discordHint": "Únete a la comunidad",
+    "contact": "Contáctenos",
+    "privacyPolicy": "Política de privacidad",
+    "privacyPolicyHint": "Cómo AlterSend maneja tus datos",
+    "terms": "Términos de servicio",
+    "termsHint": "Reglas para usar AlterSend",
+    "website": "Sitio web"
+  },
+  "legal": {
+    "terms": "Términos de uso",
+    "privacy": "Declaración de privacidad",
+    "sentence": "<terms>Términos de uso</terms> y <privacy>Declaración de privacidad</privacy>."
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "title": "反馈",
+  "types": {
+    "bug": "错误报告",
+    "feature": "功能请求",
+    "general": "一般"
+  },
+  "placeholders": {
+    "bug": "描述发生了什么以及如何重现它......",
+    "desktopBug": "描述一下出了什么问题...",
+    "feature": "您希望在 AlterSend 中看到什么？",
+    "desktopFeature": "你想看什么？",
+    "general": "分享您的想法..."
+  },
+  "actions": {
+    "send": "发送反馈",
+    "sending": "正在发送..."
+  },
+  "states": {
+    "sent": "感谢您的反馈！",
+    "failed": "发送失败。检查您的连接。",
+    "received": "已收到你的反馈。"
+  }
+}

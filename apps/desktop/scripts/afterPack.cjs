@@ -18,6 +18,7 @@
 const fs = require('fs')
 const fsp = require('fs/promises')
 const path = require('path')
+const releaseConfig = require('../../../packages/locales/src/release.json')
 
 const ARCH_NAMES = {
   0: 'ia32',
@@ -28,11 +29,39 @@ const ARCH_NAMES = {
 }
 
 exports.default = async function afterPack(context) {
+  await copyMacLocalizations(context)
   await prunePrebuilds(context)
 
   if (context.electronPlatformName === 'linux') {
     await wrapLinuxNoSandbox(context)
   }
+}
+
+async function copyMacLocalizations(context) {
+  if (context.electronPlatformName !== 'darwin' && context.electronPlatformName !== 'mas') return
+
+  const sourceDir = path.join(__dirname, '..', 'build', 'locales')
+  if (!fs.existsSync(sourceDir)) return
+
+  const appName = context.packager.appInfo.productFilename
+  const resourcesDir = path.join(context.appOutDir, `${appName}.app`, 'Contents', 'Resources')
+  const entries = await safeReadDir(sourceDir)
+
+  const localeEntries = releaseConfig.isMultiLangEnabled
+    ? entries
+    : entries.filter((entry) => entry.name === 'en.lproj')
+
+  for (const entry of localeEntries) {
+    if (!entry.isDirectory() || !entry.name.endsWith('.lproj')) continue
+    const targetDir = path.join(resourcesDir, entry.name)
+    await fsp.mkdir(targetDir, { recursive: true })
+    await fsp.copyFile(
+      path.join(sourceDir, entry.name, 'InfoPlist.strings'),
+      path.join(targetDir, 'InfoPlist.strings')
+    )
+  }
+
+  console.log(`afterPack: copied ${localeEntries.length} macOS localization dir(s)`)
 }
 
 async function prunePrebuilds(context) {

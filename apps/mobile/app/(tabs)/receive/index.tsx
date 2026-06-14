@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Button } from '@altersend/components'
+import { useTranslation } from '@altersend/locales'
 import { useFocusEffect, useRouter } from 'expo-router'
 import {
   JOIN_CODE_PATTERN,
+  getDisplayError,
   getDownloadTotals,
   getReceivePageCopy,
   getReceiveStep,
@@ -19,8 +21,9 @@ import {
 import { Layout } from '@/src/components'
 
 export default function ReceiveScreen() {
+  const { t } = useTranslation(['receive', 'common', 'errors'])
   const router = useRouter()
-  const errorMessage = useTransferStore((s) => s.errorMessage)
+  const errorCode = useTransferStore((s) => s.errorCode)
   const role = useTransferStore((s) => s.role)
   const isReconnecting = useTransferStore((s) => s.isReconnecting)
   const incomingFileOffers = useTransferStore((s) => s.incomingFileOffers)
@@ -38,8 +41,8 @@ export default function ReceiveScreen() {
     if (!showValidation || isValidJoinCode || trimmedJoinCode.length === 0) {
       return undefined
     }
-    return 'Enter a valid 64-character hex code.'
-  }, [isValidJoinCode, showValidation, trimmedJoinCode.length])
+    return t('receive:errors.invalidCode')
+  }, [isValidJoinCode, showValidation, t, trimmedJoinCode.length])
 
   const handleJoinCodeChange = (value: string) => {
     setJoinCode(value)
@@ -91,12 +94,10 @@ export default function ReceiveScreen() {
     }
   }, [step])
 
-  const copy = getReceivePageCopy(step, incomingFileOffers.length)
-  const title = step === 'join' ? 'Receive' : copy.title
-  const description =
-    step === 'join'
-      ? "Scan or import a sender's QR, or paste their 64-character code to start streaming."
-      : copy.description
+  const totalBytes = incomingFileOffers.reduce((sum, file) => sum + file.size, 0)
+  const copy = getReceivePageCopy(t, step, incomingFileOffers.length, totalBytes)
+  const title = step === 'join' ? t('receive:page.tabTitle') : copy.title
+  const description = step === 'join' ? t('receive:page.join.mobileDescription') : copy.description
 
   const footer =
     step === 'join' ? undefined : (
@@ -106,12 +107,15 @@ export default function ReceiveScreen() {
         variant={step === 'interrupted' ? 'primary' : 'secondary'}
         width='full'
       >
-        {step === 'interrupted' ? 'Done' : 'End session'}
+        {step === 'interrupted' ? t('common:actions.done') : t('common:actions.endSession')}
       </Button>
     )
 
+  const displayError = getDisplayError(t, errorCode)
   const errorPanel =
-    errorMessage && step !== 'interrupted' ? <ErrorPanel message={errorMessage} /> : null
+    displayError && step !== 'interrupted' ? (
+      <ErrorPanel title={t('receive:errors.transferIssue')} message={displayError} />
+    ) : null
 
   if (step === 'join') {
     return (

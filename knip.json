@@ -6,9 +6,7 @@
       "project": ["scripts/**/*.{js,cjs,mjs}"],
       "ignoreDependencies": [
         "expo",
-        "react",
-        "react-dom",
-        "react-native"
+        "react-dom"
       ]
     },
     "packages/core": {
@@ -18,14 +16,11 @@
       "entry": ["src/**/*.test.ts"]
     },
     "packages/locales": {
-      "entry": ["src/**/*.test.ts"]
+      "entry": ["src/**/*.test.ts"],
+      "project": ["src/**/*.{ts,tsx}"]
     },
     "packages/components": {
       "entry": [
-        "src/index.ts",
-        "src/theme/index.ts",
-        "src/theme/tokens.raw.ts",
-        "src/icons/index.ts",
         "scripts/*.mjs",
         ".storybook/{main,preview}.{ts,tsx}",
         "src/**/*.stories.{ts,tsx}"
@@ -50,7 +45,6 @@
         "src/**/*.{ts,tsx,cjs}",
         "scripts/**/*.{js,cjs,mjs}"
       ],
-      "ignoreUnresolved": ["^\\./sentry-dsn\\.gen\\.js$"],
       "ignoreDependencies": [
         "b4a",
         "bare-rpc",
@@ -59,11 +53,13 @@
         "hyperdrive",
         "hyperswarm",
         "pear-runtime-updater",
-        "tailwindcss",
         "@electron-forge/maker-dmg",
         "@electron-forge/maker-msix",
         "@electron-forge/maker-squirrel",
         "app-builder-lib"
+      ],
+      "ignoreUnresolved": [
+        "^\\./sentry-dsn\\.gen\\.js$"
       ],
       "ignoreBinaries": [
         "electron-builder.mac.json",

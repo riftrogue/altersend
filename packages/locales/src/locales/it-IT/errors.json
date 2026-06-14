@@ -1,0 +1,21 @@
+{
+  "crash": {
+    "title": "Qualcosa è andato storto",
+    "desktopDescription": "AlterSend ha riscontrato un errore imprevisto ed è necessario riavviarlo. Il servizio di trasferimento potrebbe essere instabile, quindi un riavvio è l'opzione più sicura.",
+    "mobileDescription": "AlterSend ha riscontrato un errore imprevisto. Riprova oppure chiudi e riapri l'app se il problema persiste.",
+    "restartAlterSend": "Riavvia AlterSend",
+    "tryAgain": "Riprova"
+  },
+  "bridgeUnavailable": {
+    "title": "Connessione desktop non disponibile",
+    "description": "Questa finestra non è collegata all'app desktop. Riavvia AlterSend dall'app desktop.",
+    "status": "Connessione desktop non disponibile"
+  },
+  "transfer": {
+    "invalidTopic": "Il codice di connessione non è valido.",
+    "joinFailed": "Impossibile partecipare alla sessione.",
+    "peerUnreachable": "Impossibile raggiungere il mittente. Controlla il codice e riprova.",
+    "transferFailed": "Trasferimento non riuscito. Riprova.",
+    "downloadFailed": "Download non riuscito. Riprova."
+  }
+}

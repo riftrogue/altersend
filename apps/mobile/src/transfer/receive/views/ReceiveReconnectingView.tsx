@@ -1,8 +1,10 @@
 import React, { PropsWithChildren } from 'react'
-import { View, ActivityIndicator, Text, StyleSheet } from 'react-native'
+import { View, ActivityIndicator, StyleSheet } from 'react-native'
 import { useTheme } from '@altersend/components'
+import { useTranslation } from '@altersend/locales'
 import { IllustrationLayout } from '@/src/components'
 import ConnectionLostSvg from '../../../../../../assets/connection-lost.svg'
+import { Text } from '@/src/components/ThemedText'
 
 interface ReceiveReconnectingViewProps {
   title: string
@@ -18,6 +20,7 @@ export function ReceiveReconnectingView({
   hasNativeHeader,
   children
 }: PropsWithChildren<ReceiveReconnectingViewProps>) {
+  const { t } = useTranslation(['receive'])
   const { theme } = useTheme()
 
   return (
@@ -42,10 +45,10 @@ export function ReceiveReconnectingView({
           <ActivityIndicator color={theme.colors.colorAccent} size='small' />
           <View style={styles.textWrap}>
             <Text style={[styles.title, { color: theme.colors.colorTextPrimary }]}>
-              Reconnecting
+              {t('receive:page.reconnecting.title')}
             </Text>
             <Text style={[styles.description, { color: theme.colors.colorTextSecondary }]}>
-              Connection dropped. Rejoining the session…
+              {t('receive:page.reconnecting.panelDescription')}
             </Text>
           </View>
         </View>

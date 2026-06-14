@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ActivityIndicator, Linking, Pressable, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Linking, Pressable, StyleSheet, View } from 'react-native'
 import {
   CameraView,
   scanFromURLAsync,
@@ -9,13 +9,16 @@ import {
 import * as ImagePicker from 'expo-image-picker'
 import { Button, useTheme, withAlpha } from '@altersend/components'
 import { ArrowLeftIcon, QrCodeIcon } from '@altersend/components/icons'
+import { useTranslation } from '@altersend/locales'
 import { useNavigation, useRouter } from 'expo-router'
 import { extractJoinCode, useTransferStore } from '@altersend/domain'
 import { joinSession } from '@altersend/domain'
 import { Layout } from '@/src/components'
 import { useToast } from '@/src/components/Toast'
+import { Text } from '@/src/components/ThemedText'
 
 export default function ReceiveScanScreen() {
+  const { t } = useTranslation(['receive', 'common'])
   const { theme } = useTheme()
   const navigation = useNavigation()
   const router = useRouter()
@@ -45,7 +48,7 @@ export default function ReceiveScanScreen() {
       headerBackVisible: false,
       headerLeft: () => (
         <Pressable
-          accessibilityLabel='Back'
+          accessibilityLabel={t('common:actions.back')}
           accessibilityRole='button'
           hitSlop={12}
           onPress={goBack}
@@ -59,7 +62,7 @@ export default function ReceiveScanScreen() {
         </Pressable>
       )
     })
-  }, [goBack, navigation, theme.colors.colorTextPrimary])
+  }, [goBack, navigation, t, theme.colors.colorTextPrimary])
 
   useEffect(() => {
     if (!permission) {
@@ -84,7 +87,7 @@ export default function ReceiveScanScreen() {
         if (now - invalidScanAtRef.current > 1500) {
           invalidScanAtRef.current = now
           toast.show({
-            title: 'Unsupported QR code',
+            title: t('receive:errors.unsupportedQrTitle'),
             hint: invalidHint,
             durationMs: 2500
           })
@@ -102,21 +105,21 @@ export default function ReceiveScanScreen() {
         scanLockRef.current = false
         setIsResolving(false)
         toast.show({
-          title: 'Couldn’t join session',
-          hint: 'Try again or paste the code manually.',
+          title: t('receive:errors.mobileJoinFailedTitle'),
+          hint: t('receive:errors.mobileJoinFailedHint'),
           durationMs: 3500
         })
       }
     },
-    [goBack, role, toast]
+    [goBack, role, t, toast]
   )
 
   const handleBarcodeScanned = useCallback(
     ({ data }: BarcodeScanningResult) => {
       if (!canScan) return
-      void resolveCode(data, 'Scan an AlterSend connection code.')
+      void resolveCode(data, t('receive:errors.unsupportedQrHint'))
     },
-    [canScan, resolveCode]
+    [canScan, resolveCode, t]
   )
 
   const importFromImage = useCallback(async () => {
@@ -135,40 +138,39 @@ export default function ReceiveScanScreen() {
       const [scan] = await scanFromURLAsync(asset.uri, ['qr'])
       if (!scan) {
         toast.show({
-          title: 'No QR code found',
-          hint: 'Pick an image that shows an AlterSend QR code.',
+          title: t('receive:errors.imageNoQrTitle'),
+          hint: t('receive:errors.imageNoQrHint'),
           durationMs: 2500
         })
         return
       }
-      await resolveCode(scan.data, 'That image isn’t an AlterSend connection code.')
+      await resolveCode(scan.data, t('receive:errors.imageUnsupportedQrHint'))
     } catch (error) {
       console.warn('ReceiveScanScreen: importFromImage failed', error)
-      toast.show({ title: 'Couldn’t read that image', durationMs: 2500 })
+      toast.show({ title: t('receive:errors.imageReadFailedTitle'), durationMs: 2500 })
     }
-  }, [resolveCode, role, toast])
+  }, [resolveCode, role, t, toast])
 
   const permissionCopy = useMemo(() => {
     if (!permission) {
       return {
-        title: 'Preparing camera',
-        description: 'Checking camera access so you can scan the sender’s QR code.'
+        title: t('receive:camera.preparingTitle'),
+        description: t('receive:camera.preparingDescription')
       }
     }
 
     if (!cameraGranted) {
       return {
-        title: 'Camera access needed',
-        description: 'Allow camera access to scan a sender’s connection QR code.'
+        title: t('receive:camera.accessNeededTitle'),
+        description: t('receive:camera.accessNeededDescription')
       }
     }
 
     return {
-      title: 'Scan or import QR',
-      description:
-        'Center the sender’s QR in the frame, or import a saved image. AlterSend connects automatically.'
+      title: t('receive:camera.scanImportTitle'),
+      description: t('receive:camera.scanImportDescription')
     }
-  }, [cameraGranted, permission])
+  }, [cameraGranted, permission, t])
 
   const handlePermissionAction = useCallback(async () => {
     if (canAskAgain) {
@@ -179,7 +181,9 @@ export default function ReceiveScanScreen() {
     await Linking.openSettings()
   }, [canAskAgain, requestPermission])
 
-  const permissionButtonLabel = canAskAgain ? 'Allow camera' : 'Open settings'
+  const permissionButtonLabel = canAskAgain
+    ? t('receive:actions.allowCamera')
+    : t('common:actions.openSettings')
 
   return (
     <Layout title={permissionCopy.title} description={permissionCopy.description} hasNativeHeader>
@@ -199,11 +203,10 @@ export default function ReceiveScanScreen() {
             <QrCodeIcon size={24} color={theme.colors.colorInfo} />
           </View>
           <Text style={[styles.noticeTitle, { color: theme.colors.colorTextPrimary }]}>
-            Enable camera access
+            {t('receive:camera.enableTitle')}
           </Text>
           <Text style={[styles.noticeText, { color: theme.colors.colorTextSecondary }]}>
-            The camera is only needed to scan a QR. You can also import a saved image or paste the
-            code manually.
+            {t('receive:camera.enableImportDescription')}
           </Text>
           <Button
             onClick={() => void handlePermissionAction()}
@@ -214,10 +217,10 @@ export default function ReceiveScanScreen() {
             {permissionButtonLabel}
           </Button>
           <Button onClick={() => void importFromImage()} size='lg' variant='secondary' width='full'>
-            Import from image
+            {t('receive:actions.importFromImage')}
           </Button>
           <Button onClick={goBack} size='lg' variant='secondary' width='full'>
-            Use pasted code instead
+            {t('receive:camera.usePastedCode')}
           </Button>
         </View>
       ) : (
@@ -312,7 +315,7 @@ export default function ReceiveScanScreen() {
                 >
                   <ActivityIndicator color={theme.colors.colorTextPrimary} />
                   <Text style={[styles.statusTitle, { color: theme.colors.colorTextPrimary }]}>
-                    Connecting…
+                    {t('common:actions.connecting')}
                   </Text>
                   <Text
                     style={[
@@ -320,7 +323,7 @@ export default function ReceiveScanScreen() {
                       { color: withAlpha(theme.colors.colorTextPrimary, 0.82) }
                     ]}
                   >
-                    Joining the sender’s session.
+                    {t('receive:camera.joiningDescription')}
                   </Text>
                 </View>
               </View>
@@ -334,7 +337,7 @@ export default function ReceiveScanScreen() {
             variant='secondary'
             width='full'
           >
-            Import from image
+            {t('receive:actions.importFromImage')}
           </Button>
         </View>
       )}

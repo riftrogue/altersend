@@ -2,11 +2,7 @@ import { Image, Linking, Pressable, StyleSheet, View } from 'react-native'
 import Constants from 'expo-constants'
 import { useCallback, useEffect, useState } from 'react'
 import { useFocusEffect, useRouter } from 'expo-router'
-import {
-  LOCALE_OPTIONS,
-  useTranslation,
-  type LocalePreference
-} from '@altersend/locales'
+import { LOCALE_OPTIONS, useTranslation, type LocalePreference } from '@altersend/locales'
 import {
   discordUrl,
   privacyPolicyUrl,

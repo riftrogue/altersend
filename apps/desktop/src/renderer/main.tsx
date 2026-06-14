@@ -72,9 +72,7 @@ if (hasBridge()) {
 
 async function bootstrap() {
   try {
-    await initI18n(
-      resolveLocalePreference(getSavedLocalePreference(), getDesktopSystemLocales())
-    )
+    await initI18n(resolveLocalePreference(getSavedLocalePreference(), getDesktopSystemLocales()))
   } catch (error) {
     captureException(error)
     console.warn('Failed to bootstrap locale', error)

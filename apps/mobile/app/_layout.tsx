@@ -16,7 +16,7 @@ import {
   getLocaleFontFamily,
   initI18n,
   isSupportedLocaleCode,
-  resolveActiveLocalePreference,
+  resolveLocalePreference,
   useTranslation
 } from '@altersend/locales'
 import { Stack } from 'expo-router'
@@ -149,7 +149,7 @@ export default function RootLayout() {
     async function initializeLocale() {
       try {
         const preference = await getSavedLocalePreference()
-        await initI18n(resolveActiveLocalePreference(preference, getMobileSystemLocales()))
+        await initI18n(resolveLocalePreference(preference, getMobileSystemLocales()))
       } catch (error) {
         captureException(error)
         console.warn('Failed to initialize locale:', error)

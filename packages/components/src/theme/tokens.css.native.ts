@@ -18,13 +18,13 @@ export const nativeFontFamilies = {
     "fontFamilyMono": "Menlo"
   },
   "android": {
-    "fontFamilySans": "sans-serif",
-    "fontFamilyDisplay": "sans-serif",
+    "fontFamilySans": "System",
+    "fontFamilyDisplay": "System",
     "fontFamilyMono": "monospace"
   },
   "default": {
-    "fontFamilySans": "sans-serif",
-    "fontFamilyDisplay": "sans-serif",
+    "fontFamilySans": "System",
+    "fontFamilyDisplay": "System",
     "fontFamilyMono": "monospace"
   }
 } as Record<

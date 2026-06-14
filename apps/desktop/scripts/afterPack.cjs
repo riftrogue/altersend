@@ -18,7 +18,6 @@
 const fs = require('fs')
 const fsp = require('fs/promises')
 const path = require('path')
-const releaseConfig = require('../../../packages/locales/src/release.json')
 
 const ARCH_NAMES = {
   0: 'ia32',
@@ -45,14 +44,11 @@ async function copyMacLocalizations(context) {
 
   const appName = context.packager.appInfo.productFilename
   const resourcesDir = path.join(context.appOutDir, `${appName}.app`, 'Contents', 'Resources')
-  const entries = await safeReadDir(sourceDir)
-
-  const localeEntries = releaseConfig.isMultiLangEnabled
-    ? entries
-    : entries.filter((entry) => entry.name === 'en.lproj')
+  const localeEntries = (await safeReadDir(sourceDir)).filter(
+    (entry) => entry.isDirectory() && entry.name.endsWith('.lproj')
+  )
 
   for (const entry of localeEntries) {
-    if (!entry.isDirectory() || !entry.name.endsWith('.lproj')) continue
     const targetDir = path.join(resourcesDir, entry.name)
     await fsp.mkdir(targetDir, { recursive: true })
     await fsp.copyFile(

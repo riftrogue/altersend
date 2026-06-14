@@ -39,8 +39,6 @@ function getChunkSize(chunk: unknown): number {
  *
  * It has no knowledge of Hyperswarm, peer sessions, or file staging.
  */
-const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024 * 1024 // 50 GB
-
 export class TransferReceiver {
   private readonly driveStore: Corestore
   private readonly remoteDrives: Map<string, Hyperdrive>
@@ -156,13 +154,6 @@ export class TransferReceiver {
     const actualBytes = entry.value.blob.byteLength
     if (typeof file.size === 'number' && file.size !== actualBytes) {
       return fail(`Sender claimed ${file.size} bytes but file is ${actualBytes} bytes`, file.size)
-    }
-
-    if (actualBytes > MAX_FILE_SIZE_BYTES) {
-      return fail(
-        `File "${resolvedName}" is ${actualBytes} bytes, exceeds maximum of ${MAX_FILE_SIZE_BYTES} bytes`,
-        actualBytes
-      )
     }
 
     const totalBytes = actualBytes

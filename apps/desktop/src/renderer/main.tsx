@@ -5,7 +5,7 @@ import {
   getLocaleFontFamily,
   initI18n,
   isSupportedLocaleCode,
-  resolveActiveLocalePreference,
+  resolveLocalePreference,
   useTranslation
 } from '@altersend/locales'
 import {
@@ -73,7 +73,7 @@ if (hasBridge()) {
 async function bootstrap() {
   try {
     await initI18n(
-      resolveActiveLocalePreference(getSavedLocalePreference(), getDesktopSystemLocales())
+      resolveLocalePreference(getSavedLocalePreference(), getDesktopSystemLocales())
     )
   } catch (error) {
     captureException(error)

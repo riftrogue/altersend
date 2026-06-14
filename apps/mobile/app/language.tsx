@@ -2,9 +2,8 @@ import {
   LOCALE_OPTIONS,
   changeI18nLanguage,
   getLocaleFontFamily,
-  isMultiLangEnabled,
   normalizeLocalePreference,
-  resolveActiveLocalePreference,
+  resolveLocalePreference,
   useTranslation,
   type LocaleOption,
   type LocalePreference,
@@ -31,11 +30,6 @@ export default function LanguageScreen() {
   const [preference, setPreference] = useState<LocalePreference>(getLocalePreferenceSnapshot)
 
   useEffect(() => {
-    if (!isMultiLangEnabled) {
-      router.back()
-      return
-    }
-
     let mounted = true
     void getSavedLocalePreference().then((saved) => {
       if (mounted) setPreference(saved)
@@ -43,13 +37,11 @@ export default function LanguageScreen() {
     return () => {
       mounted = false
     }
-  }, [router])
-
-  if (!isMultiLangEnabled) return null
+  }, [])
 
   const handleSelect = async (value: string) => {
     const next = normalizeLocalePreference(value)
-    const resolvedLocale = resolveActiveLocalePreference(next, getMobileSystemLocales())
+    const resolvedLocale = resolveLocalePreference(next, getMobileSystemLocales())
     setPreference(next)
     await setSavedLocalePreference(next)
     router.back()

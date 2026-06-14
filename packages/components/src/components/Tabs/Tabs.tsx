@@ -257,7 +257,7 @@ export function TabsTrigger({ children, onClick, value, ...props }: TabsTriggerP
       tabIndex={isActive ? 0 : -1}
       type='button'
     >
-      {children}
+      <html.span style={styles.triggerLabel}>{children}</html.span>
     </html.button>
   )
 }

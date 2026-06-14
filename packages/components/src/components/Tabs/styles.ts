@@ -40,7 +40,6 @@ export const styles = css.create({
     color: tokens.colorTextSecondary,
     fontFamily: tokens.fontFamilySans,
     fontSize: tokens.fontSizeBase,
-    fontWeight: tokens.fontWeightSemibold,
     cursor: 'pointer',
     transitionDuration: '160ms',
     transitionProperty: 'color, border-color, background-color, box-shadow',
@@ -58,6 +57,10 @@ export const styles = css.create({
     borderColor: tokens.colorBorderStrong,
     boxShadow: `0 1px 2px ${tokens.colorShadow}`,
     color: tokens.colorTextPrimary
+  },
+  triggerLabel: {
+    fontWeight: tokens.fontWeightBold,
+    fontSize: tokens.fontSizeMd
   },
   content: {
     display: 'flex',

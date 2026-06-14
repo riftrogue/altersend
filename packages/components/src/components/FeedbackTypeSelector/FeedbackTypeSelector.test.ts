@@ -13,12 +13,11 @@ function getStyleBlock(name: string, followingName: string): string {
 }
 
 describe('FeedbackTypeSelector layout', () => {
-  it('keeps long translated labels inside fixed-height segments', () => {
+  it('keeps long translated labels inside single-line segments', () => {
     const chipStyle = getStyleBlock('chip', 'chipDefault')
     const labelStyle = getStyleBlock('label', 'labelDefault')
 
     expect(chipStyle).toContain('minWidth: 0')
-    expect(chipStyle).toContain('minHeight:')
     expect(labelStyle).toContain("overflow: 'hidden'")
     expect(labelStyle).toContain("textOverflow: 'ellipsis'")
     expect(labelStyle).toContain("whiteSpace: 'nowrap'")

@@ -3,7 +3,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_LOCALE, isMultiLangEnabled, RESOURCES, SUPPORTED_LOCALES } from './index'
+import { RESOURCES, SUPPORTED_LOCALES } from './index'
 
 const repoRoot = new URL('../../..', import.meta.url)
 const require = createRequire(import.meta.url)
@@ -74,7 +74,7 @@ describe('native metadata localization', () => {
     }
   })
 
-  it('keeps generated Expo native locale metadata English-only while release-gated', () => {
+  it('generates Expo native locale metadata for every supported locale', () => {
     const createExpoConfig = require('../../../apps/mobile/app.config.cjs') as (args: {
       config: Record<string, unknown>
     }) => Record<string, unknown> | { expo: Record<string, unknown> }
@@ -85,28 +85,12 @@ describe('native metadata localization', () => {
         ? (generatedConfig.expo as Record<string, unknown>)
         : (generatedConfig as Record<string, unknown>)
 
-    if (isMultiLangEnabled) {
-      expect(Object.keys((generated.locales as Record<string, string>) ?? {}).sort()).toEqual(
-        SUPPORTED_LOCALES.map((locale) => locale.code).sort()
-      )
-      return
-    }
-
-    expect(Object.keys((generated.locales as Record<string, string>) ?? {})).toEqual([
-      DEFAULT_LOCALE
-    ])
-
-    const plugins = generated.plugins as unknown[]
-    const localizationPlugin = plugins.find(
-      (plugin): plugin is [string, { supportedLocales: { ios: string[]; android: string[] } }] =>
-        Array.isArray(plugin) && plugin[0] === 'expo-localization'
+    expect(Object.keys((generated.locales as Record<string, string>) ?? {}).sort()).toEqual(
+      SUPPORTED_LOCALES.map((locale) => locale.code).sort()
     )
-
-    expect(localizationPlugin?.[1].supportedLocales.ios).toEqual([DEFAULT_LOCALE])
-    expect(localizationPlugin?.[1].supportedLocales.android).toEqual([DEFAULT_LOCALE])
   })
 
-  it('does not copy non-English macOS native localizations while release-gated', async () => {
+  it('copies macOS native localizations for every supported locale', async () => {
     const afterPack = require('../../../apps/desktop/scripts/afterPack.cjs') as {
       default: (context: unknown) => Promise<void>
     }
@@ -126,11 +110,8 @@ describe('native metadata localization', () => {
 
       const resourcesDir = join(tmp, 'AlterSend.app', 'Contents', 'Resources')
       expect(existsSync(join(resourcesDir, 'en.lproj', 'InfoPlist.strings'))).toBe(true)
-
-      if (!isMultiLangEnabled) {
-        expect(existsSync(join(resourcesDir, 'ja.lproj', 'InfoPlist.strings'))).toBe(false)
-        expect(existsSync(join(resourcesDir, 'ko.lproj', 'InfoPlist.strings'))).toBe(false)
-      }
+      expect(existsSync(join(resourcesDir, 'ja.lproj', 'InfoPlist.strings'))).toBe(true)
+      expect(existsSync(join(resourcesDir, 'ko.lproj', 'InfoPlist.strings'))).toBe(true)
     } finally {
       rmSync(tmp, { recursive: true, force: true })
     }

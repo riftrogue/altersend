@@ -146,7 +146,7 @@ export function FooterBar({ version }: { version: string }) {
             src={logo}
             alt=''
             aria-hidden
-            className='h-[26px] w-[26px] shrink-0 object-contain opacity-90'
+            className='h-[20px] w-[20px] shrink-0 object-contain opacity-90'
           />
           <span className='truncate text-text-secondary'>AlterSend</span>
           <span className='ml-1 shrink-0 tabular-nums opacity-70'>v{version}</span>

@@ -3,7 +3,7 @@
   "languageTitle": "Lingua",
   "languageHint": "Scegli la lingua utilizzata da AlterSend.",
   "sections": {
-    "privacy": "Riservatezza",
+    "general": "Generale",
     "support": "Supporto",
     "about": "Informazioni"
   },
@@ -12,6 +12,7 @@
     "description": "Condividi dati anonimi sugli arresti anomali per contribuire a migliorare AlterSend"
   },
   "rows": {
+    "security": "Sicurezza",
     "feedback": "Segnalazioni",
     "feedbackHint": "Segnala un problema o suggerisci una funzionalità",
     "discord": "Discord",

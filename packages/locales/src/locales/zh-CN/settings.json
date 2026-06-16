@@ -3,7 +3,7 @@
   "languageTitle": "语言",
   "languageHint": "选择 AlterSend 使用的语言。",
   "sections": {
-    "privacy": "隐私",
+    "general": "通用",
     "support": "支持",
     "about": "关于"
   },
@@ -12,6 +12,7 @@
     "description": "共享匿名崩溃数据以帮助改进AlterSend"
   },
   "rows": {
+    "security": "安全",
     "feedback": "反馈",
     "feedbackHint": "报告问题或建议功能",
     "discord": "Discord",

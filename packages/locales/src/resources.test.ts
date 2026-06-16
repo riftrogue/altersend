@@ -37,6 +37,7 @@ function isPlaceholderOnly(value: string): boolean {
 const identicalValueAllowList = new Set([
   'AlterSend',
   'Discord',
+  'General',
   'GitHub',
   'GitHub Issues',
   'QR',

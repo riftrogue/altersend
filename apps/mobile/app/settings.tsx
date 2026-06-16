@@ -10,7 +10,7 @@ import {
   termsOfServiceUrl,
   websiteUrl
 } from '@altersend/domain'
-import { ToggleSwitch, useTheme } from '@altersend/components'
+import { useTheme } from '@altersend/components'
 import {
   AlertCircleIcon,
   ChevronRightIcon,
@@ -18,7 +18,8 @@ import {
   FileTextIcon,
   GlobeIcon,
   LockIcon,
-  MailIcon
+  MailIcon,
+  ShieldIcon
 } from '@altersend/components/icons'
 import { Layout } from '@/src/components'
 import brandLogo from '@/assets/images/brand-logo.png'
@@ -27,11 +28,6 @@ import {
   getSavedLocalePreference,
   subscribeLocalePreference
 } from '@/src/lifecycle/localePreferenceStorage'
-import {
-  isCrashReportingEnabled,
-  setCrashReportingEnabled
-} from '@/src/lifecycle/crashReportingStorage'
-import { closeSentry, initSentry } from '@/src/sentry'
 import { Text } from '@/src/components/ThemedText'
 
 interface LinkRowProps {
@@ -78,7 +74,6 @@ export default function SettingsScreen() {
   const { theme } = useTheme()
   const router = useRouter()
   const version = Constants.expoConfig?.version ?? '0.0.0'
-  const [crashReporting, setCrashReporting] = useState(isCrashReportingEnabled)
   const [localePreference, setLocalePreference] = useState<LocalePreference>(
     getLocalePreferenceSnapshot
   )
@@ -103,13 +98,6 @@ export default function SettingsScreen() {
     }, [])
   )
 
-  const handleCrashReportingToggle = (value: boolean) => {
-    setCrashReporting(value)
-    setCrashReportingEnabled(value)
-    if (value) initSentry()
-    else closeSentry()
-  }
-
   const openUrl = (url: string) => {
     void Linking.openURL(url).catch(() => {})
   }
@@ -123,6 +111,9 @@ export default function SettingsScreen() {
     <Layout title={t('settings:title')} description='' hasNativeHeader>
       <View style={styles.content}>
         <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.colorTextMuted }]}>
+            {t('settings:sections.general')}
+          </Text>
           <View style={[styles.card, cardStyle]}>
             <LinkRow
               label={t('common:labels.language')}
@@ -132,21 +123,13 @@ export default function SettingsScreen() {
               }
               icon={<GlobeIcon size={16} color={theme.colors.colorTextSecondary} />}
               onPress={() => router.push('/language')}
-              isLast
             />
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.colorTextMuted }]}>
-            {t('settings:sections.privacy')}
-          </Text>
-          <View style={[styles.card, styles.toggleCardPad, cardStyle]}>
-            <ToggleSwitch
-              checked={crashReporting}
-              onChange={handleCrashReportingToggle}
-              label={t('settings:crashReports.label')}
-              description={t('settings:crashReports.description')}
+            <LinkRow
+              label={t('settings:rows.security')}
+              hint={t('settings:crashReports.label')}
+              icon={<ShieldIcon size={16} color={theme.colors.colorTextSecondary} />}
+              onPress={() => router.push('/security')}
+              isLast
             />
           </View>
         </View>
@@ -245,10 +228,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     overflow: 'hidden'
   },
-  toggleCardPad: {
-    paddingHorizontal: 16,
-    paddingVertical: 13
-  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -290,8 +269,8 @@ const styles = StyleSheet.create({
     paddingVertical: 13
   },
   brandLogo: {
-    width: 28,
-    height: 28
+    width: 34,
+    height: 34
   },
   brandInfo: {
     flex: 1,

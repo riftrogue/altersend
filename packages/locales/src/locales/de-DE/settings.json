@@ -3,7 +3,7 @@
   "languageTitle": "Sprache",
   "languageHint": "Wählen Sie die von AlterSend verwendete Sprache.",
   "sections": {
-    "privacy": "Datenschutz",
+    "general": "Allgemein",
     "support": "Unterstützung",
     "about": "Info"
   },
@@ -12,6 +12,7 @@
     "description": "Teilen Sie anonyme Absturzdaten, um AlterSend zu verbessern"
   },
   "rows": {
+    "security": "Sicherheit",
     "feedback": "Rückmeldung",
     "feedbackHint": "Melden Sie ein Problem oder schlagen Sie eine Funktion vor",
     "discord": "Discord",

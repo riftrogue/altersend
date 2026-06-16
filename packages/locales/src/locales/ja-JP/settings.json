@@ -3,7 +3,7 @@
   "languageTitle": "言語",
   "languageHint": "AlterSend で使用する言語を選択します。",
   "sections": {
-    "privacy": "プライバシー",
+    "general": "一般",
     "support": "サポート",
     "about": "情報"
   },
@@ -12,6 +12,7 @@
     "description": "AlterSend 改善のため匿名のクラッシュデータを共有する"
   },
   "rows": {
+    "security": "セキュリティ",
     "feedback": "フィードバック",
     "feedbackHint": "問題を報告または機能を提案",
     "discord": "Discord",

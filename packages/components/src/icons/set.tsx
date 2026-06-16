@@ -30,6 +30,7 @@ import {
   Send,
   Settings,
   Share2,
+  Shield,
   Smartphone,
   Upload,
   Video,
@@ -69,6 +70,7 @@ export const QrCodeIcon = adaptLucide(QrCode)
 export const SendIcon = adaptLucide(Send)
 export const SettingsIcon = adaptLucide(Settings)
 export const ShareIcon = adaptLucide(Share2)
+export const ShieldIcon = adaptLucide(Shield)
 export const SmartphoneIcon = adaptLucide(Smartphone)
 export const UploadIcon = adaptLucide(Upload)
 export const VideoIcon = adaptLucide(Video)

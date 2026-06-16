@@ -3,7 +3,7 @@
   "languageTitle": "語言",
   "languageHint": "選擇 AlterSend 使用的語言。",
   "sections": {
-    "privacy": "隱私",
+    "general": "一般",
     "support": "支援",
     "about": "關於"
   },
@@ -12,6 +12,7 @@
     "description": "共享匿名崩潰資料以幫助改進AlterSend"
   },
   "rows": {
+    "security": "安全",
     "feedback": "意見回饋",
     "feedbackHint": "報告問題或建議功能",
     "discord": "Discord",

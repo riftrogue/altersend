@@ -3,7 +3,7 @@
   "languageTitle": "Language",
   "languageHint": "Choose the language used by AlterSend.",
   "sections": {
-    "privacy": "Privacy",
+    "general": "General",
     "support": "Support",
     "about": "About"
   },
@@ -12,6 +12,7 @@
     "description": "Share anonymous crash data to help improve AlterSend"
   },
   "rows": {
+    "security": "Security",
     "feedback": "Feedback",
     "feedbackHint": "Report a problem or suggest a feature",
     "discord": "Discord",

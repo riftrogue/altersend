@@ -295,13 +295,18 @@ jobs:
           mkdir -p /tmp/pear-apps
           ARM64_DMG=$(find /tmp/pear-installers/macos -name "*arm64*.dmg" | head -1)
           hdiutil attach "$ARM64_DMG" -mountpoint /tmp/dmg-arm64 -nobrowse -quiet
-          cp -r "/tmp/dmg-arm64/AlterSend.app" /tmp/pear-apps/AlterSend-arm64.app
+          ditto "/tmp/dmg-arm64/AlterSend.app" /tmp/pear-apps/AlterSend-arm64.app
           hdiutil detach /tmp/dmg-arm64 -quiet
 
           X64_DMG=$(find /tmp/pear-installers/macos -name "*.dmg" | grep -v arm64 | head -1)
           hdiutil attach "$X64_DMG" -mountpoint /tmp/dmg-x64 -nobrowse -quiet
-          cp -r "/tmp/dmg-x64/AlterSend.app" /tmp/pear-apps/AlterSend-x64.app
+          ditto "/tmp/dmg-x64/AlterSend.app" /tmp/pear-apps/AlterSend-x64.app
           hdiutil detach /tmp/dmg-x64 -quiet
+
+          for APP in /tmp/pear-apps/AlterSend-arm64.app /tmp/pear-apps/AlterSend-x64.app; do
+            echo "Verifying signature: $APP"
+            codesign --verify --strict --verbose=2 "$APP"
+          done
 
       - name: Build Pear packages
         run: |
@@ -315,17 +320,17 @@ jobs:
           # /by-arch/<host>/app/AlterSend — can still find the update. Drop the bare
           # alias once the v1.1 fleet is gone.
 
-          cp -r /tmp/pear-apps/AlterSend-arm64.app /tmp/pear-apps/AlterSend.app
+          ditto /tmp/pear-apps/AlterSend-arm64.app /tmp/pear-apps/AlterSend.app
           pear-build --package "$PKG" --darwin-arm64-app /tmp/pear-apps/AlterSend.app --target "$TARGET"
           rm -rf /tmp/pear-apps/AlterSend.app
-          cp -r /tmp/pear-apps/AlterSend-arm64.app /tmp/pear-apps/AlterSend
+          ditto /tmp/pear-apps/AlterSend-arm64.app /tmp/pear-apps/AlterSend
           pear-build --package "$PKG" --darwin-arm64-app /tmp/pear-apps/AlterSend --target "$TARGET"
           rm -rf /tmp/pear-apps/AlterSend
 
-          cp -r /tmp/pear-apps/AlterSend-x64.app /tmp/pear-apps/AlterSend.app
+          ditto /tmp/pear-apps/AlterSend-x64.app /tmp/pear-apps/AlterSend.app
           pear-build --package "$PKG" --darwin-x64-app /tmp/pear-apps/AlterSend.app --target "$TARGET"
           rm -rf /tmp/pear-apps/AlterSend.app
-          cp -r /tmp/pear-apps/AlterSend-x64.app /tmp/pear-apps/AlterSend
+          ditto /tmp/pear-apps/AlterSend-x64.app /tmp/pear-apps/AlterSend
           pear-build --package "$PKG" --darwin-x64-app /tmp/pear-apps/AlterSend --target "$TARGET"
           rm -rf /tmp/pear-apps/AlterSend
 

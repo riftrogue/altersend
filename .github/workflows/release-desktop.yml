@@ -314,25 +314,13 @@ jobs:
           TARGET="$HOME/altersend-desktop-$VERSION"
           PKG="$GITHUB_WORKSPACE/apps/desktop/package.json"
 
-          # Each app is staged twice into the same drive: under the extensioned name
-          # (AlterSend.app / AlterSend.AppImage) for fixed clients, and under the bare
-          # name (AlterSend) so legacy v1.1 installs — which look for
-          # /by-arch/<host>/app/AlterSend — can still find the update. Drop the bare
-          # alias once the v1.1 fleet is gone.
-
           ditto /tmp/pear-apps/AlterSend-arm64.app /tmp/pear-apps/AlterSend.app
           pear-build --package "$PKG" --darwin-arm64-app /tmp/pear-apps/AlterSend.app --target "$TARGET"
           rm -rf /tmp/pear-apps/AlterSend.app
-          ditto /tmp/pear-apps/AlterSend-arm64.app /tmp/pear-apps/AlterSend
-          pear-build --package "$PKG" --darwin-arm64-app /tmp/pear-apps/AlterSend --target "$TARGET"
-          rm -rf /tmp/pear-apps/AlterSend
 
           ditto /tmp/pear-apps/AlterSend-x64.app /tmp/pear-apps/AlterSend.app
           pear-build --package "$PKG" --darwin-x64-app /tmp/pear-apps/AlterSend.app --target "$TARGET"
           rm -rf /tmp/pear-apps/AlterSend.app
-          ditto /tmp/pear-apps/AlterSend-x64.app /tmp/pear-apps/AlterSend
-          pear-build --package "$PKG" --darwin-x64-app /tmp/pear-apps/AlterSend --target "$TARGET"
-          rm -rf /tmp/pear-apps/AlterSend
 
           APPIMAGE=$(find /tmp/pear-installers/linux -name "*.AppImage" | head -1)
           cp "$APPIMAGE" /tmp/AlterSend.AppImage
@@ -349,6 +337,40 @@ jobs:
           cp "$APPIMAGE_ARM" /tmp/AlterSend
           pear-build --package "$PKG" --linux-arm64-app /tmp/AlterSend --target "$TARGET"
           rm /tmp/AlterSend
+
+      - name: Validate Pear packages
+        run: |
+          VERSION="${{ steps.version.outputs.value }}"
+          TARGET="$HOME/altersend-desktop-$VERSION"
+
+          for ARCH in darwin-arm64 darwin-x64; do
+            APP="$TARGET/by-arch/$ARCH/app/AlterSend.app"
+            PKG="$APP/Contents/Resources/app/package.json"
+
+            if [ ! -d "$APP" ]; then
+              echo "Missing macOS OTA app: $APP"
+              exit 1
+            fi
+
+            if [ ! -f "$PKG" ]; then
+              echo "Missing embedded package.json: $PKG"
+              exit 1
+            fi
+
+            ACTUAL_VERSION=$(node -p "require(process.argv[1]).version" "$PKG")
+            if [ "$ACTUAL_VERSION" != "$VERSION" ]; then
+              echo "Version mismatch in $PKG: expected $VERSION, got $ACTUAL_VERSION"
+              exit 1
+            fi
+
+            echo "Verifying OTA signature: $APP"
+            codesign --verify --strict --verbose=2 "$APP"
+
+            if [ -e "$TARGET/by-arch/$ARCH/app/AlterSend" ]; then
+              echo "Unexpected legacy macOS OTA alias found: $TARGET/by-arch/$ARCH/app/AlterSend"
+              exit 1
+            fi
+          done
 
 
       - name: Stage and release to Pear DHT

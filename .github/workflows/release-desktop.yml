@@ -377,8 +377,71 @@ jobs:
         run: |
           export PATH="$HOME/Library/Application Support/pear/bin:$PATH"
           VERSION="${{ steps.version.outputs.value }}"
-          pear stage --no-ask "${{ vars.PEAR_UPGRADE_LINK }}" "$HOME/altersend-desktop-$VERSION"
-          pear release "${{ vars.PEAR_UPGRADE_LINK }}"
+          TARGET="$HOME/altersend-desktop-$VERSION"
+          UPGRADE_LINK="${{ vars.PEAR_UPGRADE_LINK }}"
+          BAD_PATHS="$RUNNER_TEMP/pear-bad-framework-paths.txt"
+          CANDIDATE_PATHS="$RUNNER_TEMP/pear-framework-candidate-paths.txt"
+          BATCH_DIR="$RUNNER_TEMP/pear-bad-framework-paths"
+
+          pear stage --no-ask "$UPGRADE_LINK" "$TARGET"
+
+          # pear-runtime-updater mirrors into a Localdrive. If the release contains
+          # real blobs below macOS framework symlink aliases (for example
+          # Electron Framework.framework/Helpers/*), Localdrive can fail before the
+          # app bundle is complete. Keep the symlink entries and real Versions/A
+          # contents, but purge child blobs below the alias paths.
+          find -L \
+            "$TARGET/by-arch/darwin-arm64/app/AlterSend.app" \
+            "$TARGET/by-arch/darwin-x64/app/AlterSend.app" \
+            -type f > "$CANDIDATE_PATHS"
+
+          TARGET="$TARGET" CANDIDATE_PATHS="$CANDIDATE_PATHS" BAD_PATHS="$BAD_PATHS" python3 <<'PY'
+          import os
+          import pathlib
+          import re
+
+          target = pathlib.Path(os.environ["TARGET"]).resolve()
+          candidates = pathlib.Path(os.environ["CANDIDATE_PATHS"])
+          output = pathlib.Path(os.environ["BAD_PATHS"])
+          bad = set()
+
+          for raw_path in candidates.read_text().splitlines():
+              raw_path = raw_path.strip()
+              if not raw_path:
+                  continue
+              rel = pathlib.Path(raw_path).resolve().relative_to(target).as_posix()
+              if (
+                  re.search(r"\.framework/(Helpers|Resources|Libraries)/", rel)
+                  or re.search(r"\.framework/Versions/Current/", rel)
+              ):
+                  bad.add(rel)
+
+          output.write_text("\n".join(sorted(bad)) + ("\n" if bad else ""))
+          print(f"Found {len(bad)} macOS framework alias blob paths to purge")
+          PY
+
+          if [ -s "$BAD_PATHS" ]; then
+            rm -rf "$BATCH_DIR"
+            mkdir -p "$BATCH_DIR"
+            split -l 75 "$BAD_PATHS" "$BATCH_DIR/batch-"
+
+            for BATCH in "$BATCH_DIR"/batch-*; do
+              PATHS=$(paste -sd, "$BATCH")
+              pear stage --no-ask --json --only "$PATHS" --ignore "$PATHS" --purge "$UPGRADE_LINK" "$TARGET"
+            done
+
+            for BATCH in "$BATCH_DIR"/batch-*; do
+              PATHS=$(paste -sd, "$BATCH")
+              VERIFY_LOG="$BATCH.verify.jsonl"
+              pear stage --dry-run --no-ask --json --only "$PATHS" --ignore "$PATHS" --purge "$UPGRADE_LINK" "$TARGET" | tee "$VERIFY_LOG"
+              if grep -q '"tag":"byte-diff"' "$VERIFY_LOG"; then
+                echo "macOS framework alias blobs remain after purge; refusing to release"
+                exit 1
+              fi
+            done
+          fi
+
+          pear release "$UPGRADE_LINK"
 
       - name: Cleanup
         if: always()

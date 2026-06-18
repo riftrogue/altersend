@@ -26,6 +26,7 @@
 - [Features](#features)
 - [Download](#download)
 - [How it works](#how-it-works)
+  - [Under the hood](#under-the-hood)
 - [For developers](#for-developers)
   - [Prerequisites](#prerequisites)
   - [Setup](#setup)
@@ -35,6 +36,7 @@
   - [Internationalization](#internationalization)
   - [Tech stack](#tech-stack)
   - [Crash reporting](#crash-reporting)
+- [Contributors](#contributors)
 - [Contributing](#contributing)
 - [Security](#security)
 - [License](#license)
@@ -53,6 +55,7 @@ Why use WeTransfer, Dropbox, or Google Drive when you can send files directly �
 - **No file size limit** — send a 100 MB photo or 500 GB video archive, same experience
 - **Cross-platform** — macOS, Windows, Linux, iOS, Android
 - **Works everywhere** — local network or across continents, same code path
+- **Multi-language** — fully translated UI, available in 12 languages
 - **Open source** — Apache-2.0, audit every line yourself
 
 ## Download
@@ -88,7 +91,14 @@ Get the latest release from [altersend.com/download](https://altersend.com/downl
                    (DHT, no central server)
 ```
 
-Discovery uses [Hyperswarm](https://github.com/holepunchto/hyperswarm) (a DHT) — once peers find each other, no central infrastructure is involved. Transfers run over [Hyperdrive](https://github.com/holepunchto/hyperdrive): encrypted, content-addressed, resumable.
+### Under the hood
+
+AlterSend is built on [Hyperswarm](https://github.com/holepunchto/hyperswarm), a Kademlia DHT at its core. Behind those four steps:
+
+1. **A random 32-byte key is generated** for each transfer (`crypto.randomBytes(32)`). That 64-char hex string *is* the join code you share.
+2. **Peers rendezvous on a hash of that key, not the key itself.** Both sides compute the same discovery key — a BLAKE2b hash derived from the join code — and join the DHT on that. The raw key never leaves your device, only its hash is published.
+3. **Public bootstrap nodes are the only entry point.** A handful of them get peers onto the DHT. After that, no central server is involved — and there's no relay fallback, so if direct hole-punching fails, the connection fails.
+4. **The connection is direct and end-to-end encrypted.** Peers connect over a Noise-encrypted socket, and the sender shares its [Hyperdrive](https://github.com/holepunchto/hyperdrive) key over that channel. Files are imported into the sender's local Hyperdrive, replicated to the receiver's, then written out to disk — so in v1 each side needs roughly **2× the transfer size** in free space while a transfer runs. *(Working to improve this.)*
 
 ---
 
@@ -147,7 +157,7 @@ See [docs/architecture.md](docs/architecture.md) for data flow and inter-process
 
 ### Internationalization
 
-Desktop and mobile share locale resolution, metadata, and translation catalogs through `@altersend/locales`. Multi-language UI is currently release-gated by `isMultiLangEnabled = false`, which hides language pickers and keeps the active app locale at `en-US` until the feature is ready to ship. See [docs/i18n.md](docs/i18n.md) for the translation workflow.
+Desktop and mobile share translation catalogs through `@altersend/locales`, currently covering 12 locales. See [docs/i18n.md](docs/i18n.md) for the translation workflow.
 
 ### Tech stack
 
@@ -155,14 +165,13 @@ Desktop and mobile share locale resolution, metadata, and translation catalogs t
 
 ### Crash reporting
 
-Crash and error reporting uses [Sentry](https://sentry.io). It is **opt-in and off by default** — nothing is sent until you enable it in the app's settings.
-
-- **Where it runs.** Desktop has two Sentry SDKs: `@sentry/electron/main` for native main-process crashes and `@sentry/electron/renderer` for renderer JS / transfer errors. Mobile uses `@sentry/react-native`. The Bare worklet has no Sentry — it pipes its logs to the renderer over RPC instead.
-- **Opt-in state.** Stored locally: desktop uses the `localStorage` key `altersend.crash-reporting.enabled`; mobile uses a marker file in the app document directory. The main process initializes Sentry early (before `app` ready) but gates submission in `beforeSend`; the renderer pushes the current preference over the `sentry:setEnabled` IPC channel.
-- **PII scrubbing.** `beforeSend` rewrites home-directory paths to `~` in exception messages and breadcrumbs, so usernames and file paths don't leak into stack traces.
-- **DSNs come from env vars** — `SENTRY_DSN` (desktop main, baked in at build by `gen-sentry-dsn.cjs`), `VITE_SENTRY_DSN` (desktop renderer), `EXPO_PUBLIC_SENTRY_DSN` (mobile). All are optional; see the `.env.example` files. **Community and self-built binaries ship without DSNs, so Sentry is a complete no-op and no telemetry is ever sent.**
+Crash reporting via [Sentry](https://sentry.io) is opt-in and off by default.
 
 ---
+
+## Contributors
+
+[![Contributors](https://contrib.rocks/image?repo=denislupookov/altersend)](https://github.com/denislupookov/altersend/graphs/contributors)
 
 ## Contributing
 

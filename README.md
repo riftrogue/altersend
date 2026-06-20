@@ -1,7 +1,7 @@
 <div align="center">
   <img src="assets/altersend-logo.png" alt="AlterSend" width="380" />
 
-  ### File transfer without the cloud.
+  ### File transfer without the cloud storage.
 
   Files go directly between your devices — end-to-end encrypted, no accounts, no servers, no limits.
 

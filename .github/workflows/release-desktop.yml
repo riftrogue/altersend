@@ -122,29 +122,45 @@ jobs:
           "WINDOWS_CERTIFICATE_FILE=$pfxPath" | Out-File -FilePath $env:GITHUB_ENV -Append
           "WINDOWS_CERTIFICATE_PASSWORD=buildcert" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-      - name: Make Windows
+      - name: Make Windows installer + msix (Forge)
         run: npm run dist:win:x64 -w apps/desktop
         env:
           DEBUG: electron-windows-msix*
+
+      - name: Make Windows portable (.exe)
+        run: npm run dist:win:portable:x64 -w apps/desktop
 
       - name: List Windows make output (debug)
         if: always()
         shell: bash
         run: |
-          echo "=== files under apps/desktop/out/make ==="
-          find apps/desktop/out/make -type f 2>/dev/null || echo "(no out/make dir)"
+          echo "=== Windows deliverables under apps/desktop/out ==="
+          find apps/desktop/out -type f \( -name '*.exe' -o -name '*.msix' -o -name '*.nupkg' -o -name 'RELEASES' \) 2>/dev/null || echo "(no out dir)"
 
-      - name: Upload Windows artifacts (unsigned)
-        id: upload-windows-unsigned
+      - name: Upload Windows MSIX (unsigned)
+        id: upload-windows-msix
         uses: actions/upload-artifact@v4
         with:
-          name: windows-unsigned
-          path: |
-            apps/desktop/out/make/squirrel.windows/**/*
-            apps/desktop/out/AlterSend-win32-*/**/*.msix
+          name: windows-msix
+          path: apps/desktop/out/AlterSend-win32-*/**/*.msix
+
+      - name: Upload Windows Squirrel installer (unsigned)
+        id: upload-windows-squirrel
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-squirrel
+          path: apps/desktop/out/make/squirrel.windows/**/*
+
+      - name: Upload Windows portable (unsigned)
+        id: upload-windows-portable
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-portable
+          path: apps/desktop/out/*-Portable-*.exe
 
       # SignPath signing — only runs once `SIGNPATH_PROJECT_SLUG` repo variable is set.
-      # See docs/SIGNING.md for application and setup instructions.
+      # Signs the Squirrel installer artifact. Signing the portable .exe / .msix
+      # needs additional SignPath signing requests once those are configured.
       - name: Sign with SignPath
         if: vars.SIGNPATH_PROJECT_SLUG != ''
         uses: signpath/github-action-submit-signing-request@v1
@@ -154,7 +170,7 @@ jobs:
           project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
           signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG || 'release-signing' }}
           artifact-configuration-slug: ${{ vars.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG || 'windows-installer' }}
-          github-artifact-id: ${{ steps.upload-windows-unsigned.outputs.artifact-id }}
+          github-artifact-id: ${{ steps.upload-windows-squirrel.outputs.artifact-id }}
           wait-for-completion: true
           output-artifact-directory: signed-windows
 
@@ -255,6 +271,7 @@ jobs:
           files: |
             artifacts/**/*.dmg
             artifacts/**/*.exe
+            artifacts/**/*.msix
             artifacts/**/*.AppImage
             artifacts/**/*.apk
 

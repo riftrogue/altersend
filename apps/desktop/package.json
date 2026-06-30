@@ -24,6 +24,8 @@
     "dist:mac:x64:dev": "SKIP_NOTARIZE=true CSC_IDENTITY_AUTO_DISCOVERY=false npm run dist:mac:x64",
     "dist:win:x64": "electron-forge make --platform=win32 --arch=x64",
     "dist:win:arm64": "electron-forge make --platform=win32 --arch=arm64",
+    "dist:win:portable:x64": "npx electron-builder --win --x64 -c electron-builder.win.json --publish never",
+    "dist:win:portable:arm64": "npx electron-builder --win --arm64 -c electron-builder.win.json --publish never",
     "dist:linux:x64": "npx electron-builder --linux --x64 -c electron-builder.linux.json --publish never",
     "dist:linux:arm64": "npx electron-builder --linux --arm64 -c electron-builder.linux.json --publish never",
     "pear:build:darwin:arm64": "npx pear-build --package=./package.json --darwin-arm64-app ./out/mac-arm64/AlterSend.app --target ../../../altersend-desktop-$npm_package_version",

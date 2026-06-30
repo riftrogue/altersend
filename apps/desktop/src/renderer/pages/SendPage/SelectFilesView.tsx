@@ -5,9 +5,11 @@ import {
   addSelectedFiles,
   normalizeSelectedFiles,
   removeSelectedFile,
-  useTransferStore
+  useTransferStore,
+  ENABLE_TEXT_SHARING
 } from '@altersend/domain'
 import { bridgeApi } from '../../api/bridgeApi'
+import { Input, Button } from '@altersend/components'
 
 interface DataTransferEntryLike {
   isDirectory: boolean
@@ -28,6 +30,7 @@ export function SelectFilesView() {
   const selectedFiles = useTransferStore((s) => s.selectedFiles)
   const [isDropZoneDragging, setIsDropZoneDragging] = useState(false)
   const [selectionError, setSelectionError] = useState<string | null>(null)
+  const [textInput, setTextInput] = useState('')
 
   const hasSelectedFiles = selectedFiles.length > 0
 
@@ -68,6 +71,23 @@ export function SelectFilesView() {
     if (normalizedFiles.length > 0) {
       addSelectedFiles(normalizedFiles)
     }
+  }
+
+  const addTextItem = () => {
+    const text = textInput.trim()
+    if (!text) return
+    const name = text.length > 20 ? text.substring(0, 20) + '...' : text
+    addSelectedFiles([
+      {
+        name,
+        path: `text-${Date.now()}`,
+        kind: 'text',
+        content: text,
+        isTemporary: true,
+        size: text.length
+      }
+    ])
+    setTextInput('')
   }
 
   return (
@@ -119,6 +139,31 @@ export function SelectFilesView() {
           ))}
         </div>
       ) : null}
+
+      {ENABLE_TEXT_SHARING && (
+        <div className='flex flex-row gap-2 mt-2 items-center'>
+          <div className='flex-1'>
+            <Input
+              placeholder='Type a message or paste a link...'
+              value={textInput}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTextInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && textInput.trim().length > 0) {
+                  addTextItem()
+                }
+              }}
+            />
+          </div>
+          <Button
+            disabled={textInput.trim().length === 0}
+            onClick={addTextItem}
+            size='sm'
+            variant='secondary'
+          >
+            Add
+          </Button>
+        </div>
+      )}
 
       <ErrorBanner message={selectionError} />
     </div>

@@ -9,6 +9,7 @@ import {
   type DeviceInvite,
   type DeviceInviteResponse,
   type FileOffer,
+  type TextOffer,
   type PairingInfo,
   type RememberVote,
   type Recognition,
@@ -19,6 +20,7 @@ import {
 
 const MAX_ID_LEN = 128
 const MAX_PATH_LEN = 4096
+const MAX_CONTENT_LEN = 65_536
 const MAX_MESSAGE_LEN = 1024
 const MAX_FILES_PER_TRANSFER = 10_000
 const MAX_DISPLAY_NAME_LEN = 256
@@ -33,7 +35,7 @@ function isValidSignatureHex(x: unknown): x is string {
   return typeof x === 'string' && SIGNATURE_HEX_RE.test(x)
 }
 
-function isOptionalBoundedString(x: unknown, maxLen: number): boolean {
+function _isOptionalBoundedString(x: unknown, maxLen: number): boolean {
   return x === undefined || (typeof x === 'string' && x.length <= maxLen)
 }
 
@@ -51,8 +53,27 @@ function isValidFileOffer(x: unknown): x is FileOffer {
     isBoundedString(o.path, MAX_PATH_LEN) &&
     isNonNegativeInteger(o.size) &&
     isBoundedString(o.driveKey, MAX_ID_LEN) &&
-    isOptionalBoundedString(o.content, MAX_PATH_LEN)
+    o.kind === 'file'
   )
+}
+
+function isValidTextOffer(x: unknown): x is TextOffer {
+  if (!x || typeof x !== 'object') return false
+  const o = x as Partial<TextOffer>
+  return (
+    isBoundedString(o.id, MAX_ID_LEN) &&
+    isBoundedString(o.transferId, MAX_ID_LEN) &&
+    o.kind === 'text' &&
+    isBoundedString(o.content, MAX_CONTENT_LEN)
+  )
+}
+
+function isValidTransferOffer(x: unknown): boolean {
+  if (!x || typeof x !== 'object') return false
+  const kind = (x as { kind?: unknown }).kind
+  if (kind === 'file') return isValidFileOffer(x)
+  if (kind === 'text') return isValidTextOffer(x)
+  return false
 }
 
 export function isValidControlMessage(x: unknown): x is PeerControlMessage {
@@ -76,7 +97,7 @@ export function isValidControlMessage(x: unknown): x is PeerControlMessage {
         isBoundedString(v.transferId, MAX_ID_LEN) &&
         Array.isArray(v.files) &&
         v.files.length <= MAX_FILES_PER_TRANSFER &&
-        v.files.every(isValidFileOffer)
+        v.files.every(isValidTransferOffer)
       )
     }
     case 'download-request': {

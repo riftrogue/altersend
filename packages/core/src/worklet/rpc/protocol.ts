@@ -1,5 +1,5 @@
 import b4a from 'b4a'
-import type { FileOffer, PeerControlMessage } from '../transfer/control-channel'
+import type { TransferOffer, PeerControlMessage } from '../transfer/control-channel'
 import type { RememberedPeer } from '../peers/remembered-peer'
 import type { DeviceSecretInit } from '../identity/device-identity-store'
 import type {
@@ -45,6 +45,8 @@ export interface JoinReply {
 export interface ShareFileRequest {
   path: string
   isTemporary?: boolean
+  kind?: 'file' | 'text'
+  content?: string
 }
 
 export interface ShareFilesReply {
@@ -134,12 +136,13 @@ export type RendererTransferEvent =
   | PairingPeerConnectedEvent
   | PeerControlMessage
 export type WorkerTransferEvent = WorkerReadyEvent | RendererTransferEvent
-export type IncomingFileOffer = FileOffer
+export type IncomingFileOffer = TransferOffer
 
 export interface TransferRPC {
   host(): Promise<HostReply>
   join(topic: string): Promise<JoinReply>
   shareFiles(files: ShareFileRequest[]): Promise<ShareFilesReply>
+
   downloadFiles(files: DownloadFileRequest[]): Promise<DownloadFilesReply>
   disconnect(): Promise<DisconnectReply>
   closePeers(): Promise<void>

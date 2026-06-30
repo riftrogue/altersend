@@ -34,6 +34,8 @@ import {
   type DownloadProgress,
   type DownloadRequest,
   type PeerControlMessage,
+  type TextOffer,
+  type TransferOffer,
   type TransferReady,
   type TransferStart
 } from './control-channel'
@@ -383,10 +385,10 @@ export class TransferOrchestrator implements TransferRPC {
 
   async shareFiles(requests: ShareFileRequest[]): Promise<ShareFilesReply> {
     if (!Array.isArray(requests) || requests.length === 0) {
-      throw new BadRequestError('Missing files to share')
+      throw new BadRequestError('Missing items to share')
     }
     if (this.suspended) {
-      throw new BadRequestError('Cannot share files while suspended')
+      throw new BadRequestError('Cannot share items while suspended')
     }
 
     if (this.role === 'receiver') {
@@ -396,11 +398,14 @@ export class TransferOrchestrator implements TransferRPC {
     await this.storage.ready()
 
     try {
-      const { files, totalBytes, errors } = await this.storage.sender.scanFiles(requests)
+      const fileRequests = requests.filter((r) => r.kind !== 'text')
+      const textRequests = requests.filter((r) => r.kind === 'text')
+
+      const { files, totalBytes, errors } = await this.storage.sender.scanFiles(fileRequests)
       for (const error of errors) this.sendError(error)
 
-      if (files.length === 0) {
-        this.sendError('No valid files were selected to share. Folders are not supported yet.')
+      if (files.length === 0 && textRequests.length === 0) {
+        this.sendError('No valid items were selected to share. Folders are not supported yet.')
         return { acceptedFiles: 0 }
       }
 
@@ -410,7 +415,7 @@ export class TransferOrchestrator implements TransferRPC {
       this.activeTransfer = {
         type: 'transfer-start',
         transferId,
-        totalFiles: files.length,
+        totalFiles: files.length + textRequests.length,
         totalBytes
       }
       this.activeTransferReady = null
@@ -420,7 +425,7 @@ export class TransferOrchestrator implements TransferRPC {
       this.inflightAbort = controller
 
       try {
-        const offers = await this.storage.sender.stageFiles(
+        const offers: TransferOffer[] = await this.storage.sender.stageFiles(
           files,
           transferId,
           (file) => {
@@ -428,6 +433,17 @@ export class TransferOrchestrator implements TransferRPC {
           },
           controller.signal
         )
+
+        for (const req of textRequests) {
+          if (!req.content || req.content.trim() === '') continue
+          const textOffer: TextOffer = {
+            id: createTransferId(),
+            transferId,
+            kind: 'text',
+            content: req.content
+          }
+          offers.push(textOffer)
+        }
 
         this.activeTransferReady = { type: 'transfer-ready', transferId, files: offers }
         this.swarm.broadcast(this.activeTransferReady)

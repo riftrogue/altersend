@@ -6,9 +6,17 @@ import {
   addSelectedFiles,
   removeSelectedFile,
   useTransferStore,
+  ENABLE_TEXT_SHARING,
   type SelectedFile
 } from '@altersend/domain'
-import { DropZoneLink, ErrorBanner, FileDropZone, LinkRow } from '@altersend/components'
+import {
+  DropZoneLink,
+  ErrorBanner,
+  FileDropZone,
+  LinkRow,
+  Input,
+  Button
+} from '@altersend/components'
 import { useTranslation } from '@altersend/locales'
 
 function uriToFilePath(uri: string): string {
@@ -25,6 +33,7 @@ export function SelectFilesView() {
   const { t } = useTranslation(['send', 'common'])
   const selectedFiles = useTransferStore((s) => s.selectedFiles)
   const [selectionError, setSelectionError] = useState<string | null>(null)
+  const [textInput, setTextInput] = useState('')
 
   const hasSelectedFiles = selectedFiles.length > 0
 
@@ -105,6 +114,23 @@ export function SelectFilesView() {
     ])
   }
 
+  const addTextItem = () => {
+    const text = textInput.trim()
+    if (!text) return
+    const name = text.length > 20 ? text.substring(0, 20) + '...' : text
+    addSelectedFiles([
+      {
+        name,
+        path: `text-${Date.now()}`,
+        kind: 'text',
+        content: text,
+        isTemporary: true,
+        size: text.length
+      }
+    ])
+    setTextInput('')
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.dropZoneContainer}>
@@ -144,6 +170,28 @@ export function SelectFilesView() {
         </View>
       )}
 
+      {ENABLE_TEXT_SHARING && (
+        <View style={styles.textInputRow}>
+          <View style={styles.textInputWrapper}>
+            <Input
+              placeholder={t('send:actions.typeMessageOrLink', {
+                defaultValue: 'Type a message or link...'
+              })}
+              value={textInput}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTextInput(e.target.value)}
+            />
+          </View>
+          <Button
+            disabled={textInput.trim().length === 0}
+            onClick={addTextItem}
+            size='sm'
+            variant='secondary'
+          >
+            {t('common:actions.add', { defaultValue: 'Add' })}
+          </Button>
+        </View>
+      )}
+
       <ErrorBanner message={selectionError} />
     </View>
   )
@@ -158,5 +206,14 @@ const styles = StyleSheet.create({
   },
   fileList: {
     gap: 8
+  },
+  textInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 8
+  },
+  textInputWrapper: {
+    flex: 1
   }
 })

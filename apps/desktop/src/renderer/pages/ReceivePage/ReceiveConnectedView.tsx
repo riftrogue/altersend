@@ -44,15 +44,29 @@ export function ReceiveConnectedView() {
   const isDownloading = totals.activeCount > 0
   const allCompleted = hasIncomingFiles && totals.completedCount === incomingFileOffers.length
 
-  const downloadAll = async () => {
-    if (incomingFileOffers.length === 0 || isDownloading) return
+  const textOffer = incomingFileOffers.find((f) => f.kind === 'text')
+  const isTextTransfer = textOffer !== undefined
 
-    if (incomingFileOffers.length === 1) {
-      const selected = await bridgeApi.pickSaveFile(incomingFileOffers[0].name)
+  const isUrl = useMemo(() => {
+    if (textOffer?.kind !== 'text') return false
+    try {
+      const url = new URL(textOffer.content)
+      return url.protocol === 'https:' || url.protocol === 'http:'
+    } catch {
+      return false
+    }
+  }, [textOffer])
+
+  const downloadAll = async () => {
+    const fileOffers = incomingFileOffers.filter((f) => f.kind === 'file')
+    if (fileOffers.length === 0 || isDownloading) return
+
+    if (fileOffers.length === 1) {
+      const selected = await bridgeApi.pickSaveFile(fileOffers[0].name)
       if (!selected?.path) return
 
       try {
-        await downloadFiles([createSingleDownloadRequest(incomingFileOffers[0], selected.path)])
+        await downloadFiles([createSingleDownloadRequest(fileOffers[0], selected.path)])
       } catch (error) {
         console.error('ReceiveConnectedView: single-file download failed', error)
       }
@@ -73,33 +87,60 @@ export function ReceiveConnectedView() {
 
   return (
     <div className='flex h-full min-h-0 w-full flex-1 flex-col'>
-      <div className='min-h-0 flex-1 overflow-y-auto pr-1'>
-        <div className='overflow-hidden rounded-[10px] border border-border-primary bg-background-subtle'>
-          {incomingFileOffers.map((file) => {
-            const row = getDownloadRowDisplay(file, downloadStates[getOfferKey(file)])
-            return (
-              <LinkRow
-                key={getOfferKey(file)}
-                file
-                bare
-                compact
-                label={file.name}
-                size={file.size}
-                description={row.description}
-                status={{ label: getDownloadStatusLabel(t, row), tone: row.status.tone }}
-                progressPercent={row.progressPercent}
-              />
-            )
-          })}
+      {isTextTransfer ? (
+        <div className='flex-1 flex flex-col justify-center items-center'>
+          <div className='p-4 bg-background-subtle rounded-lg border border-border-primary w-full break-words'>
+            <p className='text-text-primary text-center select-text'>{textOffer.content}</p>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className='min-h-0 flex-1 overflow-y-auto pr-1'>
+          <div className='overflow-hidden rounded-[10px] border border-border-primary bg-background-subtle'>
+            {incomingFileOffers.map((file) => {
+              if (file.kind !== 'file') return null
+              const row = getDownloadRowDisplay(file, downloadStates[getOfferKey(file)])
+              return (
+                <LinkRow
+                  key={getOfferKey(file)}
+                  file
+                  bare
+                  compact
+                  label={file.name}
+                  size={file.size}
+                  description={row.description}
+                  status={{ label: getDownloadStatusLabel(t, row), tone: row.status.tone }}
+                  progressPercent={row.progressPercent}
+                />
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       <div className='mt-4 flex shrink-0 items-center justify-end gap-4'>
         <div className='flex shrink-0 items-center gap-2'>
           <Button onClick={clearSession} size='sm' variant='secondary'>
             {t('common:actions.endSession')}
           </Button>
-          {peerCount > 0 && hasIncomingFiles && !allCompleted ? (
+          {isTextTransfer ? (
+            isUrl ? (
+              <Button
+                onClick={() => void bridgeApi.openExternalUrl(textOffer.content!)}
+                size='sm'
+                variant='primary'
+              >
+                Open Link
+              </Button>
+            ) : (
+              <Button
+                onClick={() => void navigator.clipboard.writeText(textOffer.content!)}
+                size='sm'
+                variant='primary'
+              >
+                Copy Text
+              </Button>
+            )
+          ) : peerCount > 0 && hasIncomingFiles && !allCompleted ? (
             <Button
               disabled={isDownloading}
               icon={<DownloadIcon size={14} />}

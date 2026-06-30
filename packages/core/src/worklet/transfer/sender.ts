@@ -141,7 +141,8 @@ export class TransferSender {
         name: file.fileName,
         path: file.sourcePath,
         size: file.size,
-        driveKey: this.driveKey
+        driveKey: this.driveKey,
+        kind: 'file'
       })
     }
 

@@ -234,7 +234,9 @@ export const continueShare = async (files: SelectedFile[]): Promise<void> => {
 
   const fileRequests: ShareFileRequest[] = files.map((file) => ({
     path: file.path,
-    isTemporary: file.isTemporary
+    isTemporary: file.isTemporary,
+    kind: file.kind,
+    content: file.content
   }))
 
   dispatchToTransferStore({

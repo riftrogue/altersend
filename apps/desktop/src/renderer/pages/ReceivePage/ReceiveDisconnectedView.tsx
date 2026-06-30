@@ -46,6 +46,7 @@ export function ReceiveDisconnectedView() {
             {incomingFileOffers.map((file) => {
               const state = downloadStates[getOfferKey(file)]
               const isComplete = state?.status === 'completed'
+              if (file.kind !== 'file') return null
               return (
                 <LinkRow
                   key={getOfferKey(file)}

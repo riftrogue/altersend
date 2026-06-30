@@ -29,6 +29,7 @@ interface PickedFile {
   path: string
   name: string
   size?: number
+  relativePath?: string
 }
 
 declare global {

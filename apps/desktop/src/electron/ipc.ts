@@ -8,7 +8,7 @@ import {
   type OpenDialogOptions
 } from 'electron'
 import { isMac } from 'which-runtime'
-import { stat } from 'fs/promises'
+import { readdir, stat } from 'fs/promises'
 import path from 'path'
 import { isPathSafe, type TransferMethod } from '@altersend/core'
 import type { DesktopRuntime } from './runtime.js'
@@ -29,6 +29,62 @@ function isAllowedPath(senderId: number, filePath: string): boolean {
     if (filePath.startsWith(p + path.sep) || filePath.startsWith(p + '/')) return true
   }
   return false
+}
+
+interface PickedFile {
+  path: string
+  name: string
+  size: number
+  relativePath?: string
+}
+
+const FOLDER_SCAN_CONCURRENCY = 16
+
+function createLimit(max: number) {
+  let active = 0
+  const queue: (() => void)[] = []
+  const next = () => {
+    if (active >= max) return
+    const run = queue.shift()
+    if (!run) return
+    active++
+    run()
+  }
+
+  return <T>(task: () => Promise<T>): Promise<T> =>
+    new Promise<T>((resolve, reject) => {
+      queue.push(() => {
+        task()
+          .then(resolve, reject)
+          .finally(() => {
+            active--
+            next()
+          })
+      })
+      next()
+    })
+}
+
+async function collectFolderFiles(rootDir: string): Promise<PickedFile[]> {
+  const files: PickedFile[] = []
+  const limit = createLimit(FOLDER_SCAN_CONCURRENCY)
+  const walk = async (absDir: string, relDir: string): Promise<void> => {
+    const entries = await limit(() => readdir(absDir, { withFileTypes: true }))
+    await Promise.all(
+      entries.map(async (entry) => {
+        const abs = path.join(absDir, entry.name)
+        const rel = `${relDir}/${entry.name}`
+        if (entry.isDirectory()) {
+          await walk(abs, rel)
+        } else if (entry.isFile()) {
+          const fileStats = await limit(() => stat(abs))
+          files.push({ path: abs, name: entry.name, size: fileStats.size, relativePath: rel })
+        }
+      })
+    )
+  }
+  await walk(rootDir, path.basename(rootDir))
+  return files
 }
 
 export function registerIpcHandlers(runtime: DesktopRuntime) {
@@ -56,8 +112,8 @@ export function registerIpcHandlers(runtime: DesktopRuntime) {
   ipcMain.handle('app:pickFiles', async (evt) => {
     const parentWindow = BrowserWindow.fromWebContents(evt.sender) ?? undefined
     const dialogOptions: OpenDialogOptions = {
-      title: 'Select files to share',
-      properties: ['openFile', 'multiSelections']
+      title: 'Select files or folders to share',
+      properties: ['openFile', 'openDirectory', 'multiSelections']
     }
     const result = parentWindow
       ? await dialog.showOpenDialog(parentWindow, dialogOptions)
@@ -68,19 +124,18 @@ export function registerIpcHandlers(runtime: DesktopRuntime) {
     }
 
     const id = evt.sender.id
-    return Promise.all(
-      result.filePaths.map(async (filePath) => {
-        recordPickedPath(id, filePath)
-        const fileName = path.basename(filePath)
-        const fileStats = await stat(filePath)
+    const picked: PickedFile[] = []
+    for (const filePath of result.filePaths) {
+      recordPickedPath(id, filePath)
+      const fileStats = await stat(filePath)
+      if (fileStats.isDirectory()) {
+        picked.push(...(await collectFolderFiles(filePath)))
+      } else {
+        picked.push({ path: filePath, name: path.basename(filePath), size: fileStats.size })
+      }
+    }
 
-        return {
-          path: filePath,
-          name: fileName,
-          size: fileStats.size
-        }
-      })
-    )
+    return picked
   })
 
   ipcMain.handle('app:pickSaveFile', async (evt, defaultName) => {

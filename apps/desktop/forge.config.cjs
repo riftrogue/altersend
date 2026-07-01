@@ -174,6 +174,11 @@ module.exports = {
       }
     },
     {
+      name: '@electron-forge/maker-zip',
+      platforms: ['win32'],
+      config: {}
+    },
+    {
       name: '@electron-forge/maker-msix',
       platforms: isWindows ? ['win32'] : [],
       config: {

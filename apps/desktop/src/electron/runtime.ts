@@ -10,7 +10,7 @@ import {
   type TransferMethod,
   type WorkerClient
 } from '@altersend/core'
-import { isMac, isLinux } from 'which-runtime'
+import { isMac, isLinux, isWindows } from 'which-runtime'
 import { command, flag, sloppy } from 'paparam'
 import { createRequire } from 'module'
 import { getAppPath, getWorkerClientPath, getWorkerEntryPath } from './workerPaths.js'
@@ -87,9 +87,15 @@ const cliArgs = (app.isPackaged ? process.argv.slice(1) : process.argv.slice(2))
 cmd.parse(cliArgs)
 
 const pearStore = cmd.flags.storage
-const updates = (process as NodeJS.Process & { windowsStore?: boolean }).windowsStore
-  ? false
-  : cmd.flags.updates
+const windowsStore = (process as NodeJS.Process & { windowsStore?: boolean }).windowsStore === true
+
+const isWindowsPortable =
+  isWindows &&
+  app.isPackaged &&
+  !windowsStore &&
+  !fs.existsSync(path.resolve(path.dirname(process.execPath), '..', 'Update.exe'))
+
+const updates = windowsStore || isWindowsPortable ? false : cmd.flags.updates
 
 function isTransferMethod(method: unknown): method is TransferMethod {
   return typeof method === 'string' && method in API.methods

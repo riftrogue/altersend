@@ -57,6 +57,7 @@
         "@electron-forge/maker-dmg",
         "@electron-forge/maker-msix",
         "@electron-forge/maker-squirrel",
+        "@electron-forge/maker-zip",
         "app-builder-lib"
       ],
       "ignoreUnresolved": [

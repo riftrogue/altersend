@@ -122,20 +122,17 @@ jobs:
           "WINDOWS_CERTIFICATE_FILE=$pfxPath" | Out-File -FilePath $env:GITHUB_ENV -Append
           "WINDOWS_CERTIFICATE_PASSWORD=buildcert" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-      - name: Make Windows installer + msix (Forge)
+      - name: Make Windows installer + msix + portable zip (Forge)
         run: npm run dist:win:x64 -w apps/desktop
         env:
           DEBUG: electron-windows-msix*
-
-      - name: Make Windows portable (.exe)
-        run: npm run dist:win:portable:x64 -w apps/desktop
 
       - name: List Windows make output (debug)
         if: always()
         shell: bash
         run: |
           echo "=== Windows deliverables under apps/desktop/out ==="
-          find apps/desktop/out -type f \( -name '*.exe' -o -name '*.msix' -o -name '*.nupkg' -o -name 'RELEASES' \) 2>/dev/null || echo "(no out dir)"
+          find apps/desktop/out -type f \( -name '*.exe' -o -name '*.msix' -o -name '*.zip' -o -name '*.nupkg' -o -name 'RELEASES' \) 2>/dev/null || echo "(no out dir)"
 
       - name: Upload Windows MSIX (unsigned)
         id: upload-windows-msix
@@ -151,12 +148,12 @@ jobs:
           name: windows-squirrel
           path: apps/desktop/out/make/squirrel.windows/**/*
 
-      - name: Upload Windows portable (unsigned)
+      - name: Upload Windows portable zip
         id: upload-windows-portable
         uses: actions/upload-artifact@v4
         with:
           name: windows-portable
-          path: apps/desktop/out/*-Portable-*.exe
+          path: apps/desktop/out/make/zip/win32/**/*.zip
 
       # SignPath signing — only runs once `SIGNPATH_PROJECT_SLUG` repo variable is set.
       # Signs the Squirrel installer artifact. Signing the portable .exe / .msix
@@ -272,6 +269,7 @@ jobs:
             artifacts/**/*.dmg
             artifacts/**/*.exe
             artifacts/**/*.msix
+            artifacts/**/*.zip
             artifacts/**/*.AppImage
             artifacts/**/*.apk
 

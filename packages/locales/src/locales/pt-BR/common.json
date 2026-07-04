@@ -27,7 +27,10 @@
     "skip": "Pular",
     "paste": "Colar",
     "openLink": "Abrir link",
-    "copyText": "Copiar texto"
+    "copyText": "Copiar texto",
+    "add": "Adicionar",
+    "showMore": "Mostrar mais",
+    "showLess": "Mostrar menos"
   },
   "labels": {
     "settings": "Configurações",
@@ -53,7 +56,13 @@
     "files": "Arquivos",
     "downloads": "Arquivos › Downloads",
     "photosAndAlterSend": "Fotos + pasta AlterSend",
-    "alterSendFolder": "Pasta AlterSend"
+    "alterSendFolder": "Pasta AlterSend",
+    "text": "Texto",
+    "items_one": "{{count}} item",
+    "items_other": "{{count}} itens",
+    "texts_one": "{{count}} texto",
+    "texts_other": "{{count}} textos",
+    "filesGeneric": "arquivos"
   },
   "update": {
     "ready": "Atualização pronta",
@@ -66,10 +75,15 @@
     "notNow": "Agora não"
   },
   "status": {
-    "connected": "Conectado"
+    "connected": "Conectado",
+    "wantsToSend": "quer enviar {{label}}{{size}} para você"
   },
   "confirm": {
     "leaveShareSession": "Sair encerrará sua sessão de compartilhamento ativa. Continuar?",
     "leaveReceiveSession": "Sair encerrará sua sessão de recebimento ativa. Continuar?"
+  },
+  "units": {
+    "chars_one": "{{count}} caractere",
+    "chars_other": "{{count}} caracteres"
   }
 }

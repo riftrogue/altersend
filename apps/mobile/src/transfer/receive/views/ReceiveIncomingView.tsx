@@ -1,89 +1,101 @@
-import React from 'react'
-import { View, StyleSheet, Linking } from 'react-native'
+import { Linking, View, StyleSheet } from 'react-native'
 import * as Clipboard from 'expo-clipboard'
-import { LinkRow, Button, useTheme } from '@altersend/components'
-import { getDownloadRowDisplay, getOfferKey, useTransferStore } from '@altersend/domain'
+import { LinkRow, ReceivedTextRow, useTheme } from '@altersend/components'
+import {
+  getDownloadRowDisplay,
+  getOfferKey,
+  useCopiedFlag,
+  useTransferStore
+} from '@altersend/domain'
 import { useTranslation } from '@altersend/locales'
 import { Text } from '@/src/components/ThemedText'
 
 export function ReceiveIncomingView() {
-  const { t } = useTranslation(['receive'])
+  const { t } = useTranslation(['receive', 'common'])
   const incomingFileOffers = useTransferStore((s) => s.incomingFileOffers)
   const downloadStates = useTransferStore((s) => s.receiveDownloadStates)
   const { theme } = useTheme()
+  const c = theme.colors
+  const { copiedId, flashCopied } = useCopiedFlag()
 
-  const textOffer = incomingFileOffers.find((f) => f.kind === 'text')
-  const isTextTransfer = textOffer !== undefined
+  const copyText = (id: string, content: string) => {
+    void Clipboard.setStringAsync(content)
+    flashCopied(id)
+  }
 
-  const isUrl = React.useMemo(() => {
-    if (textOffer?.kind !== 'text') return false
-    try {
-      const url = new URL(textOffer.content)
-      return url.protocol === 'https:' || url.protocol === 'http:'
-    } catch {
-      return false
-    }
-  }, [textOffer])
+  const fileOffers = incomingFileOffers.filter(
+    (o): o is Extract<typeof o, { kind: 'file' }> => o.kind === 'file'
+  )
+  const textOffers = incomingFileOffers.filter(
+    (o): o is Extract<typeof o, { kind: 'text' }> => o.kind === 'text'
+  )
+
+  if (incomingFileOffers.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text style={[styles.waitingText, { color: c.colorTextMuted }]}>
+          {t('receive:status.waitingForFiles')}
+        </Text>
+      </View>
+    )
+  }
+
+  const cardStyle = [
+    styles.card,
+    { borderColor: c.colorBorderPrimary, backgroundColor: c.colorBackgroundSubtle }
+  ]
 
   return (
     <View style={styles.container}>
-      {isTextTransfer ? (
-        <View style={styles.textContainer}>
-          <Text style={[styles.textContent, { color: theme.colors.colorTextPrimary }]}>
-            {textOffer.content}
+      {fileOffers.length > 0 ? (
+        <View style={styles.section}>
+          <Text style={[styles.heading, { color: c.colorTextMuted }]}>
+            {t('common:files.files')}
           </Text>
-          <View style={styles.textActions}>
-            {isUrl ? (
-              <Button
-                onClick={() => void Linking.openURL(textOffer.content!)}
-                size='sm'
-                variant='primary'
-              >
-                {t('common:actions.openLink')}
-              </Button>
-            ) : (
-              <Button
-                onClick={() => void Clipboard.setStringAsync(textOffer.content!)}
-                size='sm'
-                variant='primary'
-              >
-                {t('common:actions.copyText')}
-              </Button>
-            )}
+          <View style={cardStyle}>
+            {fileOffers.map((offer, index) => {
+              const row = getDownloadRowDisplay(offer, downloadStates[getOfferKey(offer)])
+              return (
+                <LinkRow
+                  key={getOfferKey(offer)}
+                  file
+                  bare
+                  isFirst={index === 0}
+                  label={offer.name}
+                  size={offer.size}
+                  description={row.isActive ? `${row.description} · ${row.percent}%` : undefined}
+                  progressPercent={row.isActive || row.isCompleted ? row.percent : undefined}
+                />
+              )
+            })}
           </View>
         </View>
-      ) : incomingFileOffers.length > 0 ? (
-        <View
-          style={[
-            styles.card,
-            {
-              borderColor: theme.colors.colorBorderPrimary,
-              backgroundColor: theme.colors.colorBackgroundSubtle
-            }
-          ]}
-        >
-          {incomingFileOffers.map((file, index) => {
-            if (file.kind !== 'file') return null
-            const row = getDownloadRowDisplay(file, downloadStates[getOfferKey(file)])
-            return (
-              <LinkRow
-                key={getOfferKey(file)}
-                file
-                bare
+      ) : null}
+
+      {textOffers.length > 0 ? (
+        <View style={styles.section}>
+          <Text style={[styles.heading, { color: c.colorTextMuted }]}>
+            {t('common:files.text')}
+          </Text>
+          <View style={cardStyle}>
+            {textOffers.map((offer, index) => (
+              <ReceivedTextRow
+                key={getOfferKey(offer)}
+                content={offer.content}
                 isFirst={index === 0}
-                label={file.name}
-                size={file.size}
-                description={row.isActive ? `${row.description} · ${row.percent}%` : undefined}
-                progressPercent={row.isActive || row.isCompleted ? row.percent : undefined}
+                copied={copiedId === offer.id}
+                subtitleLabel={t('common:files.text')}
+                copyLabel={t('common:actions.copyText')}
+                copiedLabel={t('common:actions.copied')}
+                showMoreLabel={t('common:actions.showMore')}
+                showLessLabel={t('common:actions.showLess')}
+                onCopy={() => copyText(offer.id, offer.content)}
+                onOpenLink={(url) => void Linking.openURL(url)}
               />
-            )
-          })}
+            ))}
+          </View>
         </View>
-      ) : (
-        <Text style={[styles.waitingText, { color: theme.colors.colorTextMuted }]}>
-          {t('receive:status.waitingForFiles')}
-        </Text>
-      )}
+      ) : null}
     </View>
   )
 }
@@ -91,7 +103,14 @@ export function ReceiveIncomingView() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: 16
+    gap: 20
+  },
+  section: {
+    gap: 8
+  },
+  heading: {
+    fontSize: 13,
+    fontWeight: '500'
   },
   card: {
     borderRadius: 12,
@@ -100,19 +119,5 @@ const styles = StyleSheet.create({
   },
   waitingText: {
     fontSize: 13
-  },
-  textContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 16
-  },
-  textContent: {
-    fontSize: 16,
-    textAlign: 'center'
-  },
-  textActions: {
-    flexDirection: 'row',
-    gap: 8
   }
 })

@@ -1,9 +1,16 @@
 import { useEffect, useState } from 'react'
-import { declineInvite, formatFileSize, useTransferStore } from '@altersend/domain'
+import {
+  declineInvite,
+  formatFileSize,
+  formatItemsCount,
+  useTransferStore
+} from '@altersend/domain'
+import { useTranslation } from '@altersend/locales'
 import { Button } from '@altersend/components'
 import { CheckIcon, CloseIcon, deviceIcon } from '@altersend/components/icons'
 
 export function InviteBanner({ onAccept }: { onAccept: (topic: string) => void }) {
+  const { t } = useTranslation(['common'])
   const invite = useTransferStore((s) => s.remember.incomingInvite)
   const [accepted, setAccepted] = useState(false)
 
@@ -15,12 +22,15 @@ export function InviteBanner({ onAccept }: { onAccept: (topic: string) => void }
 
   const Icon = deviceIcon(invite.deviceType)
 
-  const fileLabel =
-    invite.fileCount != null
-      ? `${invite.fileCount} ${invite.fileCount === 1 ? 'file' : 'files'}`
-      : 'files'
+  const fileCount = invite.fileCount ?? 0
+  const textCount = invite.textCount ?? 0
+  const hasCounts = fileCount > 0 || textCount > 0
+
+  const fileLabel = hasCounts
+    ? formatItemsCount(fileCount, textCount, t)
+    : t('common:files.filesGeneric')
   const sizeLabel =
-    invite.totalSize != null && invite.totalSize > 0 ? ` · ${formatFileSize(invite.totalSize)}` : ''
+    fileCount > 0 && invite.totalSize != null ? ` · ${formatFileSize(invite.totalSize)}` : ''
 
   const accept = () => {
     setAccepted(true)
@@ -54,8 +64,7 @@ export function InviteBanner({ onAccept }: { onAccept: (topic: string) => void }
             {invite.displayName}
           </p>
           <p className='m-0 mt-0.5 text-[12px] leading-snug text-text-secondary'>
-            wants to send you {fileLabel}
-            {sizeLabel}
+            {t('common:status.wantsToSend', { label: fileLabel, size: sizeLabel })}
           </p>
         </div>
 

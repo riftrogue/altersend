@@ -35,6 +35,9 @@ export const styles = css.create({
     paddingLeft: tokens.space25,
     paddingRight: tokens.space25
   },
+  rowAlignTop: {
+    alignItems: 'flex-start'
+  },
   rowStandalone: {
     borderWidth: 1,
     borderStyle: 'solid',
@@ -185,6 +188,15 @@ export const styles = css.create({
     fontFamily: tokens.fontFamilySans,
     fontSize: tokens.fontSizeSm,
     lineHeight: tokens.lineHeightNormal
+  },
+  statusLabelMuted: {
+    color: tokens.colorTextSecondary
+  },
+  statusLabelActive: {
+    color: tokens.colorTextPrimary
+  },
+  statusLabelSuccess: {
+    color: tokens.colorSuccess
   },
   progressTrack: {
     marginTop: tokens.space15,

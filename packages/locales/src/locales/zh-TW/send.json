@@ -27,7 +27,12 @@
     "endSession": "結束會話",
     "pickFilesTitle": "新增文件",
     "pickPhotos": "照片",
-    "pickFiles": "文件"
+    "pickFiles": "文件",
+    "typeSnippet": "輸入或貼上片段…",
+    "sendTexts_one": "傳送 {{count}} 則文字",
+    "sendTexts_other": "傳送 {{count}} 則文字",
+    "sendItems_one": "傳送 {{count}} 項",
+    "sendItems_other": "傳送 {{count}} 項"
   },
   "status": {
     "waitingForPeer": "等待接收方",
@@ -94,6 +99,7 @@
   },
   "files": {
     "addedFiles": "已新增的檔案",
-    "removeLabel": "删除{{name}}"
+    "removeLabel": "删除{{name}}",
+    "addedText": "已新增文字"
   }
 }

@@ -27,7 +27,10 @@
     "skip": "Ignorer",
     "paste": "Coller",
     "openLink": "Ouvrir le lien",
-    "copyText": "Copier le texte"
+    "copyText": "Copier le texte",
+    "add": "Ajouter",
+    "showMore": "Afficher plus",
+    "showLess": "Afficher moins"
   },
   "labels": {
     "settings": "Paramètres",
@@ -53,7 +56,13 @@
     "files": "Fichiers",
     "downloads": "Fichiers › Téléchargements",
     "photosAndAlterSend": "Photos + dossier AlterSend",
-    "alterSendFolder": "Dossier AlterSend"
+    "alterSendFolder": "Dossier AlterSend",
+    "text": "Texte",
+    "items_one": "{{count}} élément",
+    "items_other": "{{count}} éléments",
+    "texts_one": "{{count}} texte",
+    "texts_other": "{{count}} textes",
+    "filesGeneric": "des fichiers"
   },
   "update": {
     "ready": "Mise à jour prête",
@@ -66,10 +75,15 @@
     "notNow": "Plus tard"
   },
   "status": {
-    "connected": "Connecté"
+    "connected": "Connecté",
+    "wantsToSend": "veut vous envoyer {{label}}{{size}}"
   },
   "confirm": {
     "leaveShareSession": "Quitter mettra fin à votre session de partage active. Continuer?",
     "leaveReceiveSession": "Quitter mettra fin à votre session de réception active. Continuer?"
+  },
+  "units": {
+    "chars_one": "{{count}} caractère",
+    "chars_other": "{{count}} caractères"
   }
 }

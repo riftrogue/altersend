@@ -27,7 +27,10 @@
     "skip": "跳过",
     "paste": "粘贴",
     "openLink": "打开链接",
-    "copyText": "复制文本"
+    "copyText": "复制文本",
+    "add": "添加",
+    "showMore": "显示更多",
+    "showLess": "收起"
   },
   "labels": {
     "settings": "设置",
@@ -53,7 +56,13 @@
     "files": "文件",
     "downloads": "文件 › 下载",
     "photosAndAlterSend": "照片 + AlterSend 文件夹",
-    "alterSendFolder": "AlterSend 文件夹"
+    "alterSendFolder": "AlterSend 文件夹",
+    "text": "文本",
+    "items_one": "{{count}} 项",
+    "items_other": "{{count}} 项",
+    "texts_one": "{{count}} 条文本",
+    "texts_other": "{{count}} 条文本",
+    "filesGeneric": "文件"
   },
   "update": {
     "ready": "更新准备就绪",
@@ -66,10 +75,15 @@
     "notNow": "以后再说"
   },
   "status": {
-    "connected": "已连接"
+    "connected": "已连接",
+    "wantsToSend": "想要发送 {{label}}{{size}} 给你"
   },
   "confirm": {
     "leaveShareSession": "离开将结束您的活跃共享会话。继续？",
     "leaveReceiveSession": "离开将结束您的活动接收会话。继续？"
+  },
+  "units": {
+    "chars_one": "{{count}} 个字符",
+    "chars_other": "{{count}} 个字符"
   }
 }

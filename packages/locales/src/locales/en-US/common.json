@@ -27,7 +27,10 @@
     "skip": "Skip",
     "paste": "Paste",
     "openLink": "Open Link",
-    "copyText": "Copy Text"
+    "copyText": "Copy Text",
+    "add": "Add",
+    "showMore": "Show more",
+    "showLess": "Show less"
   },
   "labels": {
     "settings": "Settings",
@@ -53,7 +56,13 @@
     "files": "Files",
     "downloads": "Files › Downloads",
     "photosAndAlterSend": "Photos + AlterSend folder",
-    "alterSendFolder": "AlterSend folder"
+    "alterSendFolder": "AlterSend folder",
+    "text": "Text",
+    "items_one": "{{count}} item",
+    "items_other": "{{count}} items",
+    "texts_one": "{{count}} text",
+    "texts_other": "{{count}} texts",
+    "filesGeneric": "files"
   },
   "update": {
     "ready": "Update ready",
@@ -66,10 +75,15 @@
     "notNow": "Not now"
   },
   "status": {
-    "connected": "Connected"
+    "connected": "Connected",
+    "wantsToSend": "wants to send you {{label}}{{size}}"
   },
   "confirm": {
     "leaveShareSession": "Leaving will end your active share session. Continue?",
     "leaveReceiveSession": "Leaving will end your active receive session. Continue?"
+  },
+  "units": {
+    "chars_one": "{{count}} char",
+    "chars_other": "{{count}} chars"
   }
 }

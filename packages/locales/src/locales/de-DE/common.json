@@ -27,7 +27,10 @@
     "skip": "Überspringen",
     "paste": "Einfügen",
     "openLink": "Link öffnen",
-    "copyText": "Text kopieren"
+    "copyText": "Text kopieren",
+    "add": "Hinzufügen",
+    "showMore": "Mehr anzeigen",
+    "showLess": "Weniger anzeigen"
   },
   "labels": {
     "settings": "Einstellungen",
@@ -53,7 +56,13 @@
     "files": "Dateien",
     "downloads": "Dateien › Downloads",
     "photosAndAlterSend": "Ordner „Fotos + AlterSend“.",
-    "alterSendFolder": "Ordner AlterSend"
+    "alterSendFolder": "Ordner AlterSend",
+    "text": "Text",
+    "items_one": "{{count}} Element",
+    "items_other": "{{count}} Elemente",
+    "texts_one": "{{count}} Text",
+    "texts_other": "{{count}} Texte",
+    "filesGeneric": "Dateien"
   },
   "update": {
     "ready": "Update bereit",
@@ -66,10 +75,15 @@
     "notNow": "Später"
   },
   "status": {
-    "connected": "Verbunden"
+    "connected": "Verbunden",
+    "wantsToSend": "möchte dir {{label}}{{size}} senden"
   },
   "confirm": {
     "leaveShareSession": "Durch das Verlassen wird Ihre aktive Freigabesitzung beendet. Weitermachen?",
     "leaveReceiveSession": "Durch das Verlassen wird Ihre aktive Empfangssitzung beendet. Weitermachen?"
+  },
+  "units": {
+    "chars_one": "{{count}} Zeichen",
+    "chars_other": "{{count}} Zeichen"
   }
 }

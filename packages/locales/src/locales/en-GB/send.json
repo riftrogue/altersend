@@ -27,7 +27,12 @@
     "endSession": "End session",
     "pickFilesTitle": "Add files",
     "pickPhotos": "Photos",
-    "pickFiles": "Files"
+    "pickFiles": "Files",
+    "typeSnippet": "Type or paste a snippet…",
+    "sendTexts_one": "Send {{count}} text",
+    "sendTexts_other": "Send {{count}} texts",
+    "sendItems_one": "Send {{count}} item",
+    "sendItems_other": "Send {{count}} items"
   },
   "status": {
     "waitingForPeer": "Waiting for peer",
@@ -94,6 +99,7 @@
   },
   "files": {
     "addedFiles": "Added files",
-    "removeLabel": "Remove {{name}}"
+    "removeLabel": "Remove {{name}}",
+    "addedText": "Added text"
   }
 }

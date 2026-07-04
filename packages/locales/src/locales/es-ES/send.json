@@ -27,7 +27,12 @@
     "endSession": "Finalizar sesión",
     "pickFilesTitle": "Agregar archivos",
     "pickPhotos": "Fotos",
-    "pickFiles": "Archivos"
+    "pickFiles": "Archivos",
+    "typeSnippet": "Escribe o pega un fragmento…",
+    "sendTexts_one": "Enviar {{count}} texto",
+    "sendTexts_other": "Enviar {{count}} textos",
+    "sendItems_one": "Enviar {{count}} elemento",
+    "sendItems_other": "Enviar {{count}} elementos"
   },
   "status": {
     "waitingForPeer": "Esperando al destinatario",
@@ -94,6 +99,7 @@
   },
   "files": {
     "addedFiles": "Archivos añadidos",
-    "removeLabel": "Eliminar {{name}}"
+    "removeLabel": "Eliminar {{name}}",
+    "addedText": "Texto añadido"
   }
 }

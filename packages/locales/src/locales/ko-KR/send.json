@@ -27,7 +27,12 @@
     "endSession": "세션 종료",
     "pickFilesTitle": "파일 추가",
     "pickPhotos": "사진",
-    "pickFiles": "파일"
+    "pickFiles": "파일",
+    "typeSnippet": "스니펫을 입력하거나 붙여넣기…",
+    "sendTexts_one": "{{count}}개 텍스트 보내기",
+    "sendTexts_other": "{{count}}개 텍스트 보내기",
+    "sendItems_one": "{{count}}개 항목 보내기",
+    "sendItems_other": "{{count}}개 항목 보내기"
   },
   "status": {
     "waitingForPeer": "수신자를 기다리는 중",
@@ -94,6 +99,7 @@
   },
   "files": {
     "addedFiles": "추가된 파일",
-    "removeLabel": "{{name}} 삭제"
+    "removeLabel": "{{name}} 삭제",
+    "addedText": "추가된 텍스트"
   }
 }

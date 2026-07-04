@@ -46,17 +46,29 @@ export function Sidebar({
         {!collapsed && (
           <img src={logoMark} alt='AlterSend' className='h-6 w-auto shrink-0 object-contain' />
         )}
-        <Button
-          variant='ghost'
-          iconOnly
-          size={collapsed ? 'md' : 'sm'}
-          aria-label={toggleLabel}
-          onClick={onToggleCollapsed}
-          icon={collapsed ? <PanelLeftOpenIcon size={17} /> : <PanelLeftCloseIcon size={17} />}
-        />
+        {collapsed ? (
+          <ListItem
+            icon={<PanelLeftOpenIcon size={17} />}
+            label={toggleLabel}
+            tooltip={toggleLabel}
+            collapsed
+            onClick={onToggleCollapsed}
+          />
+        ) : (
+          <Button
+            variant='ghost'
+            iconOnly
+            size='sm'
+            aria-label={toggleLabel}
+            tooltip={toggleLabel}
+            tooltipSide='bottom'
+            onClick={onToggleCollapsed}
+            icon={<PanelLeftCloseIcon size={17} />}
+          />
+        )}
       </div>
 
-      {collapsed && <div className='mx-3 mt-1 border-t border-border-primary' />}
+      {collapsed && <div className='mx-3 mt-3 border-t border-border-primary' />}
 
       <nav
         className={`flex flex-col gap-1 px-3 ${collapsed ? 'items-center pt-3' : 'pt-8'}`}
@@ -65,6 +77,7 @@ export function Sidebar({
         <ListItem
           icon={<SendIcon size={18} />}
           label={t('common:labels.send')}
+          tooltip={t('common:labels.send')}
           collapsed={collapsed}
           active={activeTab === 'send'}
           showDot={role === 'sender'}
@@ -73,6 +86,7 @@ export function Sidebar({
         <ListItem
           icon={<DownloadIcon size={18} />}
           label={t('common:labels.receive')}
+          tooltip={t('common:labels.receive')}
           collapsed={collapsed}
           active={activeTab === 'receive'}
           showDot={role === 'receiver'}
@@ -86,6 +100,7 @@ export function Sidebar({
         <ListItem
           icon={<SlidersHorizontalIcon size={18} />}
           label={t('common:labels.settings')}
+          tooltip={t('common:labels.settings')}
           collapsed={collapsed}
           onClick={() => openSettingsPanel()}
         />

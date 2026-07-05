@@ -103,6 +103,28 @@ async function gracefulShutdown(_reason: string) {
   }
 }
 
+function exitProcess() {
+  try {
+    ;(Bare as unknown as { exit: (code?: number) => void }).exit(0)
+  } catch {}
+}
+
+const ipcStream = ipc as { on?: (event: string, listener: () => void) => void }
+if (typeof ipcStream.on === 'function') {
+  let exiting = false
+  const exitWithHost = (reason: string) => () => {
+    if (exiting) return
+    exiting = true
+    const force = setTimeout(exitProcess, 2000)
+    void gracefulShutdown(reason).finally(() => {
+      clearTimeout(force)
+      exitProcess()
+    })
+  }
+  ipcStream.on('close', exitWithHost('ipc-close'))
+  ipcStream.on('end', exitWithHost('ipc-end'))
+}
+
 bareProcess.on('beforeExit', () => {
   void gracefulShutdown('beforeExit')
 })

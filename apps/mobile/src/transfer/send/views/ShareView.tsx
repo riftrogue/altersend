@@ -295,8 +295,8 @@ const styles = StyleSheet.create({
   sectionCount: { fontSize: 11.5, fontWeight: '500' },
   section: { marginBottom: 16 },
   filesWrap: { marginBottom: 24 },
-  tiles: { flexDirection: 'row', gap: 12, marginBottom: 24 },
-  tile: { flex: 1, minWidth: 0 },
+  tiles: { flexDirection: 'row', alignItems: 'stretch', gap: 12, marginBottom: 24 },
+  tile: { flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 0 },
   invitePanel: {
     marginBottom: 20
   },

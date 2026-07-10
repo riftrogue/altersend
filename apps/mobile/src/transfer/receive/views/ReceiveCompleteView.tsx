@@ -1,6 +1,6 @@
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
-import { LinkRow, useTheme, withAlpha } from '@altersend/components'
+import { LinkRow, useTheme } from '@altersend/components'
 import { CheckIcon } from '@altersend/components/icons'
 import { formatFileSize, getOfferKey, useTransferStore } from '@altersend/domain'
 import { useTranslation } from '@altersend/locales'
@@ -23,31 +23,17 @@ export function ReceiveCompleteView() {
 
   return (
     <View style={styles.container}>
-      <View
-        style={[
-          styles.successCard,
-          {
-            borderColor: withAlpha(theme.colors.colorSuccess, 0.22),
-            backgroundColor: withAlpha(theme.colors.colorSuccess, 0.08)
-          }
-        ]}
-      >
-        <View
-          style={[
-            styles.checkBadge,
-            { backgroundColor: withAlpha(theme.colors.colorSuccess, 0.2) }
-          ]}
+      <View style={styles.successRow}>
+        <CheckIcon size={17} color={theme.colors.colorSuccess} />
+        <Text style={[styles.successTitle, { color: theme.colors.colorTextPrimary }]}>
+          {t('receive:page.completed.title', { count: fileCount })}
+        </Text>
+        <Text
+          style={[styles.successMeta, { color: theme.colors.colorTextMuted }]}
+          numberOfLines={1}
         >
-          <CheckIcon size={16} color={theme.colors.colorSuccess} />
-        </View>
-        <View style={styles.successText}>
-          <Text style={[styles.successTitle, { color: theme.colors.colorSuccess }]}>
-            {t('receive:page.completed.title', { count: fileCount })}
-          </Text>
-          <Text style={[styles.successSubtitle, { color: theme.colors.colorTextMuted }]}>
-            {formatFileSize(totalBytes)} · {t('receive:summary.saved')}
-          </Text>
-        </View>
+          {formatFileSize(totalBytes)} · {t('receive:summary.saved')}
+        </Text>
       </View>
 
       <View
@@ -87,38 +73,25 @@ export function ReceiveCompleteView() {
 
 const styles = StyleSheet.create({
   container: {
-    gap: 12
+    gap: 14
   },
-  successCard: {
+  successRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
-    borderRadius: 14,
-    borderWidth: 1,
-    padding: 16
-  },
-  checkBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0
-  },
-  successText: {
-    flex: 1,
-    minWidth: 0
+    gap: 8,
+    paddingHorizontal: 2
   },
   successTitle: {
-    fontSize: 15,
-    fontWeight: '700'
+    fontSize: 14,
+    fontWeight: '600',
+    letterSpacing: -0.2
   },
-  successSubtitle: {
-    fontSize: 13,
-    marginTop: 2
+  successMeta: {
+    flex: 1,
+    fontSize: 13
   },
   card: {
-    borderRadius: 14,
+    borderRadius: 12,
     borderWidth: 1,
     overflow: 'hidden'
   }

@@ -24,7 +24,7 @@ const styles = css.create({
     top: 0,
     bottom: 0,
     borderRadius: tokens.radiusSm,
-    backgroundColor: tokens.colorSurfacePrimary,
+    backgroundColor: tokens.colorSurfaceSecondary,
     transitionProperty: 'transform, width',
     transitionDuration: '200ms',
     transitionTimingFunction: 'ease'

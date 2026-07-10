@@ -15,6 +15,9 @@ export function TabIndicator({ activeIndex, count, stretch }: TabIndicatorProps)
   const slot = stretch && count > 0 ? width / count : 0
 
   useEffect(() => {
+    if (slot <= 0) {
+      return
+    }
     Animated.timing(translateX, {
       toValue: activeIndex * slot,
       duration: 200,
@@ -24,20 +27,22 @@ export function TabIndicator({ activeIndex, count, stretch }: TabIndicatorProps)
 
   const onLayout = (event: LayoutChangeEvent) => setWidth(event.nativeEvent.layout.width)
 
+  if (!stretch || count < 1) {
+    return null
+  }
+
   return (
     <View pointerEvents='none' style={styles.layer} onLayout={onLayout}>
-      {slot > 0 ? (
-        <Animated.View
-          style={[
-            styles.pill,
-            {
-              width: slot,
-              backgroundColor: theme.colors.colorSurfacePrimary,
-              transform: [{ translateX }]
-            }
-          ]}
-        />
-      ) : null}
+      <Animated.View
+        style={[
+          styles.pill,
+          {
+            width: `${100 / count}%`,
+            backgroundColor: theme.colors.colorSurfaceSecondary,
+            transform: [{ translateX }]
+          }
+        ]}
+      />
     </View>
   )
 }

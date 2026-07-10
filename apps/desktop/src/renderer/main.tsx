@@ -18,6 +18,7 @@ import { bridgeApi, hasBridge } from './api/bridgeApi'
 import { startDeepLinkHandler } from './lifecycle/deepLinkHandler'
 import { initSentry, captureException } from './sentry'
 import { isCrashReportingEnabled } from './lifecycle/crashReportingStorage'
+import { isRelayEnabled } from './lifecycle/relayStorage'
 import { getSavedLocalePreference } from './lifecycle/localePreferenceStorage'
 import { getDesktopSystemLocales } from './lifecycle/systemLocale'
 import './strict.css'
@@ -65,6 +66,9 @@ if (hasBridge()) {
   bindTransferApi(bridgeApi, {
     onError: (context, error) => captureException(error, context)
   })
+  bridgeApi.worker
+    .setRelayConfig({ enabled: isRelayEnabled() })
+    .catch((err) => captureException(err, 'setRelayConfig'))
   startPeerWatchdog()
   startBackgroundReconnectEffect()
   startDeepLinkHandler()

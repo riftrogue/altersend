@@ -14,6 +14,7 @@ import { isMac, isLinux, isWindows } from 'which-runtime'
 import { command, flag, sloppy } from 'paparam'
 import { createRequire } from 'module'
 import { getAppPath, getWorkerClientPath, getWorkerEntryPath } from './workerPaths.js'
+import { RELAY_CONF_PUBKEY_HEX } from './relay-conf-pubkey.gen.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -155,6 +156,7 @@ function appDataDir(name: string): string {
 export function createDesktopRuntime({ broadcast }: { broadcast: Broadcast }): DesktopRuntime {
   const workers = new Map<string, WorkerRuntime>()
   let pear: PearRuntimeInstance | null = null
+  let rememberedRelayConfig: Parameters<WorkerClient['setRelayConfig']>[0] | null = null
 
   function getPear() {
     if (pear) return pear
@@ -206,6 +208,8 @@ export function createDesktopRuntime({ broadcast }: { broadcast: Broadcast }): D
       `--storage=${pear.storage}`,
       `--identity=${identityRoot}`,
       '--device-type=desktop',
+      ...(RELAY_CONF_PUBKEY_HEX ? [`--relay-conf-pubkey=${RELAY_CONF_PUBKEY_HEX}`] : []),
+      ...cliArgs.filter((arg) => arg.startsWith('--relay-')),
       ...args
     ])
     const client = createTransferWorkerClient(worker, {
@@ -218,6 +222,15 @@ export function createDesktopRuntime({ broadcast }: { broadcast: Broadcast }): D
       worker,
       client,
       ready: client.ready
+    }
+
+    if (rememberedRelayConfig) {
+      const cfg = rememberedRelayConfig
+      runtime.ready
+        .then(() => runtime.client.setRelayConfig(cfg))
+        .catch((err) =>
+          console.error('[relay] re-applying relay config on worker respawn failed', err)
+        )
     }
 
     function sendWorkerStdout(data: unknown) {
@@ -272,6 +285,9 @@ export function createDesktopRuntime({ broadcast }: { broadcast: Broadcast }): D
     }
 
     const runtime = getWorker(specifier)
+    if (method === 'setRelayConfig') {
+      rememberedRelayConfig = args[0] as typeof rememberedRelayConfig
+    }
     return (runtime.client[method] as (...a: unknown[]) => Promise<unknown>)(...args)
   }
 

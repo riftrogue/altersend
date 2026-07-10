@@ -34,6 +34,7 @@ import { useAlterSendFonts } from '../src/theme/useAlterSendFonts'
 import { startAppStateBridge } from '../src/lifecycle/appStateBridge'
 import { startDeepLinkHandler } from '../src/lifecycle/deepLinkHandler'
 import { getSavedLocalePreference } from '../src/lifecycle/localePreferenceStorage'
+import { isRelayEnabled } from '../src/lifecycle/relayStorage'
 import { getMobileSystemLocales } from '../src/lifecycle/systemLocale'
 import { ShareIntentHandler } from '../src/lifecycle/ShareIntentHandler'
 import { startPhotosCopyEffect } from '../src/transfer/receive'
@@ -45,6 +46,9 @@ initSentry()
 bindTransferApi(mobileApi, {
   onError: (context, error) => captureException(error, context)
 })
+mobileApi.worker
+  .setRelayConfig({ enabled: isRelayEnabled() })
+  .catch((err) => captureException(err, 'setRelayConfig'))
 startAppStateBridge()
 startPeerWatchdog()
 startBackgroundReconnectEffect()
@@ -92,6 +96,7 @@ function ThemedStack() {
       <Stack.Screen name='onboarding' options={{ headerShown: false, gestureEnabled: false }} />
       <Stack.Screen name='settings' options={flowScreenOptions} />
       <Stack.Screen name='language' options={flowScreenOptions} />
+      <Stack.Screen name='connection' options={flowScreenOptions} />
       <Stack.Screen name='security' options={flowScreenOptions} />
       <Stack.Screen name='devices' options={flowScreenOptions} />
       <Stack.Screen name='about' options={flowScreenOptions} />

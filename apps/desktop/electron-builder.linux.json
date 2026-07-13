@@ -1,6 +1,6 @@
 {
   "appId": "com.altersend.desktop",
-  "electronVersion": "40.2.1",
+  "electronVersion": "40.10.0",
   "electronDownload": {
     "cache": ".electron-dist"
   },

@@ -51,6 +51,11 @@ jobs:
           AWS_DEFAULT_REGION: auto
           R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
         run: |
+          # OSTree repos contain thousands of small files. Increase concurrency
+          # from the default 10 to avoid bottlenecking on per-request latency.
+          aws configure set default.s3.max_concurrent_requests 100
+          aws configure set default.s3.max_queue_size 10000
+
           mkdir -p repo
           aws s3 sync s3://altersend-flatpak/ repo/ \
             --endpoint-url "$R2_ENDPOINT" \

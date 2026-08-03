@@ -18,7 +18,7 @@ jobs:
   build-flatpak:
     # TODO: revert before upstream PR
     # if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container:
       image: bilelmoussaoui/flatpak-github-actions@sha256:d534700a8a0090dfa5e23ed3ae09106a1beafde54e66b6b1327b27dbd3f0c7c2 # freedesktop-24.08
       # --privileged is required by flatpak-builder to create user namespace
@@ -52,6 +52,15 @@ jobs:
           ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
           rm -rf awscliv2.zip aws/
 
+      - name: Configure AWS CLI
+        shell: bash
+        run: |
+          # OSTree repos contain thousands of small files. Increase concurrency
+          # from the default 10 to avoid bottlenecking on per-request latency.
+          # These settings persist for the lifetime of the container (all subsequent steps).
+          aws configure set default.s3.max_concurrent_requests 100
+          aws configure set default.s3.max_queue_size 10000
+
       - name: Download existing OSTree repo from R2 for delta updates
         shell: bash
         env:
@@ -60,16 +69,22 @@ jobs:
           AWS_DEFAULT_REGION: auto
           R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
         run: |
-          # OSTree repos contain thousands of small files. Increase concurrency
-          # from the default 10 to avoid bottlenecking on per-request latency.
-          aws configure set default.s3.max_concurrent_requests 100
-          aws configure set default.s3.max_queue_size 10000
-
           mkdir -p repo
-          aws s3 sync s3://altersend-flatpak/ repo/ \
+
+          # Sync the existing repo from R2. An empty bucket exits 0 and downloads
+          # nothing — no special handling needed. Only suppress NoSuchBucket (true
+          # first-run); re-raise all other errors (auth failures, network errors, etc.)
+          # to prevent silently deploying over a corrupted or empty state.
+          sync_err=$(aws s3 sync s3://altersend-flatpak/ repo/ \
             --endpoint-url "$R2_ENDPOINT" \
-            --no-progress \
-            || echo "No existing repo found in R2 — will initialize from scratch."
+            --no-progress 2>&1) || {
+            if echo "$sync_err" | grep -q "NoSuchBucket"; then
+              echo "Bucket not found — initializing fresh repository."
+            else
+              echo "$sync_err" >&2
+              exit 1
+            fi
+          }
 
       - name: Clean and verify OSTree repo
         shell: bash
@@ -94,10 +109,10 @@ jobs:
       - name: Build Flatpak
         uses: flatpak/flatpak-github-actions/flatpak-builder@401fe28a8384095fc1531b9d320b292f0ee45adb # v6
         with:
-          bundle: altersend.flatpak
           manifest-path: flatpak/com.altersend.AlterSend.yaml
           cache-key: flatpak-builder-${{ hashFiles('flatpak/com.altersend.AlterSend.yaml', 'flatpak/node-modules.json') }}
           build-bundle: false  # Bundle output is handled by a dedicated release workflow
+          upload-artifact: false  # No bundle produced, so nothing to upload
           repository-name: flathub
           repository-url: https://flathub.org/repo/flathub.flatpakrepo
           gpg-sign: ${{ steps.import_gpg.outputs.fingerprint }}
@@ -137,11 +152,6 @@ jobs:
           #   1. This step only runs after a fully successful build + sign.
           #   2. If the sync is interrupted, the next run will re-sync and restore consistency.
           ostree fsck --repo=repo
-
-          # OSTree repos contain thousands of small files. Increase concurrency
-          # from the default 10 to avoid bottlenecking on per-request latency.
-          aws configure set default.s3.max_concurrent_requests 100
-          aws configure set default.s3.max_queue_size 10000
 
           aws s3 sync repo/ s3://altersend-flatpak/ \
             --endpoint-url "$R2_ENDPOINT" \

@@ -44,7 +44,9 @@ jobs:
           # Verify the installer against Amazon's official GPG signing key before
           # executing anything. Key fingerprint published at:
           # https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
-          gpg --keyserver hkps://keys.openpgp.org \
+          # Note: keys.openpgp.org strips user IDs by default causing gpg to skip
+          # the import; keyserver.ubuntu.com returns the full key correctly.
+          gpg --keyserver hkps://keyserver.ubuntu.com \
               --recv-keys FB5DB77FD5C118B80511ADA8A6310ACC4672475C
           gpg --verify awscliv2.zip.sig awscliv2.zip
 

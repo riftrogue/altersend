@@ -39,9 +39,18 @@ jobs:
         shell: bash
         run: |
           curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
+          curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip.sig" -o awscliv2.zip.sig
+
+          # Verify the installer against Amazon's official GPG signing key before
+          # executing anything. Key fingerprint published at:
+          # https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+          gpg --keyserver hkps://keys.openpgp.org \
+              --recv-keys FB5DB77FD5C118B80511ADA8A6310ACC4672475C
+          gpg --verify awscliv2.zip.sig awscliv2.zip
+
           unzip -q awscliv2.zip
           ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
-          rm -rf awscliv2.zip aws/
+          rm -rf awscliv2.zip awscliv2.zip.sig aws/
 
       - name: Download existing OSTree repo from R2 for delta updates
         shell: bash
@@ -88,7 +97,7 @@ jobs:
           bundle: altersend.flatpak
           manifest-path: flatpak/com.altersend.AlterSend.yaml
           cache-key: flatpak-builder-${{ hashFiles('flatpak/com.altersend.AlterSend.yaml', 'flatpak/node-modules.json') }}
-          build-bundle: true
+          build-bundle: false  # Bundle output is handled by a dedicated release workflow
           repository-name: flathub
           repository-url: https://flathub.org/repo/flathub.flatpakrepo
           gpg-sign: ${{ steps.import_gpg.outputs.fingerprint }}
@@ -123,6 +132,12 @@ jobs:
           AWS_DEFAULT_REGION: auto
           R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
         run: |
+          # Guard: verify the repo is structurally valid before syncing.
+          # --delete is safe here because:
+          #   1. This step only runs after a fully successful build + sign.
+          #   2. If the sync is interrupted, the next run will re-sync and restore consistency.
+          ostree fsck --repo=repo
+
           # OSTree repos contain thousands of small files. Increase concurrency
           # from the default 10 to avoid bottlenecking on per-request latency.
           aws configure set default.s3.max_concurrent_requests 100

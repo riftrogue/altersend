@@ -35,15 +35,27 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Checkout existing OSTree repo for delta updates
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          persist-credentials: false
-          # TODO: revert before upstream PR
-          repository: riftrogue/altersend-flatpak
-          ref: main
-          path: repo
-          token: ${{ secrets.FLATPAK_PUBLISH_TOKEN }}
+      - name: Install AWS CLI
+        shell: bash
+        run: |
+          curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
+          unzip -q awscliv2.zip
+          ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+          rm -rf awscliv2.zip aws/
+
+      - name: Download existing OSTree repo from R2 for delta updates
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+        run: |
+          mkdir -p repo
+          aws s3 sync s3://altersend-flatpak/ repo/ \
+            --endpoint-url "$R2_ENDPOINT" \
+            --no-progress \
+            || echo "No existing repo found in R2 — will initialize from scratch."
 
       - name: Clean and verify OSTree repo
         shell: bash
@@ -52,7 +64,6 @@ jobs:
             echo "Validating existing OSTree repository..."
             mkdir -p repo/refs/remotes repo/refs/mirrors repo/objects
             ostree fsck --repo=repo || { echo "OSTree fsck failed — repo is corrupt. Reinitializing from scratch."; rm -rf repo; }
-            rm -rf repo/.git
           else
             echo "Repository exists but is not an OSTree repository (yet). Cleaning up so flatpak-builder can initialize it."
             rm -rf repo && echo "Cleaned up non-OSTree directory."
@@ -91,8 +102,7 @@ jobs:
           {
             echo '[Flatpak Repo]'
             echo 'Title=AlterSend'
-            # TODO: revert before upstream PR
-            echo 'Url=https://riftrogue.github.io/altersend-flatpak/'
+            echo 'Url=https://pub-af60b48af6474b4190c802bd0534f451.r2.dev/'
             echo 'Homepage=https://altersend.com/'
             echo 'Comment=AlterSend Official Flatpak Repository'
             echo 'Description=Peer-to-peer file transfer'
@@ -100,14 +110,15 @@ jobs:
             echo "GPGKey=${GPG_B64}"
           } > repo/altersend.flatpakrepo
 
-      - name: Deploy to Flatpak Repo (GitHub Pages)
-        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
-        with:
-          personal_token: ${{ secrets.FLATPAK_PUBLISH_TOKEN }}
-          # TODO: revert before upstream PR
-          external_repository: riftrogue/altersend-flatpak
-          publish_branch: main
-          publish_dir: repo
-          keep_files: true
-          force_orphan: false
-          commit_message: "deploy: update from ${{ github.repository }}@${{ github.sha }}"
+      - name: Upload to Cloudflare R2
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+        run: |
+          aws s3 sync repo/ s3://altersend-flatpak/ \
+            --endpoint-url "$R2_ENDPOINT" \
+            --no-progress \
+            --delete

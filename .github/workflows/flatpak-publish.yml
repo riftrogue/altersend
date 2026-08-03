@@ -38,21 +38,19 @@ jobs:
       - name: Install AWS CLI
         shell: bash
         run: |
-          curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
-          curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip.sig" -o awscliv2.zip.sig
+          # Pin a specific version and verify its SHA256 before executing anything.
+          # To update: download the new version, compute sha256sum, and update both values.
+          # Release notes: https://raw.githubusercontent.com/aws/aws-cli/v2/CHANGELOG.rst
+          AWS_CLI_VERSION="2.36.14"
+          AWS_CLI_SHA256="43b34875482244039716cc3725d1f60e7d47ef3cfb2a19e114759a46db24dc30"
 
-          # Verify the installer against Amazon's official GPG signing key before
-          # executing anything. Key fingerprint published at:
-          # https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
-          # Note: keys.openpgp.org strips user IDs by default causing gpg to skip
-          # the import; keyserver.ubuntu.com returns the full key correctly.
-          gpg --keyserver hkps://keyserver.ubuntu.com \
-              --recv-keys FB5DB77FD5C118B80511ADA8A6310ACC4672475C
-          gpg --verify awscliv2.zip.sig awscliv2.zip
+          curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWS_CLI_VERSION}.zip" \
+            -o awscliv2.zip
+          echo "${AWS_CLI_SHA256}  awscliv2.zip" | sha256sum --check
 
           unzip -q awscliv2.zip
           ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
-          rm -rf awscliv2.zip awscliv2.zip.sig aws/
+          rm -rf awscliv2.zip aws/
 
       - name: Download existing OSTree repo from R2 for delta updates
         shell: bash

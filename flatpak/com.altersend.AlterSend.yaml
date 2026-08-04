@@ -49,7 +49,7 @@ modules:
           -c electron-builder.linux.json --publish never)
 
       - install -d /app/lib/AlterSend /app/bin
-      - cp -a apps/desktop/out/linux-unpacked/. /app/lib/AlterSend/
+      - cp -a apps/desktop/out/linux-*unpacked/. /app/lib/AlterSend/
 
       - install -Dm755 altersend.sh /app/bin/altersend
 

@@ -1,0 +1,6 @@
+apps:
+  - id: com.altersend.AlterSend
+    manifest: flatpak/com.altersend.AlterSend.yaml
+    arches:
+      - x86_64
+      - aarch64

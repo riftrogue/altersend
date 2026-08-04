@@ -1,0 +1,27 @@
+name: Flatpak Publish
+
+on:
+  push:
+    paths:
+      - 'flatpak/**'
+      - '.github/workflows/flatpak-publish.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: "flatpak-publish"
+  cancel-in-progress: true
+
+jobs:
+  publish-aetherpak:
+    uses: aetherpak/actions/.github/workflows/publish.yml@main
+    with:
+      config: flatpak/aetherpak.yaml
+      deploy: true
+      signing: 'gpg'
+    permissions:
+      contents: read
+      packages: write
+      pages: write
+      id-token: write
+    secrets:
+      gpg-private-key: ${{ secrets.FLATPAK_GPG_PRIVATE_KEY }}

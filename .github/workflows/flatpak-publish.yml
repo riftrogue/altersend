@@ -18,12 +18,17 @@ jobs:
   build-flatpak:
     # TODO: revert before upstream PR
     # if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        variant:
+          - arch: x86_64
+            runner: ubuntu-24.04
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+      fail-fast: false
+    runs-on: ${{ matrix.variant.runner }}
     container:
-      image: bilelmoussaoui/flatpak-github-actions@sha256:d534700a8a0090dfa5e23ed3ae09106a1beafde54e66b6b1327b27dbd3f0c7c2 # freedesktop-24.08
-      # --privileged is required by flatpak-builder to create user namespace
-      # sandboxes for the offline build. This is the standard configuration
-      # for all flatpak CI pipelines.
+      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-24.08
       options: --privileged
     timeout-minutes: 60
     permissions:
@@ -35,6 +40,29 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Build Flatpak
+        uses: flatpak/flatpak-github-actions/flatpak-builder@401fe28a8384095fc1531b9d320b292f0ee45adb # v6
+        with:
+          manifest-path: flatpak/com.altersend.AlterSend.yaml
+          cache-key: flatpak-builder-${{ matrix.variant.arch }}-${{ hashFiles('flatpak/com.altersend.AlterSend.yaml', 'flatpak/node-modules.json') }}
+          arch: ${{ matrix.variant.arch }}
+          build-bundle: true
+          bundle: altersend-${{ matrix.variant.arch }}.flatpak
+          artifact-name: altersend-${{ matrix.variant.arch }}
+          repository-name: flathub
+          repository-url: https://flathub.org/repo/flathub.flatpakrepo
+
+  publish-flatpak:
+    needs: build-flatpak
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-24.08
+      options: --privileged
+    timeout-minutes: 60
+    permissions:
+      contents: read
+
+    steps:
       - name: Install AWS CLI
         shell: bash
         run: |
@@ -97,6 +125,29 @@ jobs:
             echo "Repository exists but is not an OSTree repository (yet). Cleaning up so flatpak-builder can initialize it."
             rm -rf repo && echo "Cleaned up non-OSTree directory."
           fi
+          
+          # Initialize OSTree repo if it doesn't exist
+          if [ ! -f repo/config ]; then
+            ostree init --mode=archive-z2 --repo=repo
+          fi
+
+      - name: Download x86_64 bundle artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: altersend-x86_64
+          path: .
+
+      - name: Download aarch64 bundle artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: altersend-aarch64
+          path: .
+
+      - name: Import bundles into OSTree repo
+        shell: bash
+        run: |
+          flatpak build-import-bundle repo altersend-x86_64.flatpak
+          flatpak build-import-bundle repo altersend-aarch64.flatpak
 
       - name: Import GPG key
         id: import_gpg
@@ -105,17 +156,6 @@ jobs:
           gpg_private_key: ${{ secrets.FLATPAK_GPG_PRIVATE_KEY }}
           # Uncomment and add secret if your key has a passphrase:
           # passphrase: ${{ secrets.FLATPAK_GPG_PASSPHRASE }}
-
-      - name: Build Flatpak
-        uses: flatpak/flatpak-github-actions/flatpak-builder@401fe28a8384095fc1531b9d320b292f0ee45adb # v6
-        with:
-          manifest-path: flatpak/com.altersend.AlterSend.yaml
-          cache-key: flatpak-builder-${{ hashFiles('flatpak/com.altersend.AlterSend.yaml', 'flatpak/node-modules.json') }}
-          build-bundle: false  # Bundle output is handled by a dedicated release workflow
-          upload-artifact: false  # No bundle produced, so nothing to upload
-          repository-name: flathub
-          repository-url: https://flathub.org/repo/flathub.flatpakrepo
-          gpg-sign: ${{ steps.import_gpg.outputs.fingerprint }}
 
       - name: Sign OSTree Repository & Generate .flatpakrepo
         # Use an env var for the fingerprint instead of direct template injection

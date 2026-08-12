@@ -38,7 +38,7 @@ modules:
       # npm ci to fail in offline mode. This file is identical except all
       # resolved+integrity fields are populated from the npm registry.
       - cp flatpak/package-lock.flatpak.json package-lock.json
-      - npm ci --ignore-scripts
+      - npm ci --ignore-scripts --no-audit --no-fund --legacy-peer-deps
 
       - npm run build -w packages/drive
       - npm run build -w packages/core

@@ -84,6 +84,27 @@
         "vitest": "^4.1.8"
       }
     },
+    "apps/desktop/node_modules/react": {
+      "version": "19.2.8",
+      "license": "MIT",
+      "engines": {
+        "node": ">=0.10.0"
+      },
+      "resolved": "https://registry.npmjs.org/react/-/react-19.2.8.tgz",
+      "integrity": "sha512-PWaYA1L/q9u2u7xYQi+Y3L3Yfnie7XyLeaJICV1MGD6LprsBxcAqGjYyr0eY3p+QdsA+x/Irkt4Qif8D63+Sbw=="
+    },
+    "apps/desktop/node_modules/react-dom": {
+      "version": "19.2.8",
+      "license": "MIT",
+      "dependencies": {
+        "scheduler": "^0.27.0"
+      },
+      "peerDependencies": {
+        "react": "^19.2.8"
+      },
+      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-19.2.8.tgz",
+      "integrity": "sha512-rVprimfGBG3DR+Tq0IQG2DT5PxKth1WIGDmj5yPmlzr4YBe7uyE+Du4oVqTDXZSHGGGXRtTJEGSSePyQCMBglQ=="
+    },
     "apps/mobile": {
       "name": "@altersend/mobile",
       "version": "1.8.0",
@@ -203,6 +224,27 @@
         "vite-plugin-node-polyfills": "^0.24.0",
         "vitest": "^4.1.8"
       }
+    },
+    "apps/web/node_modules/react": {
+      "version": "19.2.8",
+      "license": "MIT",
+      "engines": {
+        "node": ">=0.10.0"
+      },
+      "resolved": "https://registry.npmjs.org/react/-/react-19.2.8.tgz",
+      "integrity": "sha512-PWaYA1L/q9u2u7xYQi+Y3L3Yfnie7XyLeaJICV1MGD6LprsBxcAqGjYyr0eY3p+QdsA+x/Irkt4Qif8D63+Sbw=="
+    },
+    "apps/web/node_modules/react-dom": {
+      "version": "19.2.8",
+      "license": "MIT",
+      "dependencies": {
+        "scheduler": "^0.27.0"
+      },
+      "peerDependencies": {
+        "react": "^19.2.8"
+      },
+      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-19.2.8.tgz",
+      "integrity": "sha512-rVprimfGBG3DR+Tq0IQG2DT5PxKth1WIGDmj5yPmlzr4YBe7uyE+Du4oVqTDXZSHGGGXRtTJEGSSePyQCMBglQ=="
     },
     "node_modules/@adobe/css-tools": {
       "version": "4.5.0",
@@ -16664,7 +16706,6 @@
     "node_modules/fs-xattr": {
       "version": "0.3.1",
       "dev": true,
-      "hasInstallScript": true,
       "license": "MIT",
       "optional": true,
       "os": [
@@ -28879,6 +28920,36 @@
         "node": "^8.16.0 || ^10.6.0 || >=11.0.0"
       }
     },
+    "packages/components/node_modules/lightningcss": {
+      "version": "1.33.0",
+      "dev": true,
+      "license": "MPL-2.0",
+      "dependencies": {
+        "detect-libc": "^2.0.3"
+      },
+      "engines": {
+        "node": ">= 12.0.0"
+      },
+      "funding": {
+        "type": "opencollective",
+        "url": "https://opencollective.com/parcel"
+      },
+      "optionalDependencies": {
+        "lightningcss-android-arm64": "1.33.0",
+        "lightningcss-darwin-arm64": "1.33.0",
+        "lightningcss-darwin-x64": "1.33.0",
+        "lightningcss-freebsd-x64": "1.33.0",
+        "lightningcss-linux-arm-gnueabihf": "1.33.0",
+        "lightningcss-linux-arm64-gnu": "1.33.0",
+        "lightningcss-linux-arm64-musl": "1.33.0",
+        "lightningcss-linux-x64-gnu": "1.33.0",
+        "lightningcss-linux-x64-musl": "1.33.0",
+        "lightningcss-win32-arm64-msvc": "1.33.0",
+        "lightningcss-win32-x64-msvc": "1.33.0"
+      },
+      "resolved": "https://registry.npmjs.org/lightningcss/-/lightningcss-1.33.0.tgz",
+      "integrity": "sha512-WkUDrojuJs0xkgGf2udWxa3yGBRxPtxUkB79i6aCZLRgc7PM8fZe9TosfPDcvEpQZbuFASnHYmRLBLUbmLOIIA=="
+    },
     "packages/components/node_modules/lightningcss-android-arm64": {
       "version": "1.33.0",
       "resolved": "https://registry.npmjs.org/lightningcss-android-arm64/-/lightningcss-android-arm64-1.33.0.tgz",
@@ -28899,6 +28970,27 @@
         "type": "opencollective",
         "url": "https://opencollective.com/parcel"
       }
+    },
+    "packages/components/node_modules/lightningcss-darwin-arm64": {
+      "version": "1.33.0",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "MPL-2.0",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "engines": {
+        "node": ">= 12.0.0"
+      },
+      "funding": {
+        "type": "opencollective",
+        "url": "https://opencollective.com/parcel"
+      },
+      "resolved": "https://registry.npmjs.org/lightningcss-darwin-arm64/-/lightningcss-darwin-arm64-1.33.0.tgz",
+      "integrity": "sha512-Sciaz8eenNTKn9b3t7+xr0ipTp9YxKQY4npwQ3mrRuL0BAVHBLyZxofhaKBAVtzmtRZ/zTyo0/to4B1uWG/Djg=="
     },
     "packages/components/node_modules/lightningcss-darwin-x64": {
       "version": "1.33.0",
@@ -29089,6 +29181,107 @@
         "url": "https://opencollective.com/parcel"
       }
     },
+    "packages/components/node_modules/react": {
+      "version": "19.2.8",
+      "dev": true,
+      "license": "MIT",
+      "engines": {
+        "node": ">=0.10.0"
+      },
+      "resolved": "https://registry.npmjs.org/react/-/react-19.2.8.tgz",
+      "integrity": "sha512-PWaYA1L/q9u2u7xYQi+Y3L3Yfnie7XyLeaJICV1MGD6LprsBxcAqGjYyr0eY3p+QdsA+x/Irkt4Qif8D63+Sbw=="
+    },
+    "packages/components/node_modules/react-dom": {
+      "version": "19.2.8",
+      "dev": true,
+      "license": "MIT",
+      "dependencies": {
+        "scheduler": "^0.27.0"
+      },
+      "peerDependencies": {
+        "react": "^19.2.8"
+      },
+      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-19.2.8.tgz",
+      "integrity": "sha512-rVprimfGBG3DR+Tq0IQG2DT5PxKth1WIGDmj5yPmlzr4YBe7uyE+Du4oVqTDXZSHGGGXRtTJEGSSePyQCMBglQ=="
+    },
+    "packages/components/node_modules/vite": {
+      "version": "8.2.0",
+      "dev": true,
+      "license": "MIT",
+      "dependencies": {
+        "lightningcss": "^1.33.0",
+        "picomatch": "^4.0.5",
+        "postcss": "^8.5.23",
+        "rolldown": "~1.2.0",
+        "tinyglobby": "^0.2.17"
+      },
+      "bin": {
+        "vite": "bin/vite.js"
+      },
+      "engines": {
+        "node": "^20.19.0 || >=22.12.0"
+      },
+      "funding": {
+        "url": "https://github.com/vitejs/vite?sponsor=1"
+      },
+      "optionalDependencies": {
+        "fsevents": "~2.3.3"
+      },
+      "peerDependencies": {
+        "@types/node": "^20.19.0 || >=22.12.0",
+        "@vitejs/devtools": "^0.4.0",
+        "esbuild": "^0.27.0 || ^0.28.0",
+        "jiti": ">=1.21.0",
+        "less": "^4.0.0",
+        "sass": "^1.70.0",
+        "sass-embedded": "^1.70.0",
+        "stylus": ">=0.54.8",
+        "sugarss": "^5.0.0",
+        "terser": "^5.16.0",
+        "tsx": "^4.8.1",
+        "yaml": "^2.4.2"
+      },
+      "peerDependenciesMeta": {
+        "@types/node": {
+          "optional": true
+        },
+        "@vitejs/devtools": {
+          "optional": true
+        },
+        "esbuild": {
+          "optional": true
+        },
+        "jiti": {
+          "optional": true
+        },
+        "less": {
+          "optional": true
+        },
+        "sass": {
+          "optional": true
+        },
+        "sass-embedded": {
+          "optional": true
+        },
+        "stylus": {
+          "optional": true
+        },
+        "sugarss": {
+          "optional": true
+        },
+        "terser": {
+          "optional": true
+        },
+        "tsx": {
+          "optional": true
+        },
+        "yaml": {
+          "optional": true
+        }
+      },
+      "resolved": "https://registry.npmjs.org/vite/-/vite-8.2.0.tgz",
+      "integrity": "sha512-pn+CFpM0lwDeKwmOq1ZaBK/9sjorZcgqxki6MbY/jPEVd9vichIlmlD4HmQ5wdP5EgqQCFRaACBxMC7uEGc6lQ=="
+    },
     "packages/core": {
       "name": "@altersend/core",
       "version": "1.8.0",
@@ -29160,6 +29353,23 @@
         "typescript": "^5.9.3",
         "vitest": "^4.1.8"
       }
+    },
+    "packages/drive/node_modules/@types/node": {
+      "version": "22.20.1",
+      "dev": true,
+      "license": "MIT",
+      "dependencies": {
+        "undici-types": "~6.21.0"
+      },
+      "resolved": "https://registry.npmjs.org/@types/node/-/node-22.20.1.tgz",
+      "integrity": "sha512-EANqOCF9QFyra+4pfxUcX9STKJpCLjMbObVzljIJomAWSnuSIEAvyzEU53GaajbXJEgdh0iEcPL+DGvpUd4k1Q=="
+    },
+    "packages/drive/node_modules/undici-types": {
+      "version": "6.21.0",
+      "dev": true,
+      "license": "MIT",
+      "resolved": "https://registry.npmjs.org/undici-types/-/undici-types-6.21.0.tgz",
+      "integrity": "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="
     },
     "packages/locales": {
       "name": "@altersend/locales",

@@ -48,7 +48,6 @@ jobs:
           arch: ${{ matrix.variant.arch }}
           build-bundle: true
           bundle: altersend-${{ matrix.variant.arch }}.flatpak
-          artifact-name: altersend-${{ matrix.variant.arch }}
           repository-name: flathub
           repository-url: https://flathub.org/repo/flathub.flatpakrepo
 
@@ -143,12 +142,6 @@ jobs:
           name: altersend-aarch64-aarch64.flatpak
           path: .
 
-      - name: Import bundles into OSTree repo
-        shell: bash
-        run: |
-          flatpak build-import-bundle repo altersend-x86_64.flatpak
-          flatpak build-import-bundle repo altersend-aarch64.flatpak
-
       - name: Import GPG key
         id: import_gpg
         uses: crazy-max/ghaction-import-gpg@111c56156bcc6918c056dbef52164cfa583dc549 # v6
@@ -157,6 +150,19 @@ jobs:
           # Uncomment and add secret if your key has a passphrase:
           # passphrase: ${{ secrets.FLATPAK_GPG_PASSPHRASE }}
 
+      - name: Import bundles into OSTree repo
+        shell: bash
+        env:
+          GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
+        run: |
+          flatpak build-import-bundle --gpg-sign="$GPG_FINGERPRINT" repo altersend-x86_64.flatpak
+          flatpak build-import-bundle --gpg-sign="$GPG_FINGERPRINT" repo altersend-aarch64.flatpak
+          
+          # Force sign the entire application and extensions to ensure old commits 
+          # (like Locale) from previous runs are signed with the current GPG key.
+          flatpak build-sign --gpg-sign="$GPG_FINGERPRINT" repo com.altersend.AlterSend || true
+          flatpak build-sign --gpg-sign="$GPG_FINGERPRINT" repo com.altersend.AlterSend.Locale || true
+          flatpak build-sign --gpg-sign="$GPG_FINGERPRINT" repo com.altersend.AlterSend.Debug || true
       - name: Sign OSTree Repository & Generate .flatpakrepo
         # Use an env var for the fingerprint instead of direct template injection
         # into the shell script, following GitHub's security hardening guidelines.

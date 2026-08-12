@@ -19,6 +19,7 @@ build-options:
     NPM_CONFIG_CACHE: "/run/build/altersend/flatpak-node/npm-cache"
     FLATPAK_BUILD: "1"
     ELECTRON_BUILDER_CACHE: "/run/build/altersend/apps/desktop/.electron-dist"
+    ELECTRON_CACHE: "/run/build/altersend/apps/desktop/.electron-dist"
 
 finish-args:
   - --share=network

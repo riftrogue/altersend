@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native'
-import { ListItem } from '@altersend/components'
+import { MenuItem, useTheme } from '@altersend/components'
 import { PencilIcon, TrashIcon } from '@altersend/components/icons'
 import { useTranslation } from '@altersend/locales'
 import { BottomSheet } from '../BottomSheet'
@@ -13,29 +13,25 @@ interface DeviceActionsSheetProps {
 
 export function DeviceActionsSheet({ open, onClose, onRemove, onRename }: DeviceActionsSheetProps) {
   const { t } = useTranslation(['settings'])
+  const { theme } = useTheme()
+  const c = theme.colors
 
   return (
-    <BottomSheet
-      open={open}
-      onClose={onClose}
-      title={t('settings:pairing.deviceActions')}
-      sheetStyle={styles.sheet}
-    >
+    <BottomSheet open={open} onClose={onClose} sheetStyle={styles.sheet}>
       <View style={styles.actionList}>
-        <ListItem
-          size='large'
-          square
-          icon={<PencilIcon size={16} />}
+        <MenuItem
+          chevron={false}
+          icon={<PencilIcon size={19} color={c.colorTextSecondary} />}
           label={t('settings:pairing.renameDevice')}
-          onClick={onRename}
+          onPress={onRename}
         />
-        <ListItem
+        <MenuItem
+          isLast
+          chevron={false}
           tone='danger'
-          size='large'
-          square
-          icon={<TrashIcon size={16} />}
+          icon={<TrashIcon size={19} color={c.colorDanger} />}
           label={t('settings:pairing.removeDevice')}
-          onClick={onRemove}
+          onPress={onRemove}
         />
       </View>
     </BottomSheet>

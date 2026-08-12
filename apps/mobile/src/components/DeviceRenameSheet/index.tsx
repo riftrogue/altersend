@@ -30,7 +30,6 @@ export function DeviceRenameSheet({
       open={open}
       onClose={onClose}
       title={t('settings:pairing.renameDevice')}
-      keyboardAvoiding
       sheetStyle={styles.sheet}
     >
       <View style={styles.form}>
@@ -61,5 +60,5 @@ export function DeviceRenameSheet({
 
 const styles = StyleSheet.create({
   sheet: { paddingBottom: 58, gap: 24 },
-  form: { gap: 22, paddingHorizontal: 20 }
+  form: { gap: 22, paddingHorizontal: 16 }
 })

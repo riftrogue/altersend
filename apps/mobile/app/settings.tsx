@@ -2,18 +2,25 @@ import { useCallback, useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { useFocusEffect, useRouter } from 'expo-router'
 import { LOCALE_OPTIONS, useTranslation, type LocalePreference } from '@altersend/locales'
-import { loadPeers, useTransferStore } from '@altersend/domain'
-import { LinkCard, LinkRow, useTheme } from '@altersend/components'
+import { loadPeers, useSubscriptionStore, useTransferStore } from '@altersend/domain'
 import {
-  AlertCircleIcon,
+  AppearancePicker,
+  MenuGroup,
+  MenuItem,
+  SYSTEM_THEME_PREFERENCE,
+  ThemeType,
+  useTheme
+} from '@altersend/components'
+import {
   GlobeIcon,
   InfoIcon,
+  MailIcon,
   SlidersHorizontalIcon,
   SmartphoneIcon,
+  UserIcon,
   WaypointsIcon
 } from '@altersend/components/icons'
 import { Layout } from '@/src/components'
-import { Text } from '@/src/components/ThemedText'
 import {
   getLocalePreferenceSnapshot,
   getSavedLocalePreference,
@@ -22,13 +29,14 @@ import {
 
 export default function SettingsScreen() {
   const { t } = useTranslation(['settings', 'common'])
-  const { theme } = useTheme()
+  const { theme, themePreference, setThemePreference } = useTheme()
   const c = theme.colors
   const router = useRouter()
   const [localePreference, setLocalePreference] = useState<LocalePreference>(
     getLocalePreferenceSnapshot
   )
   const peers = useTransferStore((s) => s.peers)
+  const isPro = useSubscriptionStore((s) => s.active)
 
   useEffect(() => {
     void loadPeers()
@@ -56,62 +64,72 @@ export default function SettingsScreen() {
     LOCALE_OPTIONS.find((option) => option.preference === localePreference)?.nativeName ??
     t('common:labels.systemDefault')
 
-  return (
-    <Layout title={t('settings:title')} description='' hasNativeHeader>
-      <View style={styles.container}>
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: c.colorTextMuted }]}>
-            {t('settings:sections.general')}
-          </Text>
-          <LinkCard>
-            <LinkRow
-              label={t('settings:pairing.pairedDevices')}
-              subtitle={
-                peers.length === 0
-                  ? t('settings:rows.noDevices')
-                  : t('settings:rows.pairedCount', { count: peers.length })
-              }
-              icon={<SmartphoneIcon size={16} color={c.colorTextSecondary} />}
-              onPress={() => router.push('/devices')}
-            />
-            <LinkRow
-              label={t('settings:sections.general')}
-              icon={<SlidersHorizontalIcon size={16} color={c.colorTextSecondary} />}
-              onPress={() => router.push('/general')}
-            />
-            <LinkRow
-              label={t('common:labels.language')}
-              subtitle={languageLabel}
-              icon={<GlobeIcon size={16} color={c.colorTextSecondary} />}
-              onPress={() => router.push('/language')}
-            />
-            <LinkRow
-              isLast
-              label={t('settings:rows.connection')}
-              icon={<WaypointsIcon size={16} color={c.colorTextSecondary} />}
-              onPress={() => router.push('/connection')}
-            />
-          </LinkCard>
-        </View>
+  const appearanceLabels = {
+    [ThemeType.Light]: t('settings:appearance.light'),
+    [ThemeType.Dark]: t('settings:appearance.dark'),
+    [SYSTEM_THEME_PREFERENCE]: t('settings:appearance.system')
+  }
 
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: c.colorTextMuted }]}>
-            {t('settings:sections.support')}
-          </Text>
-          <LinkCard>
-            <LinkRow
-              label={t('settings:rows.feedback')}
-              icon={<AlertCircleIcon size={16} color={c.colorTextSecondary} />}
-              onPress={() => router.push('/report')}
-            />
-            <LinkRow
+  return (
+    <Layout hasNativeHeader>
+      <View style={styles.container}>
+        {isPro ? (
+          <MenuGroup>
+            <MenuItem
               isLast
-              label={t('settings:sections.about')}
-              icon={<InfoIcon size={16} color={c.colorTextSecondary} />}
-              onPress={() => router.push('/about')}
+              label={t('settings:account.title')}
+              icon={<UserIcon size={19} color={c.colorTextSecondary} />}
+              onPress={() => router.push('/subscription')}
             />
-          </LinkCard>
-        </View>
+          </MenuGroup>
+        ) : null}
+
+        <MenuGroup title={t('settings:sections.general')}>
+          <MenuItem
+            label={t('settings:pairing.pairedDevices')}
+            value={peers.length === 0 ? undefined : String(peers.length)}
+            icon={<SmartphoneIcon size={19} color={c.colorTextSecondary} />}
+            onPress={() => router.push('/devices')}
+          />
+          <MenuItem
+            label={t('settings:sections.general')}
+            icon={<SlidersHorizontalIcon size={19} color={c.colorTextSecondary} />}
+            onPress={() => router.push('/general')}
+          />
+          <MenuItem
+            label={t('common:labels.language')}
+            value={languageLabel}
+            icon={<GlobeIcon size={19} color={c.colorTextSecondary} />}
+            onPress={() => router.push('/language')}
+          />
+          <MenuItem
+            isLast
+            label={t('settings:rows.connection')}
+            icon={<WaypointsIcon size={19} color={c.colorTextSecondary} />}
+            onPress={() => router.push('/connection')}
+          />
+        </MenuGroup>
+
+        <MenuGroup title={t('settings:sections.support')}>
+          <MenuItem
+            label={t('settings:rows.feedback')}
+            icon={<MailIcon size={19} color={c.colorTextSecondary} />}
+            onPress={() => router.push('/report')}
+          />
+          <MenuItem
+            isLast
+            label={t('settings:sections.about')}
+            icon={<InfoIcon size={19} color={c.colorTextSecondary} />}
+            onPress={() => router.push('/about')}
+          />
+        </MenuGroup>
+
+        <AppearancePicker
+          value={themePreference}
+          labels={appearanceLabels}
+          onChange={setThemePreference}
+          title={t('settings:appearance.title')}
+        />
       </View>
     </Layout>
   )
@@ -120,15 +138,5 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     gap: 22
-  },
-  section: {
-    gap: 8
-  },
-  sectionTitle: {
-    fontSize: 11,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    paddingHorizontal: 4
   }
 })

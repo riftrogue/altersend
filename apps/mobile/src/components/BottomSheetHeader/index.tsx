@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { useTheme } from '@altersend/components'
-import { ArrowLeftIcon, CloseIcon } from '@altersend/components/icons'
+import { useTranslation } from '@altersend/locales'
+import { IconButton } from '../IconButton'
 import { Text } from '../ThemedText'
 
 interface BottomSheetHeaderProps {
@@ -12,19 +13,14 @@ interface BottomSheetHeaderProps {
 
 export function BottomSheetHeader({ title, subtitle, onBack, onClose }: BottomSheetHeaderProps) {
   const { theme } = useTheme()
+  const { t } = useTranslation(['common'])
   const c = theme.colors
   return (
     <View style={styles.header}>
       {onBack ? (
-        <Pressable
-          accessibilityRole='button'
-          accessibilityLabel='Back'
-          hitSlop={12}
-          onPress={onBack}
-          style={({ pressed }) => [styles.backButton, { opacity: pressed ? 0.6 : 1 }]}
-        >
-          <ArrowLeftIcon size={20} color={c.colorTextPrimary} />
-        </Pressable>
+        <View style={styles.backSlot}>
+          <IconButton icon='back' label={t('common:actions.back')} onPress={onBack} size='medium' />
+        </View>
       ) : null}
       <View style={styles.titleGroup}>
         <Text style={[styles.title, { color: c.colorTextPrimary }]} numberOfLines={1}>
@@ -32,30 +28,15 @@ export function BottomSheetHeader({ title, subtitle, onBack, onClose }: BottomSh
         </Text>
         {subtitle && <Text style={[styles.subtitle, { color: c.colorTextMuted }]}>{subtitle}</Text>}
       </View>
-      <Pressable
-        accessibilityRole='button'
-        accessibilityLabel='Close'
-        hitSlop={12}
-        onPress={onClose}
-        style={({ pressed }) => [styles.closeButton, { opacity: pressed ? 0.6 : 1 }]}
-      >
-        <CloseIcon size={20} color={c.colorTextPrimary} />
-      </Pressable>
+      <IconButton icon='close' label={t('common:actions.close')} onPress={onClose} size='medium' />
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  backButton: {
-    width: 32,
-    height: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 4
-  },
+  backSlot: { marginRight: 16 },
   titleGroup: { flex: 1, marginRight: 8 },
-  title: { fontSize: 16, fontWeight: '700' },
-  subtitle: { fontSize: 12, marginTop: 2 },
-  closeButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' }
+  title: { fontSize: 18, fontWeight: '700' },
+  subtitle: { fontSize: 13, marginTop: 2 }
 })

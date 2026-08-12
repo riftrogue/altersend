@@ -69,11 +69,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         >
           <div
             key={current.id}
-            className='pointer-events-auto flex max-w-[420px] items-center gap-3 rounded-[12px] border border-border-primary bg-surface-primary px-4 py-3 shadow-[0_12px_32px_color-mix(in_oklab,var(--as-color-scrim)_45%,transparent)]'
+            className='pointer-events-auto flex max-w-[420px] items-center gap-3 rounded-2xl border border-border-primary bg-surface-primary px-4 py-3 shadow-[0_12px_32px_color-mix(in_oklab,var(--as-color-scrim)_45%,transparent)]'
             style={{ animation: 'as-toast-in 220ms cubic-bezier(0.16, 1, 0.3, 1)' }}
           >
             <span
-              className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full text-text-primary ${current.variant === 'error' ? 'bg-danger' : 'bg-success'}`}
+              className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full text-background ${current.variant === 'error' ? 'bg-danger' : 'bg-success'}`}
             >
               {current.variant === 'error' ? (
                 <AlertCircleIcon size={11} />

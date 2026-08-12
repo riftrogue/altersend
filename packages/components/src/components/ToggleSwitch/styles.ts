@@ -1,5 +1,5 @@
 import { css } from 'react-strict-dom'
-import { tokens } from '../../theme/tokens.css'
+import { fontTokens, tokens } from '../../theme/tokens.css'
 
 export const styles = css.create({
   root: {
@@ -21,14 +21,14 @@ export const styles = css.create({
     cursor: 'pointer'
   },
   label: {
-    fontFamily: tokens.fontFamilySans,
+    fontFamily: fontTokens.fontFamilySans,
     fontSize: tokens.fontSizeBase,
     fontWeight: tokens.fontWeightMedium,
     color: tokens.colorTextPrimary,
     lineHeight: tokens.lineHeightNormal
   },
   description: {
-    fontFamily: tokens.fontFamilySans,
+    fontFamily: fontTokens.fontFamilySans,
     fontSize: tokens.fontSizeSm,
     color: tokens.colorTextMuted,
     lineHeight: tokens.lineHeightNormal
@@ -70,8 +70,8 @@ export const styles = css.create({
     width: '20px',
     height: '20px',
     flexShrink: 0,
-    borderRadius: '100px',
-    backgroundColor: tokens.colorTextPrimary,
+    borderRadius: tokens.radiusFull,
+    backgroundColor: tokens.colorControlKnob,
     transitionProperty: 'transform',
     transitionDuration: '150ms',
     transitionTimingFunction: 'ease-out'

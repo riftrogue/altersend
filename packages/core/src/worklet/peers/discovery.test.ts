@@ -99,7 +99,7 @@ function setup(peers: RememberedPeer[] = []) {
     return socket
   }
 
-  return { coordinator, emits, joins, destroy, touch, connect, getFirewall: () => firewall }
+  return { coordinator, deps, emits, joins, destroy, touch, connect, getFirewall: () => firewall }
 }
 
 describe('DiscoveryCoordinator', () => {
@@ -205,23 +205,49 @@ describe('DiscoveryCoordinator', () => {
     })
   })
 
-  it('emits an event when an invite arrives over the control channel', async () => {
-    const peer = makePeer()
+  it('emits an invite with the locally stored alias instead of the advertised name', async () => {
+    const peer = { ...makePeer(), displayName: 'Renamed Phone' }
     const { coordinator, connect, emits } = setup([peer])
     await coordinator.start()
 
     connect(peer.remoteDevicePubkey)
     channels[0].onmessage({
       type: 'invite',
-      displayName: 'Phone',
+      displayName: 'Pixel 8',
       deviceType: 'phone',
       topic: hex(crypto.randomBytes(32))
     })
+    await flush()
 
     expect(emits).toHaveLength(1)
     expect(emits[0]).toMatchObject({
       type: 'invite-received',
-      remoteDevicePubkey: peer.remoteDevicePubkey
+      remoteDevicePubkey: peer.remoteDevicePubkey,
+      displayName: 'Renamed Phone'
+    })
+  })
+
+  it('falls back to the advertised name when the remembered lookup fails', async () => {
+    const peer = makePeer()
+    const { coordinator, connect, emits, deps } = setup([peer])
+    deps.rememberedStore.get = async () => {
+      throw new Error('store locked')
+    }
+    await coordinator.start()
+
+    connect(peer.remoteDevicePubkey)
+    channels[0].onmessage({
+      type: 'invite',
+      displayName: 'Pixel 8',
+      deviceType: 'phone',
+      topic: hex(crypto.randomBytes(32))
+    })
+    await flush()
+
+    expect(emits).toHaveLength(1)
+    expect(emits[0]).toMatchObject({
+      type: 'invite-received',
+      displayName: 'Pixel 8'
     })
   })
 })

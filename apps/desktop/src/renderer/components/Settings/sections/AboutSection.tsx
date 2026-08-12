@@ -1,4 +1,4 @@
-import { LinkCard, LinkRow, useTheme } from '@altersend/components'
+import { MenuGroup, MenuItem, useTheme } from '@altersend/components'
 import {
   ArrowUpRightIcon,
   DiscordIcon,
@@ -39,24 +39,25 @@ export function AboutSection({ version }: { version: string }) {
 
   return (
     <SectionShell title={t('settings:sections.about')}>
-      <div className='mb-4 flex items-center gap-[14px] rounded-xl border border-border-primary bg-background-subtle px-[18px] py-4'>
-        <div className='h-10 w-10 shrink-0 overflow-hidden rounded-[10px]'>
-          <img src={logo} alt='' aria-hidden className='h-full w-full object-cover' />
-        </div>
-        <p className='m-0 min-w-0 flex-1 text-[15px] font-semibold text-text-primary'>AlterSend</p>
-        <span className='shrink-0 text-[14px] tabular-nums text-text-muted'>v{version}</span>
-      </div>
-
       <div className='flex flex-col gap-4'>
+        <MenuGroup>
+          <MenuItem
+            isLast
+            iconSize={36}
+            icon={<img src={logo} alt='' aria-hidden className='h-9 w-9 rounded-md object-cover' />}
+            label='AlterSend'
+            value={`v${version}`}
+          />
+        </MenuGroup>
+
         {aboutLinkGroups.map((group) => (
-          <LinkCard key={group[0].key}>
+          <MenuGroup key={group[0].key}>
             {group.map(({ key, labelKey, url }, index) => {
               const Icon = linkIcons[key]
               return (
-                <LinkRow
+                <MenuItem
                   key={key}
-                  compact
-                  icon={<Icon size={16} color={c.colorTextSecondary} />}
+                  icon={<Icon size={19} color={c.colorTextSecondary} />}
                   label={t(labelKey)}
                   trailing={<ArrowUpRightIcon size={14} color={c.colorTextMuted} />}
                   onPress={() => openUrl(url)}
@@ -64,7 +65,7 @@ export function AboutSection({ version }: { version: string }) {
                 />
               )
             })}
-          </LinkCard>
+          </MenuGroup>
         ))}
       </div>
 

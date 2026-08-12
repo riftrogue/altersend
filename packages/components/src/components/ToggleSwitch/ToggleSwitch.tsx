@@ -1,17 +1,11 @@
 import type { ComponentProps } from 'react'
 import { html } from 'react-strict-dom'
 import { styles } from './styles'
+import type { ToggleSwitchProps } from './types'
 
 type HtmlDivProps = ComponentProps<typeof html.div>
 
-export type ToggleSwitchProps = Omit<HtmlDivProps, 'children'> & {
-  checked?: boolean
-  onChange?: (checked: boolean) => void
-  label?: string
-  description?: string
-  disabled?: boolean
-  'aria-label'?: string
-}
+type Props = ToggleSwitchProps & Omit<HtmlDivProps, 'children'>
 
 export function ToggleSwitch({
   checked = false,
@@ -21,7 +15,7 @@ export function ToggleSwitch({
   disabled = false,
   'aria-label': ariaLabel,
   ...rest
-}: ToggleSwitchProps) {
+}: Props) {
   const handleToggle = () => {
     if (!disabled && onChange) onChange(!checked)
   }

@@ -3,6 +3,7 @@ import {
   AppWindow,
   Archive,
   ArrowLeft,
+  ArrowUpCircle,
   ArrowUpRight,
   Bell,
   Camera,
@@ -33,6 +34,7 @@ import {
   Menu,
   MessageSquare,
   Monitor,
+  Moon,
   MoreHorizontal,
   MoreVertical,
   Music,
@@ -49,8 +51,13 @@ import {
   Settings,
   Share2,
   Shield,
+  Eye,
+  EyeOff,
+  LogOut,
+  User,
   SlidersHorizontal,
   Smartphone,
+  Sun,
   Tablet,
   Trash2,
   Unlink,
@@ -67,6 +74,7 @@ export { AppleIcon, DiscordIcon, GithubIcon, WindowsIcon, XIcon } from './svgIco
 export const AlertCircleIcon = adaptLucide(AlertCircle)
 export const ArchiveIcon = adaptLucide(Archive)
 export const ArrowLeftIcon = adaptLucide(ArrowLeft)
+export const ArrowUpCircleIcon = adaptLucide(ArrowUpCircle)
 export const ArrowUpRightIcon = adaptLucide(ArrowUpRight)
 export const AppWindowIcon = adaptLucide(AppWindow)
 export const BellIcon = adaptLucide(Bell)
@@ -93,6 +101,8 @@ export const ImageIcon = adaptLucide(Image)
 export const InfoIcon = adaptLucide(Info)
 export const LaptopIcon = adaptLucide(Laptop)
 export const MonitorIcon = adaptLucide(Monitor)
+export const MoonIcon = adaptLucide(Moon)
+export const SunIcon = adaptLucide(Sun)
 export const TabletIcon = adaptLucide(Tablet)
 export const LockIcon = adaptLucide(Lock)
 export const MailIcon = adaptLucide(Mail)
@@ -113,6 +123,10 @@ export const SendIcon = adaptLucide(Send)
 export const SettingsIcon = adaptLucide(Settings)
 export const ShareIcon = adaptLucide(Share2)
 export const ShieldIcon = adaptLucide(Shield)
+export const LogOutIcon = adaptLucide(LogOut)
+export const EyeIcon = adaptLucide(Eye)
+export const EyeOffIcon = adaptLucide(EyeOff)
+export const UserIcon = adaptLucide(User)
 export const SlidersHorizontalIcon = adaptLucide(SlidersHorizontal)
 export const SmartphoneIcon = adaptLucide(Smartphone)
 export const TrashIcon = adaptLucide(Trash2)

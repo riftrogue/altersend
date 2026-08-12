@@ -64,6 +64,24 @@ export const bridgeApi = {
   async chooseDownloadFolder() {
     return requireBridge().chooseDownloadFolder()
   },
+  getAccountCode() {
+    return requireBridge().getAccountCode()
+  },
+  setAccountCode(code: string) {
+    return requireBridge().setAccountCode(code)
+  },
+  clearAccountCode() {
+    return requireBridge().clearAccountCode()
+  },
+  getAccountToken() {
+    return requireBridge().getAccountToken()
+  },
+  setAccountToken(token: string | null) {
+    return requireBridge().setAccountToken(token)
+  },
+  saveAccountCode(contents: string, defaultName: string) {
+    return requireBridge().saveAccountCode(contents, defaultName)
+  },
   appRestart() {
     return requireBridge().appRestart()
   },
@@ -79,11 +97,26 @@ export const bridgeApi = {
   onDeepLink(cb: (url: string) => void) {
     return requireBridge().onDeepLink(cb)
   },
+  onExternalFiles(cb: (files: PickedFile[]) => void) {
+    return requireBridge().onExternalFiles(cb)
+  },
+  externalFilesReady() {
+    return requireBridge().externalFilesReady()
+  },
+  shareExtensionState() {
+    return requireBridge().shareExtensionState()
+  },
+  openShareSettings() {
+    return requireBridge().openShareSettings()
+  },
   onRuntimeUpdated(cb: () => void) {
     return requireBridge().onRuntimeUpdated(cb)
   },
   setSentryEnabled(enabled: boolean) {
     return requireBridge().setSentryEnabled(enabled)
+  },
+  setThemePreference(preference: string) {
+    return requireBridge().setThemePreference(preference)
   },
   requestCameraAccess() {
     return requireBridge().requestCameraAccess()

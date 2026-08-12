@@ -23,6 +23,7 @@ function untouchableDrive(): Hyperdrive {
 function scanned(name: string, size: number): ScannedFile {
   return {
     fileName: name,
+    displayName: name,
     inputPath: `/src/${name}`,
     sourcePath: `/${name}`,
     sourceDrive: {} as Localdrive,
@@ -57,6 +58,19 @@ describe('TransferSender.buildOffers', () => {
     const offers = sender.buildOffers([scanned('a.bin', 1), scanned('a.bin', 1)], 't1')
 
     expect(offers[0].id).not.toBe(offers[1].id)
+  })
+
+  it('sends the picker display name on the wire, not the on-disk cache file name', () => {
+    const sender = new TransferSender(untouchableDrive())
+
+    const [offer] = sender.buildOffers(
+      [
+        { ...scanned('a1b2c3d4-e5f6-47a8-9b0c-1d2e3f4a5b6c.flac', 10), displayName: 'My Song.flac' }
+      ],
+      't1'
+    )
+
+    expect(offer.name).toBe('My Song.flac')
   })
 })
 

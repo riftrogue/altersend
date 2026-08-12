@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import * as Haptics from 'expo-haptics'
 import { Button } from '@altersend/components'
 import { useTranslation } from '@altersend/locales'
 import { useFocusEffect, useRouter } from 'expo-router'
@@ -12,12 +13,12 @@ import {
 } from '@altersend/domain'
 import { clearSession, joinSession } from '@altersend/domain'
 import {
-  ErrorPanel,
   ReceiveConnectingView,
   ReceiveInterruptedView,
   ReceiveJoinView,
   openCompletedFile
 } from '@/src/transfer/receive'
+import { useErrorToast } from '@/src/transfer/receive/utils/useErrorToast'
 import { Layout } from '@/src/components'
 
 export default function ReceiveScreen() {
@@ -52,7 +53,12 @@ export default function ReceiveScreen() {
   const submitJoin = async () => {
     if (isJoining || role !== null) return
     setShowValidation(true)
-    if (!isValidJoinCode) return
+    if (!isValidJoinCode) {
+      if (trimmedJoinCode.length > 0) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {})
+      }
+      return
+    }
     try {
       setIsJoining(true)
       await joinSession(trimmedJoinCode)
@@ -106,10 +112,7 @@ export default function ReceiveScreen() {
     )
 
   const displayError = getDisplayError(t, errorCode)
-  const errorPanel =
-    displayError && step !== 'interrupted' ? (
-      <ErrorPanel title={t('receive:errors.transferIssue')} message={displayError} />
-    ) : null
+  useErrorToast(step === 'interrupted' ? null : displayError, t('receive:errors.transferIssue'))
 
   if (step === 'join') {
     return (
@@ -127,11 +130,7 @@ export default function ReceiveScreen() {
   }
 
   if (step === 'connecting') {
-    return (
-      <ReceiveConnectingView title={title} description={copy.description} footer={footer}>
-        {errorPanel}
-      </ReceiveConnectingView>
-    )
+    return <ReceiveConnectingView title={title} description={copy.description} footer={footer} />
   }
 
   if (step === 'interrupted') {
@@ -147,9 +146,5 @@ export default function ReceiveScreen() {
     )
   }
 
-  return (
-    <ReceiveConnectingView title={title} description={copy.description} footer={footer}>
-      {errorPanel}
-    </ReceiveConnectingView>
-  )
+  return <ReceiveConnectingView title={title} description={copy.description} footer={footer} />
 }

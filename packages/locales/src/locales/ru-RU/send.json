@@ -47,6 +47,7 @@
     "online": "В сети",
     "downloading": "Загрузка",
     "downloadingPercent": "Загрузка {{percent}}%",
+    "percent": "{{percent}}%",
     "waitingForJoin": "Ожидание подключения",
     "pairedToast": "Сопряжено с {{name}}",
     "inviteFailedToast": "Не удалось связаться с {{name}}",
@@ -80,7 +81,9 @@
     "failedPickPhotos": "Не удалось выбрать фото"
   },
   "hints": {
-    "keepOpen": "Закрытие приложения отменяет передачу."
+    "keepOpen": "Закрытие приложения отменяет передачу.",
+    "stayInApp": "Оставайтесь в приложении до подключения.",
+    "stayUntilDone": "Оставайтесь в приложении до конца передачи."
   },
   "preparing": {
     "uploadedCount_one": "Загружено {{completed}} из {{count}} файла",

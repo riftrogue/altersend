@@ -1,5 +1,14 @@
-import { useEffect, useState } from 'react'
-import { Button, LinkRow, ToggleSwitch, useTheme } from '@altersend/components'
+import { useEffect, useRef, useState } from 'react'
+import {
+  AppearancePicker,
+  Button,
+  LinkCard,
+  LinkRow,
+  SYSTEM_THEME_PREFERENCE,
+  ThemeType,
+  ToggleSwitch,
+  useTheme
+} from '@altersend/components'
 import { FolderIcon } from '@altersend/components/icons'
 import { useTranslation } from '@altersend/locales'
 import { bridgeApi } from '../../../api/bridgeApi'
@@ -22,20 +31,49 @@ function truncatePath(folder: string): string {
 }
 
 export function GeneralSection() {
-  const { t } = useTranslation(['settings', 'errors'])
-  const { theme } = useTheme()
+  const { t } = useTranslation(['settings', 'errors', 'common'])
+  const { theme, themePreference, setThemePreference } = useTheme()
   const c = theme.colors
   const toast = useToast()
+
+  const appearanceLabels = {
+    [ThemeType.Light]: t('settings:appearance.light'),
+    [ThemeType.Dark]: t('settings:appearance.dark'),
+    [SYSTEM_THEME_PREFERENCE]: t('settings:appearance.system')
+  }
 
   const [folder, setFolder] = useState<string | null>(null)
   const [askEveryTime, setAsk] = useState(isAskEveryTime)
   const [crashReporting, setCrashReporting] = useState(isCrashReportingEnabled)
+  const [shareExtension, setShareExtension] = useState<ShareExtensionState>('unknown')
+  const awaitingSettingsVisit = useRef(false)
 
   useEffect(() => {
     bridgeApi
       .getDownloadFolder()
       .then(setFolder)
       .catch((error) => console.error('GeneralSection: could not load download folder', error))
+  }, [])
+
+  useEffect(() => {
+    if (bridgeApi.platform() !== 'darwin') return
+
+    const check = () => {
+      bridgeApi
+        .shareExtensionState()
+        .then(setShareExtension)
+        .catch((error) => console.error('GeneralSection: could not read share menu state', error))
+    }
+
+    const recheckAfterSettingsVisit = () => {
+      if (!awaitingSettingsVisit.current) return
+      awaitingSettingsVisit.current = false
+      check()
+    }
+
+    check()
+    window.addEventListener('focus', recheckAfterSettingsVisit)
+    return () => window.removeEventListener('focus', recheckAfterSettingsVisit)
   }, [])
 
   const handleChangeFolder = async () => {
@@ -51,6 +89,13 @@ export function GeneralSection() {
   const handleAutoSaveToggle = (next: boolean) => {
     setAsk(!next)
     setAskEveryTime(!next)
+  }
+
+  const handleShareMenuToggle = () => {
+    awaitingSettingsVisit.current = true
+    bridgeApi
+      .openShareSettings()
+      .catch((error) => console.error('GeneralSection: could not open share settings', error))
   }
 
   const handleCrashToggle = (next: boolean) => {
@@ -71,7 +116,7 @@ export function GeneralSection() {
   return (
     <SectionShell title={t('settings:sections.general')}>
       <div className='flex flex-col gap-2.5'>
-        <div className='overflow-hidden rounded-[10px] border border-border-primary bg-background-subtle'>
+        <LinkCard>
           <LinkRow
             compact
             isLast={askEveryTime}
@@ -101,20 +146,48 @@ export function GeneralSection() {
               }
             />
           )}
-        </div>
+        </LinkCard>
 
-        <LinkRow
-          standalone
-          compact
-          label={t('settings:crashReports.label')}
-          trailing={
-            <ToggleSwitch
-              checked={crashReporting}
-              onChange={handleCrashToggle}
-              aria-label={t('settings:crashReports.label')}
+        <LinkCard>
+          {shareExtension !== 'unknown' && (
+            <LinkRow
+              compact
+              label={t('settings:shareMenu.label')}
+              subtitle={t('settings:shareMenu.description')}
+              trailing={
+                <ToggleSwitch
+                  checked={shareExtension === 'enabled'}
+                  onChange={handleShareMenuToggle}
+                  aria-label={t('settings:shareMenu.label')}
+                />
+              }
             />
-          }
-        />
+          )}
+
+          <LinkRow
+            compact
+            isLast
+            label={t('settings:crashReports.label')}
+            trailing={
+              <ToggleSwitch
+                checked={crashReporting}
+                onChange={handleCrashToggle}
+                aria-label={t('settings:crashReports.label')}
+              />
+            }
+          />
+        </LinkCard>
+
+        <div className='mt-3 flex flex-col gap-2.5'>
+          <h3 className='m-0 text-[16px] font-semibold text-text-primary'>
+            {t('settings:appearance.title')}
+          </h3>
+          <AppearancePicker
+            value={themePreference}
+            labels={appearanceLabels}
+            onChange={setThemePreference}
+          />
+        </div>
       </div>
     </SectionShell>
   )

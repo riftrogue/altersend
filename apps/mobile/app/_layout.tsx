@@ -5,12 +5,14 @@ import {
   ThemeType,
   useTheme
 } from '@altersend/components'
-import type { Theme } from '@altersend/components'
+import type { Theme, ThemePreference } from '@altersend/components'
 import {
   bindTransferApi,
   startBackgroundReconnectEffect,
+  startDownloadRetryEffect,
   startPeerWatchdog,
-  useSimulatedLoading
+  useSimulatedLoading,
+  useSubscriptionStore
 } from '@altersend/domain'
 import {
   getLocaleFontFamily,
@@ -23,21 +25,32 @@ import { Stack } from 'expo-router'
 import { Platform, StyleSheet, View } from 'react-native'
 import { useEffect, useState } from 'react'
 import * as SplashScreen from 'expo-splash-screen'
+import * as SystemUI from 'expo-system-ui'
 import { LoadingScreen } from '../src/loading'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { mobileApi } from '../src/api/mobileApi'
 import { ToastProvider } from '../src/components/Toast'
+import { AccountProvider } from '../src/account'
 import { UpdateBanner } from '../src/components/UpdateBanner'
 import { PairRequestBanner } from '../src/components/PairRequestBanner'
 import { InviteBanner } from '../src/components/InviteBanner'
 import { useAlterSendFonts } from '../src/theme/useAlterSendFonts'
 import { startAppStateBridge } from '../src/lifecycle/appStateBridge'
+import { startBackgroundTransferService } from '../src/lifecycle/backgroundTransferService'
 import { startDeepLinkHandler } from '../src/lifecycle/deepLinkHandler'
 import { getSavedLocalePreference } from '../src/lifecycle/localePreferenceStorage'
+import {
+  getSavedThemePreference,
+  getThemePreferenceSnapshot,
+  setSavedThemePreference
+} from '../src/lifecycle/themePreferenceStorage'
 import { isRelayEnabled } from '../src/lifecycle/relayStorage'
+import { startAccountSync, syncAccountToken } from '../src/lifecycle/account'
+import { watchEntitlement } from '../src/lifecycle/purchases'
+import { UpgradeButton } from '@/src/components'
 import { getMobileSystemLocales } from '../src/lifecycle/systemLocale'
 import { ShareIntentHandler } from '../src/lifecycle/ShareIntentHandler'
-import { startPhotosCopyEffect } from '../src/transfer/receive'
+import { startDownloadRoutingEffect } from '../src/transfer/receive'
 import { initSentry, captureException } from '../src/sentry'
 
 SplashScreen.preventAutoHideAsync().catch(() => {})
@@ -49,10 +62,16 @@ bindTransferApi(mobileApi, {
 mobileApi.worker
   .setRelayConfig({ enabled: isRelayEnabled() })
   .catch((err) => captureException(err, 'setRelayConfig'))
+watchEntitlement(() => {
+  syncAccountToken().catch((err) => console.warn('[account] entitlement sync failed', err))
+})
+startAccountSync()
 startAppStateBridge()
 startPeerWatchdog()
 startBackgroundReconnectEffect()
-startPhotosCopyEffect()
+startDownloadRetryEffect()
+startBackgroundTransferService()
+startDownloadRoutingEffect()
 startDeepLinkHandler()
 
 function MobileCrashScreen({ error, onRestart }: { error: Error; onRestart: () => void }) {
@@ -69,56 +88,125 @@ function MobileCrashScreen({ error, onRestart }: { error: Error; onRestart: () =
   )
 }
 
-function getFlowScreenOptions(theme: Theme, backTitle: string) {
+function getHeaderOptions(theme: Theme) {
   return {
     headerShown: true,
     headerStyle: { backgroundColor: theme.colors.colorBackground },
     headerTintColor: theme.colors.colorTextPrimary,
     headerShadowVisible: false,
-    headerTitle: '',
-    ...(Platform.OS === 'ios' ? { headerBackTitle: backTitle } : {})
+    ...(Platform.OS === 'ios' ? { headerBackButtonDisplayMode: 'minimal' as const } : {})
   } as const
 }
 
-function ThemedStack() {
-  const { t } = useTranslation(['common'])
-  const { theme } = useTheme()
-  const flowScreenOptions = getFlowScreenOptions(theme, t('common:actions.back'))
-  const progress = useSimulatedLoading()
+function getFlowScreenOptions(theme: Theme) {
+  return {
+    ...getHeaderOptions(theme),
+    headerTitle: '',
+    headerBackButtonMenuEnabled: false
+  } as const
+}
 
-  if (progress < 100) {
-    return <LoadingScreen progress={progress} />
-  }
+function getTitledScreenOptions(theme: Theme, fontFamilyName?: string) {
+  return {
+    ...getHeaderOptions(theme),
+    ...(fontFamilyName ? { headerTitleStyle: { fontFamily: fontFamilyName } } : {})
+  } as const
+}
+
+function persistThemePreference(preference: ThemePreference) {
+  setSavedThemePreference(preference).catch((error) =>
+    captureException(error, 'setSavedThemePreference')
+  )
+}
+
+function ThemedStack() {
+  const { theme, themeType, fontFamilyName } = useTheme()
+  const { t } = useTranslation(['settings', 'feedback'])
+  const flowScreenOptions = getFlowScreenOptions(theme)
+  const titledScreenOptions = getTitledScreenOptions(theme, fontFamilyName)
+  const progress = useSimulatedLoading()
+  const statusBarStyle = themeType === ThemeType.Light ? 'dark' : 'light'
+  const isPro = useSubscriptionStore((state) => state.active)
+
+  useEffect(() => {
+    SystemUI.setBackgroundColorAsync(theme.colors.colorBackground).catch((error) =>
+      captureException(error, 'setSystemBackgroundColor')
+    )
+  }, [theme])
 
   return (
-    <Stack>
-      <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-      <Stack.Screen name='onboarding' options={{ headerShown: false, gestureEnabled: false }} />
-      <Stack.Screen name='settings' options={flowScreenOptions} />
-      <Stack.Screen name='language' options={flowScreenOptions} />
-      <Stack.Screen name='general' options={flowScreenOptions} />
-      <Stack.Screen name='connection' options={flowScreenOptions} />
-      <Stack.Screen name='devices' options={flowScreenOptions} />
-      <Stack.Screen name='about' options={flowScreenOptions} />
-      <Stack.Screen name='report' options={flowScreenOptions} />
-      <Stack.Screen
-        name='send/preparing'
-        options={{ ...flowScreenOptions, gestureEnabled: false }}
-      />
-      <Stack.Screen name='send/share' options={{ ...flowScreenOptions, gestureEnabled: false }} />
-      <Stack.Screen name='receive/scan' options={flowScreenOptions} />
-      <Stack.Screen
-        name='receive/incoming'
-        options={{ ...flowScreenOptions, gestureEnabled: false }}
-      />
-      <Stack.Screen
-        name='receive/complete'
-        options={{
-          headerShown: false,
-          gestureEnabled: false
+    <>
+      <Stack
+        screenOptions={{
+          contentStyle: { backgroundColor: theme.colors.colorBackground },
+          statusBarStyle
         }}
-      />
-    </Stack>
+      >
+        <Stack.Screen name='index' options={{ headerShown: false }} />
+        <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+        <Stack.Screen name='onboarding' options={{ headerShown: false, gestureEnabled: false }} />
+        <Stack.Screen
+          name='settings'
+          options={{
+            ...titledScreenOptions,
+            title: t('settings:title'),
+            headerRight: isPro ? undefined : () => <UpgradeButton />
+          }}
+        />
+        <Stack.Screen
+          name='language'
+          options={{ ...titledScreenOptions, title: t('settings:languageTitle') }}
+        />
+        <Stack.Screen
+          name='general'
+          options={{ ...titledScreenOptions, title: t('settings:sections.general') }}
+        />
+        <Stack.Screen
+          name='connection'
+          options={{ ...titledScreenOptions, title: t('settings:rows.connection') }}
+        />
+        <Stack.Screen
+          name='account'
+          options={{
+            headerShown: false,
+            presentation: 'fullScreenModal',
+            animation: 'slide_from_bottom'
+          }}
+        />
+        <Stack.Screen
+          name='subscription'
+          options={{ ...titledScreenOptions, title: t('settings:account.title') }}
+        />
+        <Stack.Screen
+          name='devices'
+          options={{ ...titledScreenOptions, title: t('settings:pairing.pairedDevices') }}
+        />
+        <Stack.Screen
+          name='about'
+          options={{ ...titledScreenOptions, title: t('settings:sections.about') }}
+        />
+        <Stack.Screen
+          name='report'
+          options={{ ...titledScreenOptions, title: t('feedback:title') }}
+        />
+        <Stack.Screen name='send/preparing' options={flowScreenOptions} />
+        <Stack.Screen name='send/share' options={flowScreenOptions} />
+        <Stack.Screen name='receive/scan' options={flowScreenOptions} />
+        <Stack.Screen name='receive/incoming' options={flowScreenOptions} />
+        <Stack.Screen
+          name='receive/complete'
+          options={{
+            headerShown: false,
+            gestureEnabled: false
+          }}
+        />
+      </Stack>
+      {progress < 100 && (
+        <View style={StyleSheet.absoluteFill}>
+          <LoadingScreen progress={progress} />
+        </View>
+      )}
+    </>
   )
 }
 
@@ -131,7 +219,11 @@ function AppShell() {
   return (
     <SafeAreaProvider>
       <View style={styles.root}>
-        <ThemeProvider theme={ThemeType.Dark} fontFamily={fontFamily}>
+        <ThemeProvider
+          preference={getThemePreferenceSnapshot()}
+          onPreferenceChange={persistThemePreference}
+          fontFamily={fontFamily}
+        >
           <ErrorBoundary
             fallback={(error, reset) => {
               captureException(error)
@@ -139,11 +231,13 @@ function AppShell() {
             }}
           >
             <ToastProvider>
-              <ShareIntentHandler />
-              <ThemedStack />
-              <UpdateBanner />
-              <PairRequestBanner />
-              <InviteBanner />
+              <AccountProvider>
+                <ShareIntentHandler />
+                <ThemedStack />
+                <UpdateBanner />
+                <PairRequestBanner />
+                <InviteBanner />
+              </AccountProvider>
             </ToastProvider>
           </ErrorBoundary>
         </ThemeProvider>
@@ -153,37 +247,37 @@ function AppShell() {
 }
 
 export default function RootLayout() {
-  const [i18nReady, setI18nReady] = useState(false)
+  const [preferencesReady, setPreferencesReady] = useState(false)
   const [fontsLoaded, fontError] = useAlterSendFonts()
 
   useEffect(() => {
     let mounted = true
-    async function initializeLocale() {
+    async function initializePreferences() {
       try {
-        const preference = await getSavedLocalePreference()
-        await initI18n(resolveLocalePreference(preference, getMobileSystemLocales()))
+        const [locale] = await Promise.all([getSavedLocalePreference(), getSavedThemePreference()])
+        await initI18n(resolveLocalePreference(locale, getMobileSystemLocales()))
       } catch (error) {
         captureException(error)
-        console.warn('Failed to initialize locale:', error)
+        console.warn('Failed to initialize preferences:', error)
       } finally {
-        if (mounted) setI18nReady(true)
+        if (mounted) setPreferencesReady(true)
       }
     }
 
-    void initializeLocale()
+    void initializePreferences()
     return () => {
       mounted = false
     }
   }, [])
 
   useEffect(() => {
-    if (i18nReady && fontsLoaded) {
+    if (preferencesReady && fontsLoaded) {
       SplashScreen.hideAsync().catch(console.warn)
     }
-  }, [fontsLoaded, i18nReady])
+  }, [fontsLoaded, preferencesReady])
 
   if (fontError) throw fontError
-  if (!i18nReady || !fontsLoaded) return null
+  if (!preferencesReady || !fontsLoaded) return null
 
   return <AppShell />
 }

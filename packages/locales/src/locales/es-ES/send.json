@@ -47,6 +47,7 @@
     "online": "En línea",
     "downloading": "Descargando",
     "downloadingPercent": "Descargando {{percent}}%",
+    "percent": "{{percent}}%",
     "waitingForJoin": "Esperando a que alguien se una",
     "pairedToast": "Emparejado con {{name}}",
     "inviteFailedToast": "No se pudo contactar con {{name}}",
@@ -80,7 +81,9 @@
     "failedPickPhotos": "No se pudieron seleccionar las fotos"
   },
   "hints": {
-    "keepOpen": "Cerrar la aplicación cancela la transferencia."
+    "keepOpen": "Cerrar la aplicación cancela la transferencia.",
+    "stayInApp": "Permanezca en la app hasta la conexión.",
+    "stayUntilDone": "Permanezca en la app hasta que termine la transferencia."
   },
   "preparing": {
     "uploadedCount_one": "{{completed}} de {{count}} archivo subido",

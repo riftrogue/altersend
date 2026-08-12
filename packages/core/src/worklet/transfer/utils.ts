@@ -11,6 +11,12 @@ export function getFileName(filePath: string) {
   return normalizedPath.split('/').pop() || normalizedPath
 }
 
+export function withDisplayName(relativePath: string, name: string | undefined) {
+  if (!name) return relativePath
+  const dir = getDirname(relativePath)
+  return dir === '.' ? name : joinFilePath(dir, name)
+}
+
 export function joinFilePath(dirPath: string, fileName: string) {
   if (!dirPath) return fileName
 
@@ -18,6 +24,14 @@ export function joinFilePath(dirPath: string, fileName: string) {
   const trailingSeparators = /[\\/]+$/
 
   return `${dirPath.replace(trailingSeparators, '')}${separator}${fileName}`
+}
+
+export function toSafeFileName(name: string, fallback: string): string {
+  const sanitized = name
+    .replace(/[\\/\0]/g, '_')
+    .trim()
+    .slice(0, 255)
+  return sanitized.length > 0 && sanitized !== '.' && sanitized !== '..' ? sanitized : fallback
 }
 
 export function isSafeFileName(name: unknown): name is string {

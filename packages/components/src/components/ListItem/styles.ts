@@ -1,5 +1,5 @@
 import { css } from 'react-strict-dom'
-import { tokens } from '../../theme/tokens.css'
+import { fontTokens, tokens } from '../../theme/tokens.css'
 
 export const styles = css.create({
   base: {
@@ -12,7 +12,7 @@ export const styles = css.create({
     borderStyle: 'solid',
     borderRadius: tokens.radiusMd,
     padding: 0,
-    fontFamily: tokens.fontFamilySans,
+    fontFamily: fontTokens.fontFamilySans,
     fontSize: tokens.fontSizeBase,
     fontWeight: tokens.fontWeightMedium,
     lineHeight: tokens.lineHeightTight,
@@ -36,23 +36,10 @@ export const styles = css.create({
     paddingTop: tokens.space25,
     paddingBottom: tokens.space25
   },
-  expandedLarge: {
-    minHeight: tokens.space14,
-    gap: tokens.space3,
-    paddingLeft: tokens.space5,
-    paddingRight: tokens.space5,
-    paddingTop: tokens.space4,
-    paddingBottom: tokens.space4,
-    fontSize: tokens.fontSizeLg,
-    fontWeight: tokens.fontWeightSemibold
-  },
   collapsed: {
     width: tokens.space10,
     height: tokens.space10,
     justifyContent: 'center'
-  },
-  square: {
-    borderRadius: 0
   },
   left: {
     display: 'flex',
@@ -60,9 +47,6 @@ export const styles = css.create({
     alignItems: 'center',
     minWidth: 0,
     gap: tokens.space25
-  },
-  leftLarge: {
-    gap: tokens.space3
   },
   iconSlot: {
     position: 'relative',
@@ -81,27 +65,11 @@ export const styles = css.create({
     backgroundColor: tokens.colorSuccess,
     boxShadow: `0 0 0 2px ${tokens.colorBackgroundDeep}`
   },
-  textColumn: {
-    display: 'flex',
-    flexDirection: 'column',
-    minWidth: 0,
-    gap: 2
-  },
   label: {
     margin: 0,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
     lineHeight: tokens.lineHeightTight
-  },
-  subtitle: {
-    margin: 0,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-    fontSize: tokens.fontSizeSm,
-    fontWeight: tokens.fontWeightRegular,
-    lineHeight: tokens.lineHeightTight,
-    color: tokens.colorTextMuted
   }
 })

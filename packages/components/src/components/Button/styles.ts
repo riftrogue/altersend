@@ -1,5 +1,5 @@
 import { css } from 'react-strict-dom'
-import { tokens } from '../../theme/tokens.css'
+import { fontTokens, tokens } from '../../theme/tokens.css'
 
 export const styles = css.create({
   base: {
@@ -11,11 +11,11 @@ export const styles = css.create({
     minWidth: 0,
     borderWidth: 1,
     borderStyle: 'solid',
-    borderRadius: tokens.radiusLg,
-    padding: tokens.space3,
+    borderRadius: tokens.radiusControl,
+    paddingBlock: tokens.space2,
     alignItems: 'center',
     justifyContent: 'center',
-    fontFamily: tokens.fontFamilySans,
+    fontFamily: fontTokens.fontFamilySans,
     fontSize: tokens.fontSizeMd,
     fontWeight: tokens.fontWeightSemibold,
     lineHeight: 1.1,
@@ -29,32 +29,26 @@ export const styles = css.create({
     transitionTimingFunction: 'ease'
   },
   sm: {
-    paddingTop: tokens.space3,
-    paddingBottom: tokens.space3,
-    paddingLeft: 22,
-    paddingRight: 22,
+    minHeight: tokens.space10,
+    paddingInline: tokens.space5,
     fontSize: tokens.fontSizeMd
   },
   md: {
-    paddingTop: tokens.space4,
-    paddingBottom: tokens.space4,
-    paddingLeft: 26,
-    paddingRight: 26,
+    minHeight: tokens.space11,
+    paddingInline: tokens.space6,
     fontSize: tokens.fontSizeBase
   },
   lg: {
-    paddingTop: tokens.space35,
-    paddingBottom: tokens.space35,
-    paddingLeft: tokens.space4,
-    paddingRight: tokens.space4,
+    minHeight: tokens.space12,
+    paddingInline: tokens.space6,
     gap: tokens.space2,
     fontSize: tokens.fontSizeLg
   },
   stack: {
     flexDirection: 'column',
     gap: tokens.space2,
-    paddingLeft: tokens.space2,
-    paddingRight: tokens.space2
+    paddingBlock: tokens.space3,
+    paddingInline: tokens.space2
   },
   stackText: {
     whiteSpace: 'normal'
@@ -63,31 +57,25 @@ export const styles = css.create({
     width: '100%'
   },
   iconOnlySm: {
-    paddingTop: tokens.space2,
-    paddingBottom: tokens.space2,
-    paddingLeft: tokens.space15,
-    paddingRight: tokens.space15,
-    borderRadius: tokens.radiusSm
+    minWidth: tokens.space8,
+    minHeight: tokens.space8,
+    paddingInline: 0
   },
   iconOnlyMd: {
-    paddingTop: tokens.space25,
-    paddingBottom: tokens.space25,
-    paddingLeft: tokens.space25,
-    paddingRight: tokens.space25,
-    borderRadius: tokens.radiusMd
+    minWidth: tokens.space9,
+    minHeight: tokens.space9,
+    paddingInline: 0
   },
   iconOnlyLg: {
-    paddingTop: tokens.space3,
-    paddingBottom: tokens.space3,
-    paddingLeft: tokens.space25,
-    paddingRight: tokens.space25,
-    borderRadius: tokens.radiusLg
+    minWidth: tokens.space10,
+    minHeight: tokens.space10,
+    paddingInline: 0
   },
   primary: {
     backgroundColor: tokens.colorTextPrimary,
-    borderColor: tokens.colorBorderPrimary,
+    borderColor: 'transparent',
     color: tokens.colorBackground,
-    boxShadow: `0 1px 2px ${tokens.colorShadow}, inset 0 1px 0 ${tokens.colorHighlight}`,
+    boxShadow: `0 1px 2px ${tokens.colorShadow}`,
     ':hover': {
       backgroundColor: tokens.colorAccentActive,
       borderColor: tokens.colorBorderStrong
@@ -116,6 +104,23 @@ export const styles = css.create({
     }
   },
   secondaryPressed: {
+    backgroundColor: tokens.colorSurfaceSecondary
+  },
+  surface: {
+    backgroundColor: tokens.colorSurfacePrimary,
+    borderColor: tokens.colorBorderPrimary,
+    color: tokens.colorTextPrimary,
+    boxShadow: 'none',
+    ':hover': {
+      backgroundColor: tokens.colorSurfaceSecondary,
+      borderColor: tokens.colorBorderStrong
+    },
+    ':focus-visible': {
+      outline: 'none',
+      boxShadow: `0 0 0 2px ${tokens.colorFocusRing}`
+    }
+  },
+  surfacePressed: {
     backgroundColor: tokens.colorSurfaceSecondary
   },
   outline: {
@@ -229,7 +234,7 @@ export const styles = css.create({
     }
   },
   textBase: {
-    fontFamily: tokens.fontFamilySans,
+    fontFamily: fontTokens.fontFamilySans,
     fontWeight: tokens.fontWeightSemibold,
     letterSpacing: '-0.005em',
     textAlign: 'center',

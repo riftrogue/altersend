@@ -36,7 +36,7 @@ export default function ReportScreen() {
 
   if (state === 'sent') {
     return (
-      <Layout title={t('feedback:title')} description='' hasNativeHeader>
+      <Layout hasNativeHeader>
         <View style={styles.centred}>
           <Text style={[styles.sentTitle, { color: theme.colors.colorTextPrimary }]}>
             {t('feedback:states.sent')}
@@ -50,7 +50,7 @@ export default function ReportScreen() {
   }
 
   return (
-    <Layout title={t('feedback:title')} description='' hasNativeHeader>
+    <Layout hasNativeHeader>
       <View style={styles.content}>
         <FeedbackTypeSelector
           value={type}

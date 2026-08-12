@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native'
-import { ListItem, useTheme } from '@altersend/components'
+import { MenuItem, useTheme } from '@altersend/components'
 import { ClipboardIcon, CodeIcon, QrCodeIcon } from '@altersend/components/icons'
 import { useTranslation } from '@altersend/locales'
 import { BottomSheet } from '../BottomSheet'
@@ -26,39 +26,26 @@ export function AddPairDeviceSheet({
   const c = theme.colors
 
   return (
-    <BottomSheet
-      open={open}
-      onClose={onClose}
-      onDismiss={onDismiss}
-      title={t('settings:pairing.pairNewDevice')}
-      sheetStyle={styles.sheet}
-    >
+    <BottomSheet open={open} onClose={onClose} onDismiss={onDismiss} sheetStyle={styles.sheet}>
       <View style={styles.actionList}>
-        <ListItem
-          icon={<QrCodeIcon size={15} />}
+        <MenuItem
+          chevron={false}
+          icon={<QrCodeIcon size={19} color={c.colorTextSecondary} />}
           label={t('settings:pairing.showQrCode')}
-          variant='plain'
-          size='large'
-          square
-          onClick={onShowQrCode}
+          onPress={onShowQrCode}
         />
-        <View style={[styles.divider, { backgroundColor: c.colorBorderPrimary }]} />
-        <ListItem
-          icon={<CodeIcon size={15} />}
+        <MenuItem
+          chevron={false}
+          icon={<CodeIcon size={19} color={c.colorTextSecondary} />}
           label={t('settings:pairing.scanQrCode')}
-          variant='plain'
-          size='large'
-          square
-          onClick={onScanQrCode}
+          onPress={onScanQrCode}
         />
-        <View style={[styles.divider, { backgroundColor: c.colorBorderPrimary }]} />
-        <ListItem
-          icon={<ClipboardIcon size={15} />}
+        <MenuItem
+          isLast
+          chevron={false}
+          icon={<ClipboardIcon size={19} color={c.colorTextSecondary} />}
           label={t('settings:pairing.enterCode')}
-          variant='plain'
-          size='large'
-          square
-          onClick={onEnterCode}
+          onPress={onEnterCode}
         />
       </View>
     </BottomSheet>
@@ -67,6 +54,5 @@ export function AddPairDeviceSheet({
 
 const styles = StyleSheet.create({
   sheet: { paddingBottom: 46, gap: 10 },
-  actionList: { paddingTop: 8 },
-  divider: { height: 1, marginRight: 20, marginLeft: 50 }
+  actionList: { paddingTop: 8 }
 })

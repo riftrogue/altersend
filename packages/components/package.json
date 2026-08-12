@@ -55,10 +55,14 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "lucide-react": "*",
-    "lucide-react-native": "*"
+    "lucide-react-native": "*",
+    "@expo/ui": "*"
   },
   "peerDependenciesMeta": {
     "react-dom": {
+      "optional": true
+    },
+    "@expo/ui": {
       "optional": true
     },
     "lucide-react": {

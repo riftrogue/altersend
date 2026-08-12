@@ -14,7 +14,8 @@ import {
   isSafeRelativePath,
   joinFilePath,
   onAbort,
-  toRelativePath
+  toRelativePath,
+  withDisplayName
 } from './utils'
 import { fileExists } from './fs-utils'
 import { LegacyHyperdriveDownloader } from './legacy/downloader'
@@ -97,7 +98,8 @@ export class TransferReceiver {
         continue
       }
 
-      const targetPath = file.targetPath ?? joinFilePath(file.targetDir!, relativeTarget)
+      const relativeSaveTarget = withDisplayName(relativeTarget, file.name)
+      const targetPath = file.targetPath ?? joinFilePath(file.targetDir!, relativeSaveTarget)
 
       if (this.active.has(file.fileId)) {
         fail(targetPath, 'Already downloading this file')

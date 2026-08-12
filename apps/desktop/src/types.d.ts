@@ -25,14 +25,14 @@ declare module 'react' {
   }
 }
 
-interface PickedFile {
-  path: string
-  name: string
-  size?: number
-  relativePath?: string
-}
-
 declare global {
+  interface PickedFile {
+    path: string
+    name: string
+    size: number
+    relativePath?: string
+  }
+
   type DownloadFileRequest = import('@altersend/core').DownloadFileRequest
   type DownloadFilesReply = import('@altersend/core').DownloadFilesReply
   type DisconnectReply = import('@altersend/core').DisconnectReply
@@ -55,6 +55,8 @@ declare global {
 
   type PickMode = 'files' | 'folders' | 'combined'
 
+  type ShareExtensionState = 'enabled' | 'disabled' | 'unknown'
+
   interface Bridge {
     pkg: () => { version: string }
     platform: NodeJS.Platform
@@ -71,13 +73,24 @@ declare global {
     getPathForFile: (file: File) => string
     getDownloadFolder: () => Promise<string | null>
     chooseDownloadFolder: () => Promise<string | null>
+    getAccountCode: () => Promise<string | null>
+    setAccountCode: (code: string) => Promise<void>
+    clearAccountCode: () => Promise<void>
+    getAccountToken: () => Promise<string | null>
+    setAccountToken: (token: string | null) => Promise<void>
+    saveAccountCode: (contents: string, defaultName: string) => Promise<string | null>
     appRestart: () => Promise<unknown>
     onDeepLink: (cb: (url: string) => void) => () => void
+    onExternalFiles: (cb: (files: PickedFile[]) => void) => () => void
+    externalFilesReady: () => Promise<PickedFile[]>
+    shareExtensionState: () => Promise<ShareExtensionState>
+    openShareSettings: () => Promise<void>
     onRuntimeUpdated: (cb: () => void) => () => void
     showInFolder: (filePath: string) => Promise<void>
     openFile: (filePath: string) => Promise<string>
     openExternalUrl: (url: string) => Promise<void>
     setSentryEnabled: (enabled: boolean) => Promise<void>
+    setThemePreference: (preference: string) => Promise<void>
     requestCameraAccess: () => Promise<boolean>
     clipboardReadText: () => Promise<string>
   }

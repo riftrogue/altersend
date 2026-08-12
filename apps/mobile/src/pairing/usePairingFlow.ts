@@ -9,6 +9,7 @@ import {
 import { useTranslation } from '@altersend/locales'
 import { useToast } from '@/src/components/Toast'
 import { SHEET_TRANSITION_MS, useDeviceRename } from './useDeviceRename'
+import { useDeviceRemove } from './useDeviceRemove'
 
 export function usePairingFlow() {
   const { t } = useTranslation(['settings'])
@@ -17,6 +18,7 @@ export function usePairingFlow() {
 
   const [actionsTarget, setActionsTarget] = useState<DeviceRenameTarget | null>(null)
   const { openRename, renameSheet } = useDeviceRename(renamePeer)
+  const { confirmRemove, removeDialog } = useDeviceRemove(forgetPeer)
   const [addSheetOpen, setAddSheetOpen] = useState(false)
   const [qrSheetOpen, setQrSheetOpen] = useState(false)
   const [scanSheetOpen, setScanSheetOpen] = useState(false)
@@ -37,7 +39,7 @@ export function usePairingFlow() {
       closePairingSheets()
       toast.show({ title: t('settings:pairing.devicePaired') })
     },
-    onFailed: () => toast.show({ title: t('settings:pairing.pairFailed') })
+    onFailed: () => toast.show({ title: t('settings:pairing.pairFailed'), tone: 'error' })
   })
 
   useEffect(() => {
@@ -52,14 +54,10 @@ export function usePairingFlow() {
 
   const reopenAddSheet = () => setTimeout(() => setAddSheetOpen(true), SHEET_TRANSITION_MS)
 
-  const removeDevice = async () => {
+  const removeDevice = () => {
     const target = actionsTarget
     setActionsTarget(null)
-    if (!target) return
-    const removed = await forgetPeer(target.peerKey)
-    toast.show({
-      title: t(removed ? 'settings:pairing.deviceRemoved' : 'settings:pairing.removeFailed')
-    })
+    if (target) confirmRemove(target)
   }
 
   const openRenameSheet = () => {
@@ -80,6 +78,7 @@ export function usePairingFlow() {
       onRename: openRenameSheet
     },
     renameSheet,
+    removeDialog,
     addSheet: {
       open: addSheetOpen,
       onClose: () => setAddSheetOpen(false),

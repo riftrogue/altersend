@@ -25,13 +25,14 @@
     "packages/components": {
       "entry": ["scripts/*.mjs", ".storybook/{main,preview}.{ts,tsx}", "src/**/*.stories.{ts,tsx}"],
       "project": ["src/**/*.{ts,tsx}", "scripts/**/*.mjs"],
-      "ignoreDependencies": ["lucide-react", "lucide-react-native"],
+      "ignoreDependencies": ["lucide-react", "lucide-react-native", "@expo/ui"],
       "ignoreUnresolved": ["^\\./DragSurface$", "^\\./useIconColor$", "^\\./lucide$"]
     },
     "apps/desktop": {
       "entry": [
         "src/electron/main.ts",
         "src/electron/preload.cjs",
+        "src/**/*.test.ts",
         "scripts/*.{js,cjs,mjs}",
         "forge.config.{js,cjs,mjs}",
         "vite.config.{ts,js,mjs}"
@@ -64,6 +65,7 @@
       ],
       "project": ["app/**/*.{ts,tsx}", "src/**/*.{ts,tsx}", "scripts/**/*.{js,cjs,mjs}"],
       "ignoreDependencies": ["b4a", "react-native-b4a", "react-strict-dom", "expo-updates"],
+      "ignoreUnresolved": ["^\\./ConfirmDialog$", "^\\./IconButton$"],
       "ignoreBinaries": ["eas"]
     },
     "apps/web": {

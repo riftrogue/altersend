@@ -30,6 +30,13 @@ contextBridge.exposeInMainWorld('bridge', {
   },
   getPathForFile: (file) => webUtils.getPathForFile(file),
   getDownloadFolder: () => ipcRenderer.invoke('app:getDownloadFolder'),
+  getAccountCode: () => ipcRenderer.invoke('account:getCode'),
+  setAccountCode: (code) => ipcRenderer.invoke('account:setCode', code),
+  clearAccountCode: () => ipcRenderer.invoke('account:clearCode'),
+  getAccountToken: () => ipcRenderer.invoke('account:getToken'),
+  setAccountToken: (token) => ipcRenderer.invoke('account:setToken', token),
+  saveAccountCode: (contents, defaultName) =>
+    ipcRenderer.invoke('account:saveCode', contents, defaultName),
   chooseDownloadFolder: () => ipcRenderer.invoke('app:chooseDownloadFolder'),
   appRestart: () => ipcRenderer.invoke('app:restart'),
   showInFolder: (filePath) => ipcRenderer.invoke('app:showInFolder', filePath),
@@ -45,12 +52,21 @@ contextBridge.exposeInMainWorld('bridge', {
     ipcRenderer.on('app:deep-link', listener)
     return () => ipcRenderer.removeListener('app:deep-link', listener)
   },
+  onExternalFiles: (cb) => {
+    const listener = (_evt, files) => cb(files)
+    ipcRenderer.on('app:external-files', listener)
+    return () => ipcRenderer.removeListener('app:external-files', listener)
+  },
+  externalFilesReady: () => ipcRenderer.invoke('app:externalFilesReady'),
+  shareExtensionState: () => ipcRenderer.invoke('app:shareExtensionState'),
+  openShareSettings: () => ipcRenderer.invoke('app:openShareSettings'),
   onRuntimeUpdated: (cb) => {
     const listener = () => cb()
     ipcRenderer.on('runtime:updated', listener)
     return () => ipcRenderer.removeListener('runtime:updated', listener)
   },
   setSentryEnabled: (enabled) => ipcRenderer.invoke('sentry:setEnabled', enabled),
+  setThemePreference: (preference) => ipcRenderer.invoke('theme:setPreference', preference),
   requestCameraAccess: () => ipcRenderer.invoke('app:requestCameraAccess'),
   clipboardReadText: () => ipcRenderer.invoke('app:clipboardReadText'),
 })

@@ -7,6 +7,7 @@ export interface ThemeColors {
   colorSurfaceTertiary: string
   colorSurfaceHover: string
   colorSurfaceAccent: string
+  colorTabIndicator: string
   colorBorderPrimary: string
   colorBorderStrong: string
   colorTextPrimary: string
@@ -17,6 +18,7 @@ export interface ThemeColors {
   colorAccentHover: string
   colorAccentActive: string
   colorOnAccent: string
+  colorControlKnob: string
   colorSuccess: string
   colorSuccessSubtle: string
   colorWarning: string

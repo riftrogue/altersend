@@ -10,8 +10,7 @@ import {
   type TransferMethod,
   type WorkerClient
 } from '@altersend/core'
-import { writeFileViaTemp } from './writeFileViaTemp.js'
-import { migrateLegacyStore } from './migrateLegacyStore.js'
+import { migrateLegacyStore, writeFileViaTemp } from './store/index.js'
 import { isMac, isLinux, isWindows } from 'which-runtime'
 import { command, flag, sloppy } from 'paparam'
 import { createRequire } from 'module'
@@ -84,7 +83,7 @@ const cmd = command(
   sloppy({ flags: true, args: true })
 )
 
-const cliArgs = (app.isPackaged ? process.argv.slice(1) : process.argv.slice(2)).filter(
+export const cliArgs = (app.isPackaged ? process.argv.slice(1) : process.argv.slice(2)).filter(
   (arg) => arg !== '--no-sandbox'
 )
 cmd.parse(cliArgs)

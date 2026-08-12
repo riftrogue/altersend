@@ -1,6 +1,6 @@
 import { Image, Linking, StyleSheet, View } from 'react-native'
 import Constants from 'expo-constants'
-import { LinkCard, LinkRow, useTheme } from '@altersend/components'
+import { MenuGroup, MenuItem, useTheme } from '@altersend/components'
 import {
   ArrowUpRightIcon,
   DiscordIcon,
@@ -41,7 +41,7 @@ export default function AboutScreen() {
   }
 
   return (
-    <Layout title={t('settings:sections.about')} description='' hasNativeHeader>
+    <Layout hasNativeHeader>
       <View style={styles.content}>
         <View style={styles.brand}>
           <Image source={brandLogo} style={styles.brandLogo} resizeMode='contain' />
@@ -63,21 +63,21 @@ export default function AboutScreen() {
         </View>
 
         {aboutLinkGroups.map((group) => (
-          <LinkCard key={group[0].key}>
+          <MenuGroup key={group[0].key}>
             {group.map(({ key, labelKey, url }, index) => {
               const Icon = linkIcons[key]
               return (
-                <LinkRow
+                <MenuItem
                   key={key}
                   label={t(labelKey)}
-                  icon={<Icon size={16} color={c.colorTextSecondary} />}
+                  icon={<Icon size={19} color={c.colorTextSecondary} />}
                   trailing={<ArrowUpRightIcon size={15} color={c.colorTextMuted} />}
                   onPress={() => openUrl(url)}
                   isLast={index === group.length - 1}
                 />
               )
             })}
-          </LinkCard>
+          </MenuGroup>
         ))}
 
         <Text style={[styles.footer, { color: c.colorTextFaint }]}>

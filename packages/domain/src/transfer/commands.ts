@@ -284,6 +284,7 @@ export const continueShare = async (files: SelectedFile[]): Promise<void> => {
 
   const fileRequests: ShareFileRequest[] = files.map((file) => ({
     path: file.path,
+    name: file.name,
     relativePath: file.relativePath,
     isTemporary: file.isTemporary,
     kind: file.kind,

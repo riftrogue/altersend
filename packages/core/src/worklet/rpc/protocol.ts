@@ -45,6 +45,7 @@ export interface JoinReply {
 
 export interface ShareFileRequest {
   path: string
+  name?: string
   relativePath?: string
   isTemporary?: boolean
   kind?: 'file' | 'text'
@@ -115,6 +116,7 @@ export interface InitDeviceSecretReply {
 
 export interface SetRelayConfigInput {
   enabled: boolean
+  proToken?: string | null
 }
 
 export interface SetRelayConfigReply {

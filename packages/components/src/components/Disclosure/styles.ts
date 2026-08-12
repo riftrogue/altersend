@@ -1,5 +1,5 @@
 import { css } from 'react-strict-dom'
-import { tokens } from '../../theme/tokens.css'
+import { fontTokens, tokens } from '../../theme/tokens.css'
 
 export const styles = css.create({
   section: {
@@ -7,11 +7,8 @@ export const styles = css.create({
     borderWidth: 1,
     borderStyle: 'solid',
     borderColor: tokens.colorBorderPrimary,
-    borderRadius: tokens.radiusLg,
+    borderRadius: tokens.radius2xl,
     backgroundColor: tokens.colorBackgroundSubtle
-  },
-  sectionCompact: {
-    borderRadius: tokens.radiusMd
   },
   header: {
     display: 'flex',
@@ -76,7 +73,7 @@ export const styles = css.create({
   title: {
     margin: 0,
     color: tokens.colorTextPrimary,
-    fontFamily: tokens.fontFamilySans,
+    fontFamily: fontTokens.fontFamilySans,
     fontSize: tokens.fontSizeBase,
     fontWeight: tokens.fontWeightMedium,
     lineHeight: tokens.lineHeightSnug
@@ -87,7 +84,7 @@ export const styles = css.create({
   subtitle: {
     margin: 0,
     color: tokens.colorTextMuted,
-    fontFamily: tokens.fontFamilySans,
+    fontFamily: fontTokens.fontFamilySans,
     fontSize: tokens.fontSizeSm,
     lineHeight: tokens.lineHeightNormal
   },

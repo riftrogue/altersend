@@ -2,12 +2,13 @@ import crypto from 'hypercore-crypto'
 import fs from 'bare-fs'
 import Localdrive from 'localdrive'
 import type Hyperdrive from 'hyperdrive'
-import { getDirname, getFileName, toRelativePath } from './utils'
+import { getDirname, getFileName, toRelativePath, toSafeFileName } from './utils'
 import { LegacyPeerStaging } from './legacy/staging'
 import type { FileOffer } from './control-channel'
 
 export interface ScannedFile {
   fileName: string
+  displayName: string
   inputPath: string
   sourcePath: string
   sourceDrive: Localdrive
@@ -64,7 +65,7 @@ export class TransferSender {
   }
 
   async scanFiles(
-    requests: { path: string; relativePath?: string; isTemporary?: boolean }[]
+    requests: { path: string; name?: string; relativePath?: string; isTemporary?: boolean }[]
   ): Promise<ScanResult> {
     const files: ScannedFile[] = []
     const errors: string[] = []
@@ -75,6 +76,7 @@ export class TransferSender {
     for (const req of requests) {
       const path = req.path
       const fileName = getFileName(path)
+      const displayName = req.name ? toSafeFileName(req.name, fileName) : fileName
       const { root, relativePath } = resolveSource(path, req.relativePath, fileName)
       const sourcePath = `/${relativePath}`
       let sourceDrive = driveByDir.get(root)
@@ -93,6 +95,7 @@ export class TransferSender {
           totalBytes += size
           files.push({
             fileName,
+            displayName,
             inputPath: path,
             sourcePath,
             sourceDrive,
@@ -110,6 +113,7 @@ export class TransferSender {
       totalBytes += size
       files.push({
         fileName,
+        displayName,
         inputPath: path,
         sourcePath,
         sourceDrive,
@@ -143,7 +147,7 @@ export class TransferSender {
       return {
         id,
         transferId,
-        name: file.fileName,
+        name: file.displayName,
         path: file.sourcePath,
         size: file.size,
         driveKey: this.driveKey,

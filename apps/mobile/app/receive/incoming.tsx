@@ -2,12 +2,14 @@ import { useCallback, useEffect } from 'react'
 import { View, StyleSheet, Pressable } from 'react-native'
 import { Paths } from 'expo-file-system'
 import { Button, useTheme } from '@altersend/components'
-import { ArrowLeftIcon, DownloadIcon, InfoIcon, PlayIcon } from '@altersend/components/icons'
+import { DownloadIcon, InfoIcon, PlayIcon } from '@altersend/components/icons'
 import { useTranslation } from '@altersend/locales'
-import { useNavigation, useRouter } from 'expo-router'
+import { useRouter } from 'expo-router'
 import { uriToPath } from '@/src/api/mobileApi'
-import { Layout, IllustrationLayout } from '@/src/components'
-import { ErrorPanel, ReceiveIncomingView, ReceiveReconnectingView } from '@/src/transfer/receive'
+import { ConfirmDialog, Layout, IllustrationLayout } from '@/src/components'
+import { useLeaveSessionConfirm } from '@/src/hooks/useLeaveSessionConfirm'
+import { ReceiveIncomingView, ReceiveReconnectingView } from '@/src/transfer/receive'
+import { useErrorToast } from '@/src/transfer/receive/utils/useErrorToast'
 import { exitToReceiveTab } from '@/src/transfer/receive/utils/exitToReceiveTab'
 import ConnectionLostSvg from '../../../../assets/connection-lost.svg'
 import {
@@ -25,7 +27,6 @@ import { Text } from '@/src/components/ThemedText'
 export default function ReceiveIncomingScreen() {
   const { t } = useTranslation(['receive', 'common', 'errors'])
   const { theme } = useTheme()
-  const navigation = useNavigation()
   const router = useRouter()
   const incomingFileOffers = useTransferStore((s) => s.incomingFileOffers)
   const downloads = useReceiveDownloads()
@@ -36,6 +37,8 @@ export default function ReceiveIncomingScreen() {
   const isReconnecting = useTransferStore((s) => s.isReconnecting)
   const errorCode = useTransferStore((s) => s.errorCode)
   const displayError = getDisplayError(t, errorCode)
+
+  useErrorToast(displayError, t('receive:errors.transferIssue'))
 
   const { totals, fileOffers, allDownloaded } = downloads
   const hasIncomingFiles = incomingFileOffers.length > 0
@@ -58,27 +61,7 @@ export default function ReceiveIncomingScreen() {
     void clearSession()
     exitToReceiveTab(router)
   }, [router])
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerBackVisible: false,
-      headerLeft: () => (
-        <Pressable
-          accessibilityRole='button'
-          accessibilityLabel={t('common:actions.back')}
-          onPress={handleEndSession}
-          hitSlop={12}
-          style={({ pressed }) => ({
-            paddingHorizontal: 8,
-            paddingVertical: 4,
-            opacity: pressed ? 0.6 : 1
-          })}
-        >
-          <ArrowLeftIcon size={22} color={theme.colors.colorTextPrimary} />
-        </Pressable>
-      )
-    })
-  }, [navigation, handleEndSession, t, theme.colors.colorTextPrimary])
+  const { leaveDialog } = useLeaveSessionConfirm(handleEndSession)
 
   const totalBytes = totals.totalBytes
   const textCount = incomingFileOffers.length - downloadableFileCount
@@ -109,38 +92,6 @@ export default function ReceiveIncomingScreen() {
     </Button>
   )
 
-  if (isReconnectingStep) {
-    return (
-      <ReceiveReconnectingView
-        title={title}
-        description={description}
-        footer={endSessionButton}
-        hasNativeHeader
-      />
-    )
-  }
-
-  if (step === 'completed') {
-    return null
-  }
-
-  if (step !== 'incoming_transfer') {
-    return (
-      <IllustrationLayout
-        title={t('receive:page.sessionEnded.title')}
-        description={t('receive:page.sessionEnded.description')}
-        hasNativeHeader
-        illustration={<ConnectionLostSvg width='100%' height='100%' />}
-        aspectRatio={800 / 430}
-        footer={
-          <Button onClick={handleEndSession} size='lg' variant='primary' width='full'>
-            {t('receive:actions.backToHome')}
-          </Button>
-        }
-      />
-    )
-  }
-
   const isRelay = connectionType === 'relay'
   const badge = isRelay ? (
     <Pressable
@@ -167,44 +118,82 @@ export default function ReceiveIncomingScreen() {
     </View>
   )
 
-  return (
-    <Layout
-      title={title}
-      description={description}
-      badge={badge}
-      hasNativeHeader
-      footer={
-        <View style={styles.footerStack}>
-          {downloads.primaryAction ? (
-            <Button
-              icon={
-                downloads.primaryAction === 'resume-all' ? (
-                  <PlayIcon size={18} />
-                ) : (
-                  <DownloadIcon size={18} />
-                )
-              }
-              loading={downloads.primaryAction === 'downloading'}
-              onClick={() => void handlePrimaryAction()}
-              size='lg'
-              variant='light'
-              width='full'
-            >
-              {getPrimaryDownloadLabel(t, downloads.primaryAction, {
-                percent: totals.percent,
-                totalBytes
-              })}
+  const renderBody = () => {
+    if (isReconnectingStep) {
+      return (
+        <ReceiveReconnectingView
+          title={title}
+          description={description}
+          footer={endSessionButton}
+          hasNativeHeader
+        />
+      )
+    }
+
+    if (step === 'completed') {
+      return null
+    }
+
+    if (step !== 'incoming_transfer') {
+      return (
+        <IllustrationLayout
+          title={t('receive:page.sessionEnded.title')}
+          description={t('receive:page.sessionEnded.description')}
+          hasNativeHeader
+          illustration={<ConnectionLostSvg width='100%' height='100%' />}
+          aspectRatio={800 / 430}
+          footer={
+            <Button onClick={handleEndSession} size='lg' variant='primary' width='full'>
+              {t('receive:actions.backToHome')}
             </Button>
-          ) : null}
-          {endSessionButton}
-        </View>
-      }
-    >
-      {displayError ? (
-        <ErrorPanel title={t('receive:errors.transferIssue')} message={displayError} />
-      ) : null}
-      <ReceiveIncomingView />
-    </Layout>
+          }
+        />
+      )
+    }
+
+    return (
+      <Layout
+        title={title}
+        description={description}
+        badge={badge}
+        hasNativeHeader
+        footer={
+          <View style={styles.footerStack}>
+            {downloads.primaryAction ? (
+              <Button
+                icon={
+                  downloads.primaryAction === 'resume-all' ? (
+                    <PlayIcon size={18} />
+                  ) : (
+                    <DownloadIcon size={18} />
+                  )
+                }
+                loading={downloads.primaryAction === 'downloading'}
+                onClick={() => void handlePrimaryAction()}
+                size='lg'
+                variant='light'
+                width='full'
+              >
+                {getPrimaryDownloadLabel(t, downloads.primaryAction, {
+                  percent: totals.percent,
+                  totalBytes
+                })}
+              </Button>
+            ) : null}
+            {endSessionButton}
+          </View>
+        }
+      >
+        <ReceiveIncomingView />
+      </Layout>
+    )
+  }
+
+  return (
+    <>
+      {renderBody()}
+      <ConfirmDialog {...leaveDialog} />
+    </>
   )
 }
 

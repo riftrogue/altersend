@@ -1,5 +1,5 @@
 import { css } from 'react-strict-dom'
-import { tokens } from '../../theme/tokens.css'
+import { fontTokens, tokens } from '../../theme/tokens.css'
 
 export const styles = css.create({
   card: {
@@ -42,7 +42,7 @@ export const styles = css.create({
     borderWidth: 1,
     borderStyle: 'solid',
     borderColor: tokens.colorBorderPrimary,
-    borderRadius: tokens.radiusMd,
+    borderRadius: tokens.radius2xl,
     backgroundColor: tokens.colorBackgroundSubtle,
     transitionDuration: '160ms',
     transitionProperty: 'background-color, border-color',
@@ -77,6 +77,13 @@ export const styles = css.create({
   },
   rowActive: {
     backgroundColor: tokens.colorSurfacePrimary
+  },
+  rowSelected: {
+    borderColor: tokens.colorAccent,
+    backgroundColor: tokens.colorSurfacePrimary,
+    ':hover': {
+      borderColor: tokens.colorAccent
+    }
   },
   iconBox: {
     width: tokens.space9,
@@ -122,7 +129,7 @@ export const styles = css.create({
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
     color: tokens.colorTextPrimary,
-    fontFamily: tokens.fontFamilySans,
+    fontFamily: fontTokens.fontFamilySans,
     fontSize: tokens.fontSizeBase,
     fontWeight: tokens.fontWeightMedium,
     lineHeight: tokens.lineHeightSnug
@@ -138,7 +145,7 @@ export const styles = css.create({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
-    fontFamily: tokens.fontFamilySans,
+    fontFamily: fontTokens.fontFamilySans,
     fontSize: tokens.fontSizeSm,
     lineHeight: tokens.lineHeightNormal
   },
@@ -165,12 +172,27 @@ export const styles = css.create({
   subtitleInfo: {
     color: tokens.colorInfo
   },
+  statusColumn: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    gap: tokens.space05,
+    flexShrink: 0
+  },
   statusGroup: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     gap: tokens.space15,
     flexShrink: 0
+  },
+  statusDetail: {
+    margin: 0,
+    color: tokens.colorTextMuted,
+    fontFamily: fontTokens.fontFamilySans,
+    fontSize: tokens.fontSizeSm,
+    lineHeight: tokens.lineHeightNormal,
+    whiteSpace: 'nowrap'
   },
   statusDot: {
     width: tokens.space15,
@@ -190,7 +212,7 @@ export const styles = css.create({
   statusLabel: {
     margin: 0,
     color: tokens.colorTextSecondary,
-    fontFamily: tokens.fontFamilySans,
+    fontFamily: fontTokens.fontFamilySans,
     fontSize: tokens.fontSizeSm,
     lineHeight: tokens.lineHeightNormal
   },

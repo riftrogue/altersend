@@ -88,5 +88,28 @@
   "units": {
     "chars_one": "{{count}} 文字",
     "chars_other": "{{count}} 文字"
+  },
+  "transfer": {
+    "timeLeft": "残り {{duration}}",
+    "durationSeconds": "{{seconds}}秒",
+    "durationMinutes": "{{minutes}}分",
+    "durationMinutesSeconds": "{{minutes}}分{{seconds}}秒",
+    "durationHours": "{{hours}}時間",
+    "durationHoursMinutes": "{{hours}}時間{{minutes}}分"
+  },
+  "backgroundTransfer": {
+    "channelName": "ファイル転送",
+    "sending": "ファイルを送信中",
+    "receiving": "ファイルを受信中",
+    "preparing": "ファイルを準備中",
+    "progress": "{{percent}}% · {{transferred}} / {{total}}",
+    "waiting": "受信者を待っています",
+    "devicesConnected_one": "{{count}}台のデバイスが接続中",
+    "devicesConnected_other": "{{count}}台のデバイスが接続中",
+    "devicesReceived_one": "{{count}}台が受信済み · 待機中",
+    "devicesReceived_other": "{{count}}台が受信済み · 待機中",
+    "sentTo": "{{device}}にファイルを送信しました",
+    "someDevice": "デバイス",
+    "received": "ファイルを受信しました"
   }
 }

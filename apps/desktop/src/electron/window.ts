@@ -1,8 +1,9 @@
-import { app, BrowserWindow, shell } from 'electron'
+import { app, BrowserWindow, screen, shell } from 'electron'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { isLinux } from 'which-runtime'
-import { rawTokens } from '@altersend/components/theme/raw'
+import { forgetPickedPaths } from './pathAccess.js'
+import { applyThemeSource, loadThemeSource, windowBackgroundColor } from './theme.js'
 import type { PearRuntimeInstance } from './runtime.js'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -16,13 +17,19 @@ export function sendToAllWindows(name: string, data: unknown) {
 
 export async function createMainWindow(pear: PearRuntimeInstance) {
   const shouldOpenDevTools = false
+  const minWidth = 720
+  const minHeight = 480
+  const { width: workAreaWidth, height: workAreaHeight } = screen.getPrimaryDisplay().workAreaSize
+  const width = Math.min(980, workAreaWidth)
+  const height = Math.min(792, workAreaHeight)
+  applyThemeSource(await loadThemeSource())
   const win = new BrowserWindow({
-    width: 980,
-    height: 792,
-    minWidth: 980,
-    minHeight: 792,
+    width,
+    height,
+    minWidth: Math.min(minWidth, width),
+    minHeight: Math.min(minHeight, height),
     show: false,
-    backgroundColor: rawTokens.colors.dark.colorBackground,
+    backgroundColor: windowBackgroundColor(),
     titleBarStyle: 'hiddenInset',
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
@@ -76,9 +83,11 @@ export async function createMainWindow(pear: PearRuntimeInstance) {
   pear.updater.on('updating', onUpdating)
   pear.updater.on('updated', onUpdated)
 
+  const senderId = win.webContents.id
   win.on('closed', () => {
     pear.updater.removeListener('updating', onUpdating)
     pear.updater.removeListener('updated', onUpdated)
+    forgetPickedPaths(senderId)
   })
 
   const devServerUrl = !app.isPackaged ? process.env.PEAR_DEV_SERVER_URL : undefined
@@ -98,4 +107,16 @@ export async function createMainWindow(pear: PearRuntimeInstance) {
   if (shouldOpenDevTools) win.webContents.openDevTools({ mode: 'detach' })
 
   return win
+}
+
+export async function showOrCreateMainWindow(pear: PearRuntimeInstance): Promise<void> {
+  const existing = BrowserWindow.getAllWindows().find((win) => !win.isDestroyed())
+  if (!existing) {
+    await createMainWindow(pear)
+    return
+  }
+
+  if (existing.isMinimized()) existing.restore()
+  existing.show()
+  existing.focus()
 }

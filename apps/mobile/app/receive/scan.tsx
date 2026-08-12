@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ActivityIndicator, Linking, Pressable, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, Linking, StyleSheet, View } from 'react-native'
 import {
   CameraView,
   scanFromURLAsync,
@@ -7,10 +7,11 @@ import {
   type BarcodeScanningResult
 } from 'expo-camera'
 import * as ImagePicker from 'expo-image-picker'
+import * as Haptics from 'expo-haptics'
 import { Button, useTheme, withAlpha } from '@altersend/components'
-import { ArrowLeftIcon, QrCodeIcon } from '@altersend/components/icons'
+import { QrCodeIcon } from '@altersend/components/icons'
 import { useTranslation } from '@altersend/locales'
-import { useNavigation, useRouter } from 'expo-router'
+import { useRouter } from 'expo-router'
 import { extractJoinCode, useTransferStore } from '@altersend/domain'
 import { joinSession } from '@altersend/domain'
 import { Layout } from '@/src/components'
@@ -20,7 +21,6 @@ import { Text } from '@/src/components/ThemedText'
 export default function ReceiveScanScreen() {
   const { t } = useTranslation(['receive', 'common'])
   const { theme } = useTheme()
-  const navigation = useNavigation()
   const router = useRouter()
   const toast = useToast()
   const role = useTransferStore((s) => s.role)
@@ -42,27 +42,6 @@ export default function ReceiveScanScreen() {
 
     router.replace('/receive')
   }, [router])
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerBackVisible: false,
-      headerLeft: () => (
-        <Pressable
-          accessibilityLabel={t('common:actions.back')}
-          accessibilityRole='button'
-          hitSlop={12}
-          onPress={goBack}
-          style={({ pressed }) => ({
-            paddingHorizontal: 8,
-            paddingVertical: 4,
-            opacity: pressed ? 0.6 : 1
-          })}
-        >
-          <ArrowLeftIcon size={22} color={theme.colors.colorTextPrimary} />
-        </Pressable>
-      )
-    })
-  }, [goBack, navigation, t, theme.colors.colorTextPrimary])
 
   useEffect(() => {
     if (!permission) {
@@ -89,11 +68,14 @@ export default function ReceiveScanScreen() {
           toast.show({
             title: t('receive:errors.unsupportedQrTitle'),
             hint: invalidHint,
+            tone: 'error',
             durationMs: 2500
           })
         }
         return
       }
+
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {})
 
       try {
         scanLockRef.current = true
@@ -107,6 +89,7 @@ export default function ReceiveScanScreen() {
         toast.show({
           title: t('receive:errors.mobileJoinFailedTitle'),
           hint: t('receive:errors.mobileJoinFailedHint'),
+          tone: 'error',
           durationMs: 3500
         })
       }
@@ -140,6 +123,7 @@ export default function ReceiveScanScreen() {
         toast.show({
           title: t('receive:errors.imageNoQrTitle'),
           hint: t('receive:errors.imageNoQrHint'),
+          tone: 'error',
           durationMs: 2500
         })
         return
@@ -147,7 +131,11 @@ export default function ReceiveScanScreen() {
       await resolveCode(scan.data, t('receive:errors.imageUnsupportedQrHint'))
     } catch (error) {
       console.warn('ReceiveScanScreen: importFromImage failed', error)
-      toast.show({ title: t('receive:errors.imageReadFailedTitle'), durationMs: 2500 })
+      toast.show({
+        title: t('receive:errors.imageReadFailedTitle'),
+        tone: 'error',
+        durationMs: 2500
+      })
     }
   }, [resolveCode, role, t, toast])
 
@@ -386,7 +374,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject
+    ...StyleSheet.absoluteFill
   },
   overlayMaskVertical: {
     flex: 1
@@ -440,7 +428,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 12
   },
   statusOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 32

@@ -19,6 +19,7 @@ import {
 import { useTranslation } from '@altersend/locales'
 import syncDevicesSvg from '../../../../../../../assets/sync_devices.svg'
 import { useToast } from '../../Toast'
+import { ConfirmDialog } from '../../ConfirmDialog'
 import { Popover } from '../../Popover'
 import { PairingQrModal } from '../PairingQrModal'
 import { PairingJoinModal } from '../PairingJoinModal'
@@ -34,6 +35,7 @@ export function DevicesSection() {
   const [qrOpen, setQrOpen] = useState(false)
   const [joinOpen, setJoinOpen] = useState(false)
   const [renameTarget, setRenameTarget] = useState<DeviceRenameTarget | null>(null)
+  const [removeTarget, setRemoveTarget] = useState<DeviceRenameTarget | null>(null)
 
   const { peers, pairingTopic, isJoining, isJoinWaiting, join } = usePairingSession({
     hostOpen: qrOpen,
@@ -45,6 +47,21 @@ export function DevicesSection() {
     },
     onFailed: () => toast.show({ title: t('settings:pairing.pairFailed'), variant: 'error' })
   })
+
+  const removeDevice = () => {
+    if (!removeTarget) return
+    const peerKey = removeTarget.peerKey
+    setRemoveTarget(null)
+    forgetPeer(peerKey)
+      .then((removed) =>
+        toast.show(
+          removed
+            ? { title: t('settings:pairing.deviceRemoved') }
+            : { title: t('settings:pairing.removeFailed'), variant: 'error' }
+        )
+      )
+      .catch(() => toast.show({ title: t('settings:pairing.removeFailed'), variant: 'error' }))
+  }
 
   return (
     <SectionShell
@@ -93,7 +110,7 @@ export function DevicesSection() {
           </p>
         </div>
       ) : (
-        <div className='flex flex-col gap-2.5'>
+        <div className='flex flex-col gap-1.5'>
           {peers.map((peer) => {
             const Icon = deviceIcon(peer.deviceType)
             return (
@@ -135,23 +152,10 @@ export function DevicesSection() {
                           label={t('settings:pairing.removeDevice')}
                           onClick={() => {
                             close()
-                            forgetPeer(peer.remoteDevicePubkey)
-                              .then((removed) =>
-                                toast.show(
-                                  removed
-                                    ? { title: t('settings:pairing.deviceRemoved') }
-                                    : {
-                                        title: t('settings:pairing.removeFailed'),
-                                        variant: 'error'
-                                      }
-                                )
-                              )
-                              .catch(() =>
-                                toast.show({
-                                  title: t('settings:pairing.removeFailed'),
-                                  variant: 'error'
-                                })
-                              )
+                            setRemoveTarget({
+                              peerKey: peer.remoteDevicePubkey,
+                              name: peer.displayName
+                            })
                           }}
                         />
                       </>
@@ -192,6 +196,19 @@ export function DevicesSection() {
             )
             return renamed
           }}
+        />,
+        document.body
+      )}
+      {createPortal(
+        <ConfirmDialog
+          open={removeTarget !== null}
+          title={t('settings:pairing.removeConfirmTitle', { name: removeTarget?.name ?? '' })}
+          message={t('settings:pairing.removeConfirmMessage')}
+          confirmLabel={t('settings:pairing.removeDevice')}
+          cancelLabel={t('common:actions.cancel')}
+          destructive
+          onConfirm={removeDevice}
+          onCancel={() => setRemoveTarget(null)}
         />,
         document.body
       )}

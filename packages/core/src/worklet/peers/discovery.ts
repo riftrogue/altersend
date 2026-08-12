@@ -247,17 +247,7 @@ export class DiscoveryCoordinator {
 
   private onControlMessage(remotePubkey: string, message: PeerControlMessage): void {
     if (message.type === 'invite') {
-      this.deps.emit(
-        createInviteReceivedEvent({
-          remoteDevicePubkey: remotePubkey,
-          displayName: message.displayName,
-          deviceType: message.deviceType,
-          topic: message.topic,
-          ...(message.fileCount !== undefined ? { fileCount: message.fileCount } : {}),
-          ...(message.textCount !== undefined ? { textCount: message.textCount } : {}),
-          ...(message.totalSize !== undefined ? { totalSize: message.totalSize } : {})
-        })
-      )
+      this.emitInviteReceived(remotePubkey, message)
       return
     }
     if (message.type === 'invite-response') {
@@ -269,6 +259,28 @@ export class DiscoveryCoordinator {
         })
       )
     }
+  }
+
+  private emitInviteReceived(remotePubkey: string, message: DeviceInvite): void {
+    this.deps.rememberedStore
+      .get(remotePubkey)
+      .catch((err) => {
+        console.warn('DiscoveryCoordinator: remembered peer lookup failed', err)
+        return null
+      })
+      .then((peer) => {
+        this.deps.emit(
+          createInviteReceivedEvent({
+            remoteDevicePubkey: remotePubkey,
+            displayName: peer?.displayName ?? message.displayName,
+            deviceType: message.deviceType,
+            topic: message.topic,
+            ...(message.fileCount !== undefined ? { fileCount: message.fileCount } : {}),
+            ...(message.textCount !== undefined ? { textCount: message.textCount } : {}),
+            ...(message.totalSize !== undefined ? { totalSize: message.totalSize } : {})
+          })
+        )
+      })
   }
 
   private waitForSession(remotePubkey: string): Promise<DiscoverySession | null> {

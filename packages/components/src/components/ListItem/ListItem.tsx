@@ -1,6 +1,5 @@
 import { cloneElement, isValidElement, type ReactElement, type ReactNode } from 'react'
 import { html } from 'react-strict-dom'
-import { ChevronRightIcon } from '../../icons'
 import { usePressState } from '../../hooks/usePressState'
 import { useTheme } from '../../theme'
 import { Tooltip } from '../Tooltip'
@@ -14,12 +13,8 @@ export interface ListItemProps {
   active?: boolean
   collapsed?: boolean
   showDot?: boolean
-  chevron?: boolean
   tone?: 'default' | 'danger'
   variant?: 'default' | 'plain'
-  size?: 'default' | 'large'
-  square?: boolean
-  subtitle?: string
 }
 
 export function ListItem({
@@ -30,18 +25,13 @@ export function ListItem({
   active = false,
   collapsed = false,
   showDot = false,
-  chevron = false,
   tone = 'default',
-  variant = 'default',
-  size = 'default',
-  square = false,
-  subtitle
+  variant = 'default'
 }: ListItemProps) {
   const { theme } = useTheme()
   const c = theme.colors
   const { isHovered, isPressed, pressHandlers } = usePressState()
   const hot = isHovered || isPressed
-  const large = size === 'large' && !collapsed
 
   const contentColor = active
     ? c.colorTextPrimary
@@ -84,32 +74,16 @@ export function ListItem({
       style={[
         styles.base,
         collapsed ? styles.collapsed : styles.expanded,
-        large && styles.expandedLarge,
-        square && styles.square,
         { backgroundColor } as never
       ]}
     >
       {collapsed ? (
         iconSlot
       ) : (
-        <>
-          <html.div style={[styles.left, large && styles.leftLarge]}>
-            {iconSlot}
-            {subtitle ? (
-              <html.div style={styles.textColumn}>
-                <html.span style={[styles.label, { color: contentColor } as never]}>
-                  {label}
-                </html.span>
-                <html.span style={styles.subtitle}>{subtitle}</html.span>
-              </html.div>
-            ) : (
-              <html.span style={[styles.label, { color: contentColor } as never]}>
-                {label}
-              </html.span>
-            )}
-          </html.div>
-          {chevron ? <ChevronRightIcon size={14} color={contentColor} /> : null}
-        </>
+        <html.div style={styles.left}>
+          {iconSlot}
+          <html.span style={[styles.label, { color: contentColor } as never]}>{label}</html.span>
+        </html.div>
       )}
 
       {collapsed && tooltip ? <Tooltip label={tooltip} visible={isHovered} side='right' /> : null}

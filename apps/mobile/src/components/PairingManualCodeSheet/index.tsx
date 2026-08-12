@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import * as Clipboard from 'expo-clipboard'
+import * as Haptics from 'expo-haptics'
 import { Button, Input } from '@altersend/components'
 import { ClipboardIcon } from '@altersend/components/icons'
 import { extractJoinCode, joinPairingSession, useTransferStore } from '@altersend/domain'
@@ -57,7 +58,13 @@ export function PairingManualCodeSheet({
 
   const join = async () => {
     setShowError(true)
-    if (!joinCode || isLoading || role !== null) return
+    if (!joinCode) {
+      if (value.trim().length > 0) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {})
+      }
+      return
+    }
+    if (isLoading || role !== null) return
     try {
       setIsJoining(true)
       await joinPairingSession(joinCode)
@@ -66,7 +73,8 @@ export function PairingManualCodeSheet({
       console.warn('PairingManualCodeSheet: joinPairingSession failed', error)
       toast.show({
         title: t('settings:pairing.couldNotJoin'),
-        hint: t('settings:pairing.couldNotJoinHint')
+        hint: t('settings:pairing.couldNotJoinHint'),
+        tone: 'error'
       })
     } finally {
       setIsJoining(false)
@@ -79,7 +87,6 @@ export function PairingManualCodeSheet({
       onClose={onClose}
       onBack={onBack}
       title={t('settings:pairing.enterCode')}
-      keyboardAvoiding
       sheetStyle={styles.sheet}
     >
       <View style={styles.form}>
@@ -128,5 +135,5 @@ export function PairingManualCodeSheet({
 
 const styles = StyleSheet.create({
   sheet: { paddingBottom: 58, gap: 24 },
-  form: { gap: 22, paddingHorizontal: 20 }
+  form: { gap: 22, paddingHorizontal: 16 }
 })

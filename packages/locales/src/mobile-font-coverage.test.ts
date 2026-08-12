@@ -6,8 +6,12 @@ const repoRoot = new URL('../../..', import.meta.url)
 const mobileRoot = new URL('apps/mobile', repoRoot)
 const allowedRawTextFiles = new Set(['src/components/ThemedText.tsx'])
 
+const skippedDirs = new Set(['node_modules', 'ios', 'android', '.expo'])
+
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap((entry) => {
+    if (skippedDirs.has(entry)) return []
+
     const path = join(dir, entry)
     const stat = statSync(path)
     if (stat.isDirectory()) return walk(path)
@@ -60,12 +64,25 @@ describe('mobile font coverage', () => {
       join(repoRoot.pathname, 'packages/components/src/components/LinkRow/styles.ts'),
       'utf8'
     )
+    const menuSource = readFileSync(
+      join(repoRoot.pathname, 'packages/components/src/components/Menu/styles.ts'),
+      'utf8'
+    )
 
     expect(linkRowSource).toMatch(
       /label:\s*\{[^}]*fontSize:\s*tokens\.fontSizeBase,[^}]*lineHeight:\s*tokens\.lineHeightSnug/s
     )
     expect(linkRowSource).toMatch(
       /subtitle:\s*\{[^}]*fontSize:\s*tokens\.fontSizeSm,[^}]*lineHeight:\s*tokens\.lineHeightNormal/s
+    )
+    expect(menuSource).toMatch(
+      /label:\s*\{[^}]*fontSize:\s*tokens\.fontSizeLg,[^}]*lineHeight:\s*tokens\.lineHeightSnug/s
+    )
+    expect(menuSource).toMatch(
+      /subtitle:\s*\{[^}]*fontSize:\s*tokens\.fontSizeSm,[^}]*lineHeight:\s*tokens\.lineHeightNormal/s
+    )
+    expect(menuSource).toMatch(
+      /value:\s*\{[^}]*fontSize:\s*tokens\.fontSizeLg,[^}]*lineHeight:\s*tokens\.lineHeightSnug/s
     )
     expect(aboutSource).toMatch(/brandName:\s*\{[^}]*fontSize:\s*20,[^}]*lineHeight:\s*26/s)
   })
@@ -102,12 +119,19 @@ describe('mobile font coverage', () => {
 
   it('does not send translated back titles to Android native stack headers', () => {
     const layoutSource = readFileSync(join(mobileRoot.pathname, 'app/_layout.tsx'), 'utf8')
-    const flowOptionsMatch = layoutSource.match(/function getFlowScreenOptions\([\s\S]*?\n\}/)?.[0]
+    const headerOptionsMatch = layoutSource.match(/function getHeaderOptions\([\s\S]*?\n\}/)?.[0]
 
     expect(layoutSource).toContain('import { Platform')
-    expect(flowOptionsMatch).toBeDefined()
-    expect(flowOptionsMatch).toContain("Platform.OS === 'ios'")
-    expect(flowOptionsMatch).toContain('headerBackTitle: backTitle')
+    expect(headerOptionsMatch).toBeDefined()
+    expect(headerOptionsMatch).toContain("Platform.OS === 'ios'")
+    expect(layoutSource).not.toContain('headerBackTitle')
+  })
+
+  it('renders native stack header titles with the active locale font', () => {
+    const layoutSource = readFileSync(join(mobileRoot.pathname, 'app/_layout.tsx'), 'utf8')
+
+    expect(layoutSource).toContain('function getTitledScreenOptions')
+    expect(layoutSource).toMatch(/headerTitleStyle:\s*\{\s*fontFamily:\s*fontFamilyName\s*\}/)
   })
 
   it('registers CJK font weights through Expo and the runtime font loader', () => {

@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { OnboardingIllustration } from '@/src/onboarding/OnboardingIllustration'
 import { markOnboardingCompleted } from '@/src/onboarding/onboardingStorage'
 import { markPairPromptPending } from '@/src/onboarding/pairPromptSignal'
+import { requestNotificationPermission } from '@/src/lifecycle/notificationPermission'
 import brandLogo from '@/assets/images/brand-logo.png'
 import { Text } from '@/src/components/ThemedText'
 
@@ -45,6 +46,9 @@ export default function OnboardingScreen() {
   const finish = () => {
     markOnboardingCompleted()
     markPairPromptPending()
+    requestNotificationPermission().catch((err: unknown) => {
+      console.warn('onboarding: notification permission request failed', err)
+    })
     router.replace('/send')
   }
 
@@ -154,7 +158,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     marginTop: 28
   },
   brandRow: {
@@ -212,7 +216,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4
   },
   footer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingBottom: 36,
     gap: 18
   }

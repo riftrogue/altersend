@@ -2,6 +2,7 @@ import { useState } from 'react'
 import {
   clearSession,
   dismissInvite,
+  getLeaveSessionMessage,
   joinSession,
   useSimulatedLoading,
   useTransferStore
@@ -9,6 +10,7 @@ import {
 import { useTranslation } from '@altersend/locales'
 import { bridgeApi, hasBridge } from './api/bridgeApi'
 import {
+  ConfirmDialog,
   InviteBanner,
   openSettingsPanel,
   PairDeviceModal,
@@ -17,32 +19,49 @@ import {
   UpdateBanner
 } from './components'
 import { isOnboardingCompleted, markOnboardingCompleted } from './lifecycle/onboardingStorage'
+import { useExternalFiles } from './lifecycle/useExternalFiles'
 import { useUpdateReady } from './lifecycle/useUpdateReady'
 import { BridgeUnavailablePage, LoadingPage, OnboardingPage, TransferPage } from './pages'
 
 type TransferTab = 'send' | 'receive'
+
+interface PendingTabSwitch {
+  tab: TransferTab
+  message: string
+  onSwitched?: () => void
+}
 
 export default function App() {
   const { t } = useTranslation(['common'])
   const [showOnboarding, setShowOnboarding] = useState(() => !isOnboardingCompleted())
   const [showPairPrompt, setShowPairPrompt] = useState(false)
   const [activeTab, setActiveTab] = useState<TransferTab>('send')
+  const [pendingSwitch, setPendingSwitch] = useState<PendingTabSwitch | null>(null)
   const progress = useSimulatedLoading()
   const role = useTransferStore((s) => s.role)
   const updateReady = useUpdateReady()
+  const externalFiles = useExternalFiles(() => setActiveTab('send'))
 
-  const switchTab = (next: TransferTab): boolean => {
-    if (next === activeTab) return true
+  const switchTab = (next: TransferTab, onSwitched?: () => void): void => {
+    if (next === activeTab) {
+      onSwitched?.()
+      return
+    }
     if (role !== null) {
-      const message =
-        role === 'sender'
-          ? t('common:confirm.leaveShareSession')
-          : t('common:confirm.leaveReceiveSession')
-      if (!window.confirm(message)) return false
-      void clearSession()
+      setPendingSwitch({ tab: next, message: getLeaveSessionMessage(t, role), onSwitched })
+      return
     }
     setActiveTab(next)
-    return true
+    onSwitched?.()
+  }
+
+  const confirmSwitchTab = () => {
+    if (!pendingSwitch) return
+    const { tab, onSwitched } = pendingSwitch
+    setPendingSwitch(null)
+    clearSession().catch((error) => console.error('App: clearSession failed', error))
+    setActiveTab(tab)
+    onSwitched?.()
   }
 
   if (progress < 100) {
@@ -76,10 +95,10 @@ export default function App() {
       <PairRequestBanner />
       <InviteBanner
         onAccept={(topic) => {
-          if (switchTab('receive')) {
+          switchTab('receive', () => {
             dismissInvite()
-            void joinSession(topic)
-          }
+            joinSession(topic).catch((error) => console.error('App: joinSession failed', error))
+          })
         }}
       />
       <UpdateBanner ready={updateReady} />
@@ -90,6 +109,24 @@ export default function App() {
           openSettingsPanel('devices')
         }}
         onSkip={() => setShowPairPrompt(false)}
+      />
+      <ConfirmDialog
+        open={pendingSwitch !== null}
+        title={t('common:actions.endSession')}
+        message={pendingSwitch?.message}
+        confirmLabel={t('common:actions.continue')}
+        cancelLabel={t('common:actions.cancel')}
+        onConfirm={confirmSwitchTab}
+        onCancel={() => setPendingSwitch(null)}
+      />
+      <ConfirmDialog
+        open={externalFiles.pending}
+        title={t('common:actions.endSession')}
+        message={getLeaveSessionMessage(t, role)}
+        confirmLabel={t('common:actions.continue')}
+        cancelLabel={t('common:actions.cancel')}
+        onConfirm={externalFiles.confirm}
+        onCancel={externalFiles.cancel}
       />
     </ToastProvider>
   )

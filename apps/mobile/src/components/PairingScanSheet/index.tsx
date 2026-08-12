@@ -7,6 +7,7 @@ import {
   type BarcodeScanningResult
 } from 'expo-camera'
 import * as ImagePicker from 'expo-image-picker'
+import * as Haptics from 'expo-haptics'
 import { Button, useTheme, withAlpha } from '@altersend/components'
 import { extractJoinCode, joinPairingSession, useTransferStore } from '@altersend/domain'
 import { useTranslation } from '@altersend/locales'
@@ -62,11 +63,14 @@ export function PairingScanSheet({
           invalidScanAtRef.current = now
           toast.show({
             title: t('settings:pairing.unsupportedQr'),
-            hint: t('settings:pairing.unsupportedQrHint')
+            hint: t('settings:pairing.unsupportedQrHint'),
+            tone: 'error'
           })
         }
         return
       }
+
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {})
 
       try {
         scanLockRef.current = true
@@ -79,7 +83,8 @@ export function PairingScanSheet({
         setIsResolving(false)
         toast.show({
           title: t('settings:pairing.couldNotJoin'),
-          hint: t('settings:pairing.couldNotJoinQrHint')
+          hint: t('settings:pairing.couldNotJoinQrHint'),
+          tone: 'error'
         })
       }
     },
@@ -117,14 +122,15 @@ export function PairingScanSheet({
       if (!scan) {
         toast.show({
           title: t('settings:pairing.noQrFound'),
-          hint: t('settings:pairing.noQrFoundHint')
+          hint: t('settings:pairing.noQrFoundHint'),
+          tone: 'error'
         })
         return
       }
       await resolveCode(scan.data)
     } catch (error) {
       console.warn('PairingScanSheet: importFromImage failed', error)
-      toast.show({ title: t('settings:pairing.couldNotReadImage') })
+      toast.show({ title: t('settings:pairing.couldNotReadImage'), tone: 'error' })
     }
   }, [resolveCode, role, toast, t])
 
@@ -254,7 +260,7 @@ const styles = StyleSheet.create({
     position: 'relative'
   },
   camera: { flex: 1 },
-  scanOverlay: { ...StyleSheet.absoluteFillObject },
+  scanOverlay: { ...StyleSheet.absoluteFill },
   maskVertical: { flex: 1 },
   maskMiddle: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   maskSide: { flex: 1, height: FRAME_SIZE },
@@ -307,11 +313,11 @@ const styles = StyleSheet.create({
   permissionTitle: { fontSize: 18, fontWeight: '700', textAlign: 'center' },
   permissionText: { fontSize: 14, lineHeight: 20, textAlign: 'center' },
   statusOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 12
   },
-  actions: { gap: 10, paddingHorizontal: 20 },
+  actions: { gap: 10, paddingHorizontal: 16 },
   statusText: { fontSize: 15, fontWeight: '600' }
 })

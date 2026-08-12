@@ -44,6 +44,7 @@ export const tokens = css.defineVars({
   colorSurfaceTertiary: '#3a414e',
   colorSurfaceHover: '#434b58',
   colorSurfaceAccent: '#e7eaf0',
+  colorTabIndicator: '#434b58',
   colorBorderPrimary: '#282d35',
   colorBorderStrong: '#3d4551',
   colorTextPrimary: '#e7eaf0',
@@ -54,6 +55,7 @@ export const tokens = css.defineVars({
   colorAccentHover: '#ffffff',
   colorAccentActive: '#d5dae3',
   colorOnAccent: '#0b0f17',
+  colorControlKnob: '#e7eaf0',
   colorSuccess: '#8ab86d',
   colorSuccessSubtle: 'rgba(138, 184, 109, 0.12)',
   colorWarning: '#d4a04a',
@@ -94,6 +96,7 @@ export const tokens = css.defineVars({
   radiusLg: '12px',
   radiusXl: '14px',
   radius2xl: '16px',
+  radiusControl: '12px',
   radiusFull: '999px',
   fontSizeXs: '11px',
   fontSizeSm: '12px',
@@ -110,9 +113,13 @@ export const tokens = css.defineVars({
   lineHeightSnug: "1.35",
   lineHeightNormal: "1.4",
   lineHeightRelaxed: "1.5",
+});
+
+export const fontTokens = css.defineVars({
   fontFamilySans: nativeFontFamily.fontFamilySans,
   fontFamilyDisplay: nativeFontFamily.fontFamilyDisplay,
   fontFamilyMono: nativeFontFamily.fontFamilyMono,
 });
 
 export type Tokens = typeof tokens;
+export type FontTokens = typeof fontTokens;

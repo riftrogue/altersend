@@ -33,6 +33,11 @@ modules:
     buildsystem: simple
 
     build-commands:
+      # Use the flatpak-specific lockfile which has all resolved URLs populated.
+      # The upstream lockfile (v3 format) omits resolved URLs, which causes
+      # npm ci to fail in offline mode. This file is identical except all
+      # resolved+integrity fields are populated from the npm registry.
+      - cp flatpak/package-lock.flatpak.json package-lock.json
       - npm ci --ignore-scripts
 
       - npm run build -w packages/drive

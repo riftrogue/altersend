@@ -92,7 +92,9 @@ jobs:
       - name: Add AWS CLI to PATH (cache restore)
         if: steps.cache-aws.outputs.cache-hit == 'true'
         shell: bash
-        run: ln -sf /usr/local/aws-cli/v2/current/bin/aws /usr/local/bin/aws
+        run: |
+          mkdir -p /usr/local/bin
+          ln -sf /usr/local/aws-cli/v2/current/bin/aws /usr/local/bin/aws
 
       - name: Configure AWS CLI
         shell: bash

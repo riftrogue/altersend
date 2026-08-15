@@ -172,6 +172,7 @@ jobs:
           flatpak build-sign --gpg-sign="$GPG_FINGERPRINT" repo com.altersend.AlterSend || true
           flatpak build-sign --gpg-sign="$GPG_FINGERPRINT" repo com.altersend.AlterSend.Locale || true
           flatpak build-sign --gpg-sign="$GPG_FINGERPRINT" repo com.altersend.AlterSend.Debug || true
+
       - name: Sign OSTree Repository & Generate .flatpakrepo
         shell: bash
         env:
@@ -185,7 +186,7 @@ jobs:
             echo '[Flatpak Repo]'
             echo 'Title=AlterSend'
             # TODO: Change this to https://altersend.com/ or the official domain before merging upstream!
-            echo 'Url=https://pub-af60b48af6474b4190c802bd0534f451.r2.dev/'
+            echo 'Url=https://riftrogue.tech/'
             echo 'Homepage=https://altersend.com/'
             echo 'Comment=AlterSend Official Flatpak Repository'
             echo 'Description=Peer-to-peer file transfer'

@@ -14,6 +14,11 @@ concurrency:
   group: "flatpak-publish"
   cancel-in-progress: true
 
+env:
+  AWS_CLI_VERSION: "2.36.14"
+  AWS_DEFAULT_REGION: auto
+  R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+
 jobs:
   build-flatpak:
     # TODO: revert before upstream PR
@@ -68,15 +73,12 @@ jobs:
         with:
           path: /usr/local/aws-cli
           key: aws-cli-${{ env.AWS_CLI_VERSION }}
-        env:
-          AWS_CLI_VERSION: "2.36.14"
 
       - name: Install AWS CLI
         if: steps.cache-aws.outputs.cache-hit != 'true'
         shell: bash
         run: |
-          # To update: bump both values. SHA256: sha256sum awscliv2.zip
-          AWS_CLI_VERSION="2.36.14"
+          # To update: bump AWS_CLI_VERSION in the top-level env and update the SHA256.
           AWS_CLI_SHA256="43b34875482244039716cc3725d1f60e7d47ef3cfb2a19e114759a46db24dc30"
 
           curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWS_CLI_VERSION}.zip" \
@@ -104,8 +106,6 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: auto
-          R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
         run: |
           mkdir -p repo
 
@@ -196,8 +196,6 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: auto
-          R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
         run: |
           # Guard: fsck before upload. --delete is safe — next run restores consistency.
           ostree fsck --repo=repo

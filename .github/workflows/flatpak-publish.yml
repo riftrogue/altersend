@@ -62,12 +62,20 @@ jobs:
       contents: read
 
     steps:
+      - name: Cache AWS CLI
+        id: cache-aws
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: /usr/local/aws-cli
+          key: aws-cli-${{ env.AWS_CLI_VERSION }}
+        env:
+          AWS_CLI_VERSION: "2.36.14"
+
       - name: Install AWS CLI
+        if: steps.cache-aws.outputs.cache-hit != 'true'
         shell: bash
         run: |
-          # Pin a specific version and verify its SHA256 before executing anything.
-          # To update: download the new version, compute sha256sum, and update both values.
-          # Release notes: https://raw.githubusercontent.com/aws/aws-cli/v2/CHANGELOG.rst
+          # To update: bump both values. SHA256: sha256sum awscliv2.zip
           AWS_CLI_VERSION="2.36.14"
           AWS_CLI_SHA256="43b34875482244039716cc3725d1f60e7d47ef3cfb2a19e114759a46db24dc30"
 
@@ -79,12 +87,15 @@ jobs:
           ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
           rm -rf awscliv2.zip aws/
 
+      - name: Add AWS CLI to PATH (cache restore)
+        if: steps.cache-aws.outputs.cache-hit == 'true'
+        shell: bash
+        run: ln -sf /usr/local/aws-cli/v2/current/bin/aws /usr/local/bin/aws
+
       - name: Configure AWS CLI
         shell: bash
         run: |
-          # OSTree repos contain thousands of small files. Increase concurrency
-          # from the default 10 to avoid bottlenecking on per-request latency.
-          # These settings persist for the lifetime of the container (all subsequent steps).
+          # Increase concurrency — OSTree repos contain thousands of small files.
           aws configure set default.s3.max_concurrent_requests 100
           aws configure set default.s3.max_queue_size 10000
 
@@ -98,10 +109,7 @@ jobs:
         run: |
           mkdir -p repo
 
-          # Sync the existing repo from R2. An empty bucket exits 0 and downloads
-          # nothing — no special handling needed. Only suppress NoSuchBucket (true
-          # first-run); re-raise all other errors (auth failures, network errors, etc.)
-          # to prevent silently deploying over a corrupted or empty state.
+          # Suppress NoSuchBucket on first run; re-raise all other errors.
           sync_err=$(aws s3 sync s3://altersend-flatpak/ repo/ \
             --endpoint-url "$R2_ENDPOINT" \
             --no-progress 2>&1) || {
@@ -131,13 +139,13 @@ jobs:
           fi
 
       - name: Download x86_64 bundle artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: altersend-x86_64-x86_64.flatpak
           path: .
 
       - name: Download aarch64 bundle artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: altersend-aarch64-aarch64.flatpak
           path: .
@@ -157,15 +165,12 @@ jobs:
         run: |
           flatpak build-import-bundle --gpg-sign="$GPG_FINGERPRINT" repo altersend-x86_64.flatpak
           flatpak build-import-bundle --gpg-sign="$GPG_FINGERPRINT" repo altersend-aarch64.flatpak
-          
-          # Force sign the entire application and extensions to ensure old commits 
-          # (like Locale) from previous runs are signed with the current GPG key.
+
+          # Re-sign all refs so old commits (e.g. Locale) use the current key.
           flatpak build-sign --gpg-sign="$GPG_FINGERPRINT" repo com.altersend.AlterSend || true
           flatpak build-sign --gpg-sign="$GPG_FINGERPRINT" repo com.altersend.AlterSend.Locale || true
           flatpak build-sign --gpg-sign="$GPG_FINGERPRINT" repo com.altersend.AlterSend.Debug || true
       - name: Sign OSTree Repository & Generate .flatpakrepo
-        # Use an env var for the fingerprint instead of direct template injection
-        # into the shell script, following GitHub's security hardening guidelines.
         shell: bash
         env:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
@@ -177,6 +182,7 @@ jobs:
           {
             echo '[Flatpak Repo]'
             echo 'Title=AlterSend'
+            # TODO: Change this to https://altersend.com/ or the official domain before merging upstream!
             echo 'Url=https://pub-af60b48af6474b4190c802bd0534f451.r2.dev/'
             echo 'Homepage=https://altersend.com/'
             echo 'Comment=AlterSend Official Flatpak Repository'
@@ -193,10 +199,7 @@ jobs:
           AWS_DEFAULT_REGION: auto
           R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
         run: |
-          # Guard: verify the repo is structurally valid before syncing.
-          # --delete is safe here because:
-          #   1. This step only runs after a fully successful build + sign.
-          #   2. If the sync is interrupted, the next run will re-sync and restore consistency.
+          # Guard: fsck before upload. --delete is safe — next run restores consistency.
           ostree fsck --repo=repo
 
           aws s3 sync repo/ s3://altersend-flatpak/ \

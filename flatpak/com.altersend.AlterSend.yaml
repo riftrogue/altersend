@@ -42,6 +42,8 @@ modules:
       - cp flatpak/package-lock.flatpak.json package-lock.json
       - npm ci --ignore-scripts --no-audit --no-fund --legacy-peer-deps
 
+      - unzip -q apps/desktop/.electron-dist/electron-linux-*.zip -d apps/desktop/.electron-dist/
+
       - npm run build -w packages/drive
       - npm run build -w packages/core
       - npm run build -w packages/locales
@@ -75,16 +77,18 @@ modules:
 
       - node-modules.json
 
-      - type: archive
+      - type: file
         url: https://github.com/electron/electron/releases/download/v40.10.0/electron-v40.10.0-linux-x64.zip
         sha256: 35efe7401822e8d2e474e13788a6191362c7494dd1f7ae327b70087e0768a667
         dest: apps/desktop/.electron-dist
+        dest-filename: electron-linux-x64.zip
         only-arches:
           - x86_64
 
-      - type: archive
+      - type: file
         url: https://github.com/electron/electron/releases/download/v40.10.0/electron-v40.10.0-linux-arm64.zip
         sha256: cb4454ae64f00f43cef86f57d38eff9a6cef7b1e0690debc1dc81323f98e6e63
         dest: apps/desktop/.electron-dist
+        dest-filename: electron-linux-arm64.zip
         only-arches:
           - aarch64

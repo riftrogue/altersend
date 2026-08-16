@@ -52,7 +52,7 @@ jobs:
           cache-key: flatpak-builder-${{ matrix.variant.arch }}-${{ hashFiles('flatpak/com.altersend.AlterSend.yaml', 'flatpak/node-modules.json') }}
           arch: ${{ matrix.variant.arch }}
           build-bundle: true
-          bundle: altersend-${{ matrix.variant.arch }}.flatpak
+          bundle: altersend.flatpak
           repository-name: flathub
           repository-url: https://flathub.org/repo/flathub.flatpakrepo
 
@@ -143,14 +143,14 @@ jobs:
       - name: Download x86_64 bundle artifact
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          name: altersend-x86_64-x86_64.flatpak
-          path: .
+          name: altersend.flatpak-x86_64
+          path: bundle-x86_64
 
       - name: Download aarch64 bundle artifact
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          name: altersend-aarch64-aarch64.flatpak
-          path: .
+          name: altersend.flatpak-aarch64
+          path: bundle-aarch64
 
       - name: Import GPG key
         id: import_gpg
@@ -165,8 +165,8 @@ jobs:
         env:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
         run: |
-          flatpak build-import-bundle --gpg-sign="$GPG_FINGERPRINT" repo altersend-x86_64.flatpak
-          flatpak build-import-bundle --gpg-sign="$GPG_FINGERPRINT" repo altersend-aarch64.flatpak
+          flatpak build-import-bundle --gpg-sign="$GPG_FINGERPRINT" repo bundle-x86_64/altersend.flatpak
+          flatpak build-import-bundle --gpg-sign="$GPG_FINGERPRINT" repo bundle-aarch64/altersend.flatpak
 
           # Re-sign all refs so old commits (e.g. Locale) use the current key.
           flatpak build-sign --gpg-sign="$GPG_FINGERPRINT" repo com.altersend.AlterSend || true

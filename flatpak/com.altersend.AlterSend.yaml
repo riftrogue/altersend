@@ -35,10 +35,6 @@ modules:
     buildsystem: simple
 
     build-commands:
-      # Use the flatpak-specific lockfile which has all resolved URLs populated.
-      # The upstream lockfile (v3 format) omits resolved URLs, which causes
-      # npm ci to fail in offline mode. This file is identical except all
-      # resolved+integrity fields are populated from the npm registry.
       - cp flatpak/package-lock.flatpak.json package-lock.json
       - npm ci --ignore-scripts --no-audit --no-fund --legacy-peer-deps
 
@@ -55,7 +51,9 @@ modules:
       - |
         ARCH=$(uname -m | sed 's/x86_64/x64/;s/aarch64/arm64/')
         (cd apps/desktop && ../../node_modules/.bin/electron-builder --linux --$ARCH --dir \
-          -c electron-builder.linux.json --publish never)
+          -c electron-builder.linux.json \
+          -c ../../flatpak/electron-builder.flatpak.json \
+          --publish never)
 
       - install -d /app/lib/AlterSend /app/bin
       - cp -a apps/desktop/out/linux*unpacked/. /app/lib/AlterSend/

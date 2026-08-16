@@ -1,18 +1,11 @@
 name: Flatpak Publish
 
 on:
-  push:
-    # TODO: revert before upstream PR
-    # branches:
-    #   - main
-    paths:
-      - 'flatpak/**'
-      - '.github/workflows/flatpak-publish.yml'
   workflow_dispatch:
 
 concurrency:
   group: "flatpak-publish"
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 env:
   AWS_CLI_VERSION: "2.36.14"
@@ -21,8 +14,6 @@ env:
 
 jobs:
   build-flatpak:
-    # TODO: revert before upstream PR
-    # if: github.ref == 'refs/heads/main'
     strategy:
       matrix:
         variant:
@@ -57,6 +48,14 @@ jobs:
           repository-url: https://flathub.org/repo/flathub.flatpakrepo
 
   publish-flatpak:
+    # NOTE for Denis — before this workflow will run in the upstream repo, configure the following
+    # GitHub Actions secrets in Settings → Secrets and variables → Actions:
+    #   R2_ACCOUNT_ID          — Cloudflare R2 account ID
+    #   R2_ACCESS_KEY_ID       — R2 API token (Access Key ID)
+    #   R2_SECRET_ACCESS_KEY   — R2 API token (Secret Access Key)
+    #   FLATPAK_GPG_PRIVATE_KEY — ASCII-armored GPG private key used to sign the OSTree repo
+    # Also update the R2 bucket name "altersend-flatpak" (line ~113) and the Url/Icon in the
+    # .flatpakrepo block below if they differ from the self-hosted setup.
     needs: build-flatpak
     runs-on: ubuntu-24.04
     container:
@@ -185,8 +184,11 @@ jobs:
           {
             echo '[Flatpak Repo]'
             echo 'Title=AlterSend'
-            # TODO: Change this to https://altersend.com/ or the official domain before merging upstream!
-            echo 'Url=https://riftrogue.tech/'
+            # NOTE for Denis: set Url to where Flatpak clients will fetch updates from. Two options:
+            #   1. R2 public URL  — enable "Public access" on the R2 bucket and paste the r2.dev URL here.
+            #   2. Custom domain  — point flatpak.altersend.com (or similar) at the R2 bucket via Cloudflare,
+            #      then use that domain here. Either way the URL must serve the OSTree repo files publicly.
+            echo 'Url=https://flatpak.altersend.com/'
             echo 'Homepage=https://altersend.com/'
             echo 'Comment=AlterSend Official Flatpak Repository'
             echo 'Description=Peer-to-peer file transfer'

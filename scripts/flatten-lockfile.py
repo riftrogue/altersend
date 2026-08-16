@@ -21,23 +21,28 @@ def main():
             flattened_packages[path] = data
             continue
         
-        # If the path starts with 'node_modules/', keep it relative to the root node_modules
         if path.startswith('node_modules/'):
             flattened_packages[path] = data
             continue
 
-        # If it's a workspace package dependency (e.g. apps/desktop/node_modules/vite),
-        # we move it to the root node_modules so flatpak-node-generator finds it.
         if '/node_modules/' in path:
             parts = path.split('/node_modules/')
             new_path = 'node_modules/' + parts[-1]
             if new_path not in flattened_packages:
                 flattened_packages[new_path] = data
+            else:
+                existing_version = flattened_packages[new_path].get('version', '?')
+                new_version = data.get('version', '?')
+                if existing_version != new_version:
+                    print(
+                        f"ERROR: version conflict for '{new_path}': "
+                        f"{existing_version} (existing) vs {new_version} from '{path}'",
+                        file=sys.stderr
+                    )
+                    sys.exit(1)
 
-    # Update lockfile with flattened packages structure
     lockfile['packages'] = flattened_packages
 
-    # Write output to stdout
     print(json.dumps(lockfile, indent=2))
 
 if __name__ == "__main__":

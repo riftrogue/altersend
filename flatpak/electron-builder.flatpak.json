@@ -23,5 +23,6 @@
     "artifactName": "${productName}-${arch}.${ext}",
     "category": "Network;FileTransfer",
     "mimeTypes": ["application/octet-stream", "inode/directory", "x-scheme-handler/altersend"]
-  }
+  },
+  "afterPack": "scripts/afterPack.cjs"
 }

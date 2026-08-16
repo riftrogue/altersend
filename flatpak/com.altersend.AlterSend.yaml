@@ -51,7 +51,6 @@ modules:
       - |
         ARCH=$(uname -m | sed 's/x86_64/x64/;s/aarch64/arm64/')
         (cd apps/desktop && ../../node_modules/.bin/electron-builder --linux --$ARCH --dir \
-          -c electron-builder.linux.json \
           -c ../../flatpak/electron-builder.flatpak.json \
           --publish never)
 

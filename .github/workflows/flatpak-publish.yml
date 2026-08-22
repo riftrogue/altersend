@@ -188,7 +188,7 @@ jobs:
             #   1. R2 public URL  — enable "Public access" on the R2 bucket and paste the r2.dev URL here.
             #   2. Custom domain  — point flatpak.altersend.com (or similar) at the R2 bucket via Cloudflare,
             #      then use that domain here. Either way the URL must serve the OSTree repo files publicly.
-            echo 'Url=https://flatpak.altersend.com/'
+            echo 'Url=https://riftrogue.tech/'
             echo 'Homepage=https://altersend.com/'
             echo 'Comment=AlterSend Official Flatpak Repository'
             echo 'Description=Peer-to-peer file transfer'
